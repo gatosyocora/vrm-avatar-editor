@@ -1,6 +1,7 @@
 <template>
   <div>
     <canvas id="canvas" width="600" height="400"></canvas>
+    <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
     <p v-if="meta !== null">Title : {{meta.title}}, Version : {{meta.version}}</p>
     <p v-if="meta !== null">Author : {{meta.author}}</p>
     <p v-if="meta !== null">AllowUser : {{meta.allowedUserName}}</p>
@@ -46,12 +47,33 @@
     public meta?: VRM.VRMMeta = null;
 
     mounted() {
+      const $canvas = document.getElementById("canvas");
+      this.renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        canvas: $canvas
+      });
+
+      this.camera.position.set(0, 1, -1.5);
+      this.camera.rotation.set(0, Math.PI, 0);
+      this.light.position.set(0, 0, 10);
+      this.scene.add(this.light);
+
+      this.animate();
+    }
+    animate() {
+        requestAnimationFrame(this.animate);
+        this.renderer.render(this.scene, this.camera);
+    }
+    
+    public onFileChange (e) {
+      const file = e.target.files[0]
+      const url:string = window.URL.createObjectURL(file);
 
       const loader = new GLTFLoader();
       loader.load(
 
 	      // URL of the VRM you want to load
-	      '/models/AliciaSolid.vrm',
+	      url,
 
 	      // called when the resource is loaded
 	      ( gltf ) => {
@@ -77,23 +99,6 @@
       	( error ) => console.error( error )
 
       );
-
-      const $canvas = document.getElementById("canvas");
-      this.renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        canvas: $canvas
-      });
-
-      this.camera.position.set(0, 1, -1.5);
-      this.camera.rotation.set(0, Math.PI, 0);
-      this.light.position.set(0, 0, 10);
-      this.scene.add(this.light);
-
-      this.animate();
     }
-    animate() {
-        requestAnimationFrame(this.animate);
-        this.renderer.render(this.scene, this.camera);
-      }
   };
 </script>
