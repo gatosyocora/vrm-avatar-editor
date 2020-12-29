@@ -1,55 +1,60 @@
 <template>
-  <canvas id="canvas" width="600" height="400"></canvas>
+  <div>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <p>{{meta}}</p>
+  </div>
 </template>
 
-  import { Component, Vue } from "vue-property-decorator";
 <script lang="ts">
+  import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM } from '@pixiv/three-vrm';
 
   @Component
   export default class TestVRM extends Vue {
-    data() {
-      const scene = new THREE.Scene();
-      const renderer = null;
-      const camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
-      const light = new THREE.DirectionalLight(0xffffff);
-      const geometry = new THREE.BoxGeometry(1, 1, 1);
-      const material = new THREE.MeshNormalMaterial();
-      return { scene, renderer, camera, light, geometry, material };
-    }
+    private scene = new THREE.Scene();
+    private renderer = null;
+    private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
+    private light = new THREE.DirectionalLight(0xffffff);
+    private geometry = new THREE.BoxGeometry(1, 1, 1);
+    private material = new THREE.MeshNormalMaterial();
+    
+    @Prop()
+    public meta?: VRM.VRMMeta = null;
+
     mounted() {
 
-const loader = new GLTFLoader();
-loader.load(
+      const loader = new GLTFLoader();
+      loader.load(
 
-	// URL of the VRM you want to load
-	'/models/AliciaSolid.vrm',
+	      // URL of the VRM you want to load
+	      '/models/AliciaSolid.vrm',
 
-	// called when the resource is loaded
-	( gltf ) => {
+	      // called when the resource is loaded
+	      ( gltf ) => {
 
-		// generate a VRM instance from gltf
-		VRM.from( gltf ).then( ( vrm ) => {
+		      // generate a VRM instance from gltf
+		      VRM.from( gltf ).then( ( vrm ) => {
 
-			// add the loaded vrm to the scene
-			this.scene.add( vrm.scene );
+			      // add the loaded vrm to the scene
+			      this.scene.add( vrm.scene );
 
-			// deal with vrm features
-			console.log( vrm );
+			      // deal with vrm features
+                  this.meta = vrm.meta;
+			      console.log( vrm );
+                  console.log(this.meta);
+	      	} );
 
-		} );
+	      },
 
-	},
+      	// called while loading is progressing
+      	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
 
-	// called while loading is progressing
-	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
+      	// called when loading has errors
+      	( error ) => console.error( error )
 
-	// called when loading has errors
-	( error ) => console.error( error )
-
-);
+      );
 
       const $canvas = document.getElementById("canvas");
       this.renderer = new THREE.WebGLRenderer({
