@@ -1,17 +1,16 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <rotate-box></rotate-box>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import RotateBox from '@/components/RotateBox.vue'; // @ is an alias to /src
 
 @Component({
   components: {
-    HelloWorld,
+    RotateBox,
   },
 })
 export default class Home extends Vue {}
