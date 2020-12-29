@@ -1,7 +1,29 @@
 <template>
   <div>
     <canvas id="canvas" width="600" height="400"></canvas>
-    <p>{{meta}}</p>
+    <p v-if="meta !== null">Title : {{meta.title}}, Version : {{meta.version}}</p>
+    <p v-if="meta !== null">Author : {{meta.author}}</p>
+    <p v-if="meta !== null">AllowUser : {{meta.allowedUserName}}</p>
+    <p v-if="meta !== null">CommercialUssage : {{meta.commercialUssageName}}</p>
+    <p v-if="meta !== null">SexualUssage : {{meta.sexualUssageName}}</p>
+    <p v-if="meta !== null">ViolentUssage : {{meta.violentUssageName}}</p>
+    <p v-if="meta !== null">LicenseName : {{meta.licenseName}}</p>
+    <p v-if="meta !== null">OtherLicenseUrl : 
+      <a v-bind:href="meta.otherLicenseUrl" target="_blank">
+        {{meta.otherLicenseUrl}}
+      </a>
+    </p>
+    <p v-if="meta !== null">OtherPermissionUrl : 
+      <a v-bind:href="meta.otherPermissionUrl" target="_blank">
+        {{meta.otherPermissionUrl}}
+      </a>
+    </p>
+    <p v-if="meta !== null">ContactInformation : 
+      <a v-bind:href="meta.contactInformation" target="_blank">
+        {{meta.contactInformation}}
+      </a>
+    </p>
+    <p v-if="meta !== null">Reference : {{meta.reference}}</p>
   </div>
 </template>
 
