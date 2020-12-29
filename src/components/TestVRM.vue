@@ -2,8 +2,8 @@
   <canvas id="canvas" width="600" height="400"></canvas>
 </template>
 
-<script type="ts">
   import { Component, Vue } from "vue-property-decorator";
+<script lang="ts">
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM } from '@pixiv/three-vrm';
