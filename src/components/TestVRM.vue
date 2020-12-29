@@ -36,10 +36,10 @@
 
   @Component
   export default class TestVRM extends Vue {
-    private scene = new THREE.Scene();
+    private const scene = new THREE.Scene();
     private renderer = null;
-    private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
-    private light = new THREE.DirectionalLight(0xffffff);
+    private const camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
+    private const light = new THREE.DirectionalLight(0xffffff);
     private geometry = new THREE.BoxGeometry(1, 1, 1);
     private material = new THREE.MeshNormalMaterial();
     
