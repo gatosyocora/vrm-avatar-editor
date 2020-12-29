@@ -84,7 +84,8 @@
         canvas: $canvas
       });
 
-      this.camera.position.set(0, 1, 2);
+      this.camera.position.set(0, 1, -1.5);
+      this.camera.rotation.set(0, Math.PI, 0);
       this.light.position.set(0, 0, 10);
       this.scene.add(this.light);
 
