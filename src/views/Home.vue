@@ -1,16 +1,16 @@
 <template>
   <div class="home">
-    <rotate-box></rotate-box>
+    <TestVRM></TestVRM>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import RotateBox from '@/components/RotateBox.vue'; // @ is an alias to /src
+import TestVRM from '@/components/TestVRM.vue'; // @ is an alias to /src
 
 @Component({
   components: {
-    RotateBox,
+    TestVRM,
   },
 })
 export default class Home extends Vue {}
