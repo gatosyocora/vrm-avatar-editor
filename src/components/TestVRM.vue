@@ -46,6 +46,8 @@
     @Prop()
     public meta?: VRM.VRMMeta = null;
 
+    private vrmObject? = null;
+
     mounted() {
       const $canvas = document.getElementById("canvas");
       this.renderer = new THREE.WebGLRenderer({
@@ -81,13 +83,17 @@
 		      // generate a VRM instance from gltf
 		      VRM.from( gltf ).then( ( vrm ) => {
 
+                  if (this.vrmObject !== null) {
+                    this.scene.remove(this.vrmObject);
+                  }
+
 			      // add the loaded vrm to the scene
 			      this.scene.add( vrm.scene );
 
 			      // deal with vrm features
                   this.meta = vrm.meta;
+                  this.vrmObject = vrm.scene;
 			      console.log( vrm );
-                  console.log(this.meta);
 	      	} );
 
 	      },
