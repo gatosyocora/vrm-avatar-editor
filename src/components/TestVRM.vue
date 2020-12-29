@@ -40,8 +40,6 @@
     private renderer = null;
     private const camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
     private const light = new THREE.DirectionalLight(0xffffff);
-    private geometry = new THREE.BoxGeometry(1, 1, 1);
-    private material = new THREE.MeshNormalMaterial();
     
     @Prop()
     public meta?: VRM.VRMMeta = null;
