@@ -1,5 +1,17 @@
 <template>
   <div>
+    <div
+      class="vrm-inputfield"
+      @dragover.prevent="onDrag('over')"
+      @dragleave.prevent="onDrag('leave')"
+      @drop.prevent="onDrop">
+      <div v-if="!isDragOver">
+        VRMをドラッグ&ドロップ
+      </div>
+      <div v-else>
+        離す
+      </div>
+    </div>
     <canvas id="canvas" width="600" height="400"></canvas>
     <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
     <p v-if="meta !== null">Title : {{meta.title}}, Version : {{meta.version}}</p>
@@ -41,6 +53,52 @@
     private const camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
     private const light = new THREE.DirectionalLight(0xffffff);
     
+    public isDragOver: boolean = false;
+
+    public onDrag(type) {
+      this.isDragOver = type === "over";
+    }
+    public onDrop(e: DragEvent) {
+      this.isDragOver = false;
+      const file = e.dataTransfer.files[0]
+      const url:string = window.URL.createObjectURL(file);
+
+      const loader = new GLTFLoader();
+      loader.load(
+
+	      // URL of the VRM you want to load
+	      url,
+
+	      // called when the resource is loaded
+	      ( gltf ) => {
+
+		      // generate a VRM instance from gltf
+		      VRM.from( gltf ).then( ( vrm ) => {
+
+                  if (this.vrmObject !== null) {
+                    this.scene.remove(this.vrmObject);
+                  }
+
+			      // add the loaded vrm to the scene
+			      this.scene.add( vrm.scene );
+
+			      // deal with vrm features
+                  this.meta = vrm.meta;
+                  this.vrmObject = vrm.scene;
+			      console.log( vrm );
+	      	} );
+
+	      },
+
+      	// called while loading is progressing
+      	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
+
+      	// called when loading has errors
+      	( error ) => console.error( error )
+
+      );
+    }
+
     @Prop()
     public meta?: VRM.VRMMeta = null;
 
