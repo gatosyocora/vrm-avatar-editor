@@ -14,29 +14,34 @@
     </div>
     <canvas id="canvas" width="600" height="400"></canvas>
     <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
-    <p v-if="meta !== null">Title : {{meta.title}}, Version : {{meta.version}}</p>
-    <p v-if="meta !== null">Author : {{meta.author}}</p>
-    <p v-if="meta !== null">AllowUser : {{meta.allowedUserName}}</p>
-    <p v-if="meta !== null">CommercialUssage : {{meta.commercialUssageName}}</p>
-    <p v-if="meta !== null">SexualUssage : {{meta.sexualUssageName}}</p>
-    <p v-if="meta !== null">ViolentUssage : {{meta.violentUssageName}}</p>
-    <p v-if="meta !== null">LicenseName : {{meta.licenseName}}</p>
-    <p v-if="meta !== null">OtherLicenseUrl : 
-      <a v-bind:href="meta.otherLicenseUrl" target="_blank">
-        {{meta.otherLicenseUrl}}
-      </a>
-    </p>
-    <p v-if="meta !== null">OtherPermissionUrl : 
-      <a v-bind:href="meta.otherPermissionUrl" target="_blank">
-        {{meta.otherPermissionUrl}}
-      </a>
-    </p>
-    <p v-if="meta !== null">ContactInformation : 
-      <a v-bind:href="meta.contactInformation" target="_blank">
-        {{meta.contactInformation}}
-      </a>
-    </p>
-    <p v-if="meta !== null">Reference : {{meta.reference}}</p>
+    <div v-if="meta !== null" class="undot-list centering-list my-list">
+      <ul>
+        <li>Title : {{meta.title}}</li>
+        <li>Version : {{meta.version}}</li>
+        <li>Author : {{meta.author}}</li>
+        <li>AllowUser : {{meta.allowedUserName}}</li>
+        <li>CommercialUssage : {{meta.commercialUssageName}}</li>
+        <li>SexualUssage : {{meta.sexualUssageName}}</li>
+        <li>ViolentUssage : {{meta.violentUssageName}}</li>
+        <li>LicenseName : {{meta.licenseName}}</li>
+        <li>OtherLicense : 
+          <a v-bind:href="meta.otherLicenseUrl" target="_blank">
+            {{meta.otherLicenseUrl}}
+          </a>
+        </li>
+        <li>OtherPermission : 
+          <a v-bind:href="meta.otherPermissionUrl" target="_blank">
+            {{meta.otherPermissionUrl}}
+          </a>
+        </li>
+        <li>ContactInformation : 
+          <a v-bind:href="meta.contactInformation" target="_blank">
+            {{meta.contactInformation}}
+          </a>
+        </li>
+        <li>Reference : {{meta.reference}}</li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -164,3 +169,19 @@
     }
   };
 </script>
+<style>
+  .centering-list{
+    text-align: center;
+  }
+  .centering-list ul{
+    text-align: left;
+    display: inline-block;
+  }
+  .undot-list ul {
+    list-style: none;
+  }
+  .my-list li{
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+</style>
