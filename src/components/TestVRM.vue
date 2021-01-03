@@ -12,6 +12,16 @@
       </div>
       <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
     </div>
+    <div v-if="meta !== null">
+      <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
+      <img v-else class="license-img" src="@/assets/license/com-ng.png" />
+
+      <img v-if="meta.sexualUssageName === 'Allow'" class="license-img" src="@/assets/license/sex-ok.png" />
+      <img v-else class="license-img" src="@/assets/license/sex-ng.png" />
+
+      <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
+      <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
+    </div>
     <div v-if="meta !== null" class="undot-list centering-list my-list">
       <ul>
         <li>Title : {{meta.title}}</li>
@@ -193,6 +203,10 @@
   }
   .outline {
     outline: 5px dashed red;
+  }
+  .license-img {
+    width: 100px;
+    height: auto;
   }
   .centering-list{
     text-align: center;
