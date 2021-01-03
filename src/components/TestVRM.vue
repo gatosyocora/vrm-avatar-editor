@@ -12,7 +12,7 @@
         <div v-else>
           離す
         </div>
-        <p><input type="file" v-on:change="" accept=".vrm"></p>
+        <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
       </div>
       <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
     </div>
