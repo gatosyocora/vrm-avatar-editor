@@ -3,15 +3,11 @@
     <div class="top layer-size">
       <div
         class="layer2 layer-size layer white"
+        :class="{outline:isDragOver}"
         @dragover.prevent="onDrag('over')"
         @dragleave.prevent="onDrag('leave')"
         @drop.prevent="onDrop">
-        <div v-if="!isDragOver">
-          VRMをドラッグ&ドロップ
-        </div>
-        <div v-else>
-          離す
-        </div>
+        <div>VRMをドラッグ&ドロップ</div>
         <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
       </div>
       <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
@@ -194,6 +190,9 @@
   }
   .white {
     color: #ffffff;
+  }
+  .outline {
+    outline: 5px dashed red;
   }
   .centering-list{
     text-align: center;
