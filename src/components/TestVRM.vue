@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="top">
+    <div class="top layer-size">
       <div
-        class="layer2 layer white center"
+        class="layer2 layer-size layer white"
         @dragover.prevent="onDrag('over')"
         @dragleave.prevent="onDrag('leave')"
         @drop.prevent="onDrop">
@@ -14,7 +14,7 @@
         </div>
         <p><input type="file" v-on:change="" accept=".vrm"></p>
       </div>
-      <canvas id="canvas" width="600" height="400" class="layer1 layer"></canvas>
+      <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
     </div>
     <div v-if="meta !== null" class="undot-list centering-list my-list">
       <ul>
@@ -180,6 +180,8 @@
     top: 0;
     left: 0;
     right: 0;
+  }
+  .layer-size {
     width: 600px;
     height: 400px;
     margin: auto;
