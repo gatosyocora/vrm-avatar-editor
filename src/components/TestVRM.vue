@@ -1,19 +1,21 @@
 <template>
   <div>
-    <div
-      class="vrm-inputfield"
-      @dragover.prevent="onDrag('over')"
-      @dragleave.prevent="onDrag('leave')"
-      @drop.prevent="onDrop">
-      <div v-if="!isDragOver">
-        VRMをドラッグ&ドロップ
+    <div class="top">
+      <div
+        class="layer2 layer white center"
+        @dragover.prevent="onDrag('over')"
+        @dragleave.prevent="onDrag('leave')"
+        @drop.prevent="onDrop">
+        <div v-if="!isDragOver">
+          VRMをドラッグ&ドロップ
+        </div>
+        <div v-else>
+          離す
+        </div>
+        <p><input type="file" v-on:change="" accept=".vrm"></p>
       </div>
-      <div v-else>
-        離す
-      </div>
+      <canvas id="canvas" width="600" height="400" class="layer1 layer"></canvas>
     </div>
-    <canvas id="canvas" width="600" height="400"></canvas>
-    <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
     <div v-if="meta !== null" class="undot-list centering-list my-list">
       <ul>
         <li>Title : {{meta.title}}</li>
@@ -170,6 +172,27 @@
   };
 </script>
 <style>
+  .top {
+    position: relative;
+  }
+  .layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 600px;
+    height: 400px;
+    margin: auto;
+  }
+  .layer1 {
+    z-index: 1;
+  }
+  .layer2 {
+    z-index: 2;
+  }
+  .white {
+    color: #ffffff;
+  }
   .centering-list{
     text-align: center;
   }
