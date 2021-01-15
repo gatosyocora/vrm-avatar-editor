@@ -1,19 +1,12 @@
 # vrm-avatar-editor
+Web Application Editting VRM Avatar
 
-## Project setup
-```
-npm install
-```
+Access↓
+https://gatosyocora.github.io/vrm-avatar-editor/
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Environment
+* Vue.js
+* TypeScript
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Library
+* three-vrm [[MITLicense](https://github.com/pixiv/three-vrm/blob/dev/LICENSE)]
