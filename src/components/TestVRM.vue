@@ -57,23 +57,31 @@
   import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-  import { VRM } from '@pixiv/three-vrm';
+  import { VRM, VRMMeta } from '@pixiv/three-vrm';
+
+  interface HTMLInputEvent extends Event {
+    target: HTMLInputElement & EventTarget;
+  }
 
   @Component
   export default class TestVRM extends Vue {
-    private const scene = new THREE.Scene();
-    private renderer = null;
-    private const camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
-    private const light = new THREE.DirectionalLight(0xffffff);
+    private scene = new THREE.Scene();
+    private renderer: THREE.WebGLRenderer | null = null;
+    private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
+    private light = new THREE.DirectionalLight(0xffffff);
     
     public isDragOver: boolean = false;
 
-    public onDrag(type) {
+    public onDrag(type: string) {
       this.isDragOver = type === "over";
     }
     public onDrop(e: DragEvent) {
+
+      if (e.dataTransfer === null || 
+          e.dataTransfer.files === null) return;
+
       this.isDragOver = false;
-      const file = e.dataTransfer.files[0]
+      const file = e.dataTransfer.files[0];
       const url:string = window.URL.createObjectURL(file);
 
       const loader = new GLTFLoader();
@@ -89,15 +97,15 @@
 		      VRM.from( gltf ).then( ( vrm ) => {
 
                   if (this.vrmObject !== null) {
-                    this.scene.remove(this.vrmObject);
+                    this.scene.remove(this.vrmObject!);
                   }
 
 			      // add the loaded vrm to the scene
 			      this.scene.add( vrm.scene );
 
 			      // deal with vrm features
-                  this.meta = vrm.meta;
-                  this.vrmObject = vrm.scene;
+            this.meta = vrm.meta;
+            this.vrmObject = vrm.scene;
 			      console.log( vrm );
 	      	} );
 
@@ -113,12 +121,14 @@
     }
 
     @Prop()
-    public meta?: VRM.VRMMeta = null;
+    public meta: VRMMeta | undefined | null = null;
 
-    private vrmObject? = null;
+    private vrmObject: THREE.Scene | THREE.Group | null = null;
 
     mounted() {
-      const $canvas = document.getElementById("canvas");
+      const $canvas = <HTMLCanvasElement> document.getElementById("canvas");
+      if ($canvas === null) return;
+
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
         canvas: $canvas
@@ -133,11 +143,14 @@
     }
     animate() {
         requestAnimationFrame(this.animate);
-        this.renderer.render(this.scene, this.camera);
+        this.renderer!.render(this.scene, this.camera);
     }
     
-    public onFileChange (e) {
-      const file = e.target.files[0]
+    public onFileChange (e: HTMLInputEvent) {
+
+      if (e.target.files === null) return;
+
+      const file = e.target.files[0];
       const url:string = window.URL.createObjectURL(file);
 
       const loader = new GLTFLoader();
@@ -160,8 +173,8 @@
 			      this.scene.add( vrm.scene );
 
 			      // deal with vrm features
-                  this.meta = vrm.meta;
-                  this.vrmObject = vrm.scene;
+            this.meta = vrm.meta;
+            this.vrmObject = vrm.scene;
 			      console.log( vrm );
 	      	} );
 
