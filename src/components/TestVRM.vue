@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p><b>VRM Avatar Editor</b></p>
     <p>ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
     <div class="top layer-size">
       <div
