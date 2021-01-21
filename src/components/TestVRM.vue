@@ -17,6 +17,7 @@
     <ul v-show="vrmObject !== null"class="tabs">
       <li v-on:click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
       <li v-on:click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
+      <li v-on:click="changeTab(2)" :class="{'active': currentTab === 2}">Model</li>
     </ul>
     <div>
       <div v-show="currentTab === 0">
@@ -69,6 +70,11 @@
               {{material.userData.vrmMaterialProperties.shader}}
             </p>
           </div>
+        </div>
+      </div>
+      <div v-show="currentTab === 2">
+        <div v-if="vrmObject !== null">
+          <p v-if="materials">Material Count: {{materials.length}}</p>
         </div>
       </div>
     </div>
