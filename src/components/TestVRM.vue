@@ -52,6 +52,16 @@
         <li>Reference : {{meta.reference}}</li>
       </ul>
     </div>
+    <div v-if="materials !== null">
+      <div v-for="(material, index) in materials">
+        <p>
+          {{material.name}}
+          {{convertRGB2Hex(material.color)}}
+          {{material.map.image.width}}x{{material.map.image.height}}
+          {{material.userData.vrmMaterialProperties.shader}}
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -107,6 +117,7 @@
 
 			      // deal with vrm features
             this.meta = vrm.meta;
+            this.materials = vrm.materials;
             this.vrmObject = vrm.scene;
 			      console.log( vrm );
 	      	} );
@@ -124,6 +135,9 @@
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
+
+    @Prop()
+    public materials: THREE.Material[] | undefined | null = null;
 
     private vrmObject: THREE.Scene | THREE.Group | null = null;
 
@@ -189,6 +203,13 @@
       	( error ) => console.error( error )
 
       );
+    }
+
+    public convertRGB2Hex(color: THREE.Color): String {
+      const r = Math.round(Number(color.r) * 255);
+      const g = Math.round(Number(color.g) * 255);
+      const b = Math.round(Number(color.b) * 255);
+      return "#" + r.toString(16) + g.toString(16) + b.toString(16);
     }
   };
 </script>
