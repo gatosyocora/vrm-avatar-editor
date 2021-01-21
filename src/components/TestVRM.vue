@@ -74,7 +74,7 @@
       </div>
       <div v-show="currentTab === 2">
         <div v-if="vrmObject !== null">
-          <p v-if="materials">Material Count: {{materials.length}}</p>
+          <p v-if="materials !== null">Material Count: {{materials.length}}</p>
         </div>
       </div>
     </div>
