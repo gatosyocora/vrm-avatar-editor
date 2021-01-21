@@ -62,13 +62,15 @@
       </div>
       <div v-show="currentTab === 1">
         <div v-if="materials">
-          <div v-for="(material, index) in materials">
-            <p>
-              {{material.name}}
-              {{convertRGB2Hex(material.color)}}
-              {{material.map.image.width}}x{{material.map.image.height}}
-              {{material.userData.vrmMaterialProperties.shader}}
-            </p>
+          <div id="material-list" v-for="(material, index) in materials">
+            <div class="border">
+              <p>
+                {{material.name}}
+                {{convertRGB2Hex(material.color)}}
+                {{material.map.image.width}}x{{material.map.image.height}}
+                {{material.userData.vrmMaterialProperties.shader}}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -305,5 +307,14 @@
   .my-list li{
     padding-top: 5px;
     padding-bottom: 5px;
+  }
+  .border {
+    border: 1px solid black;
+  }
+  #material-list div {
+    width:30%;
+    text-align:left;
+    margin: 10px;
+    padding: 10px;
   }
 </style>
