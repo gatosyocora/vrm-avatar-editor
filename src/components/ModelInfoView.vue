@@ -3,6 +3,7 @@
         <p v-if="vrmObject.children !== null">Mesh Count: {{getMeshCount(vrmObject.children)}}</p>
         <p v-if="materials !== null">SubMesh Count: {{materials.length}}</p>
         <p v-if="vrmObject.children !== null">Polygon Count: {{getPolygonCount(vrmObject.children)}}</p>
+        <p v-if="vrmObject.children !== null">Bone Count: {{getBoneCount(vrmObject.children)}}</p>
         <p v-if="vrmObject.children !== null">BlendShape Count: {{getBlendShapeCount(vrmObject.children)}}</p>
     </div>
 </template>
@@ -43,6 +44,20 @@
                 }
               })
               .reduce((sum, value) => sum + value, 0) / 3;
+    }
+
+    public getBoneCount(objects: object[]): Number {
+        return this.getChildrenCount(objects.filter((object) => object.name === "Armature")[0]);
+    }
+
+    public getChildrenCount(parent: object): Number {
+        if (parent.children.length === 0) return 0;
+        else {
+            return parent.children
+                    .map((child) => this.getChildrenCount(child))
+                    .reduce((sum, value) => sum + value, 0)
+                    + parent.children.length;
+        }
     }
 
     public getBlendShapeCount(objects: object[]): Number {
