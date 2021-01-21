@@ -1,43 +1,33 @@
 <template>
     <div v-if="meta">
-        <div>
-            <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
-            <img v-else class="license-img" src="@/assets/license/com-ng.png" />
-
-            <img v-if="meta.sexualUssageName === 'Allow'" class="license-img" src="@/assets/license/sex-ok.png" />
-            <img v-else class="license-img" src="@/assets/license/sex-ng.png" />
-
-            <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
-            <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
-        </div>
-        <div v-if="meta" class="undot-list centering-list my-list">
-            <ul>
-                <li>Title : {{meta.title}}</li>
-                <li>Version : {{meta.version}}</li>
-                <li>Author : {{meta.author}}</li>
-                <li>AllowUser : {{meta.allowedUserName}}</li>
-                <li>CommercialUssage : {{meta.commercialUssageName}}</li>
-                <li>SexualUssage : {{meta.sexualUssageName}}</li>
-                <li>ViolentUssage : {{meta.violentUssageName}}</li>
-                <li>LicenseName : {{meta.licenseName}}</li>
-                <li>OtherLicense : 
-                    <a :href="meta.otherLicenseUrl" target="_blank">
-                        {{meta.otherLicenseUrl}}
-                    </a>
-                </li>
-                <li>OtherPermission : 
-                    <a :href="meta.otherPermissionUrl" target="_blank">
-                        {{meta.otherPermissionUrl}}
-                    </a>
-                </li>
-                <li>ContactInformation : 
-                    <a :href="meta.contactInformation" target="_blank">
-                        {{meta.contactInformation}}
-                    </a>
-                </li>
-                <li>Reference : {{meta.reference}}</li>
-            </ul>
-        </div>
+      <v-simple-table>
+        <tbody>
+          <tr><td>Title</td><td>{{meta.title}}</td></tr>
+          <tr><td>Version</td><td>{{meta.version}}</td></tr>
+          <tr><td>Author</td><td>{{meta.author}}</td></tr>
+          <tr><td>AllowUser</td><td>{{meta.allowedUserName}}</td></tr>
+          <tr><td>CommercialUssage</td><td>{{meta.commercialUssageName}}</td></tr>
+          <tr><td>SexualUssage</td><td>{{meta.sexualUssageName}}</td></tr>
+          <tr><td>ViolentUssage</td><td>{{meta.violentUssageName}}</td></tr>
+          <tr><td>LicenseName</td><td>{{meta.licenseName}}</td></tr>
+          <tr><td>OtherLicense</td><td>
+            <a :href="meta.otherLicenseUrl" target="_blank">
+                {{meta.otherLicenseUrl}}
+            </a>
+          </td></tr>
+          <tr><td>OtherPermission</td><td>
+            <a :href="meta.otherPermissionUrl" target="_blank">
+                {{meta.otherPermissionUrl}}
+            </a>
+          </td></tr>
+          <tr><td>ContactInformation</td><td>
+            <a :href="meta.contactInformation" target="_blank">
+                {{meta.contactInformation}}
+            </a>
+          </td></tr>
+          <tr><td>Reference</td><td>{{meta.reference}}</td></tr>
+        </tbody>
+      </v-simple-table>
     </div>
 </template>
 
