@@ -13,7 +13,7 @@
   }
 
   @Component
-  export default class TestVRM extends Vue {
+  export default class VRMCanvasView extends Vue {
     private scene = new THREE.Scene();
     private renderer: THREE.WebGLRenderer | null = null;
     private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);

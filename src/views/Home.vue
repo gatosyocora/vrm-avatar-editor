@@ -41,7 +41,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { VRM, VRMMeta } from '@pixiv/three-vrm';
 
-import VRMCanvas from '@/components/TestVRM.vue'; // @ is an alias to /src
+import VRMCanvas from '@/components/VRMCanvasView.vue'; // @ is an alias to /src
 import MetaView from '@/components/MetaView.vue';
 import MaterialView from '@/components/MaterialView.vue';
 import ModelInfoView from '@/components/ModelInfoView.vue';
