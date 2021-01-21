@@ -51,12 +51,15 @@
 
     @Watch("vrmObject", {immediate: true})
     public updateVrm(newObject: THREE.Scene | THREE.Group) {
+      
       if (this.vrmObject) {
         this.scene = new THREE.Scene();
         this.scene.add(this.light);
         this.animate();
       }
       this.vrmObject = newObject;
+
+      if (newObject === null) return;
 
       // add the loaded vrm to the scene
       this.scene.add( this.vrmObject );
