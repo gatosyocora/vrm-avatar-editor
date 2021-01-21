@@ -74,7 +74,8 @@
       </div>
       <div v-show="currentTab === 2">
         <div v-if="vrmObject !== null">
-          <p v-if="materials !== null">Material Count: {{materials.length}}</p>
+          <p v-if="vrmObject.children !== null">Mesh Count: {{getMeshCount(vrmObject.children)}}</p>
+          <p v-if="materials !== null">SubMesh Count: {{materials.length}}</p>
           <p v-if="vrmObject.children !== null">Polygon Count: {{getPolygonCount(vrmObject.children)}}</p>
           <p v-if="vrmObject.children !== null">BlendShape Count: {{getBlendShapeCount(vrmObject.children)}}</p>
         </div>
@@ -207,6 +208,10 @@
 
     public changeTab(tabNumber: Number) {
       this.currentTab = tabNumber;
+    }
+
+    public getMeshCount(objects: object[]): Number {
+      return objects.filter((object) => object.type === "Group").length;
     }
 
     public getPolygonCount(objects: object[]): Number {
