@@ -215,13 +215,20 @@
     }
 
     public getPolygonCount(objects: object[]): Number {
-      let count = 0;
-      objects.forEach((object) => {
-        if (object.type === "Group") {
-          count += object.children[0].geometry.attributes.position.count;
-        }
-      });
-      return count;
+      return objects
+              .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
+              .map((object) => 
+              {
+                if (object.type === "Group") {
+                  return object.children
+                          .map((mesh) => mesh.geometry.groups[0].count)
+                          .reduce((sum, value) => sum + value, 0);
+                }
+                else {
+                  return object.geometry.groups[0].count;
+                }
+              })
+              .reduce((sum, value) => sum + value, 0) / 3;
     }
 
     public getBlendShapeCount(objects: object[]): Number {
