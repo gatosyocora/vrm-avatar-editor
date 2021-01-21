@@ -1,10 +1,29 @@
 <template>
     <div v-if="vrmObject">
-        <p v-if="vrmObject.children !== null">Mesh Count: {{getMeshCount(vrmObject.children)}}</p>
-        <p v-if="materials !== null">SubMesh Count: {{materials.length}}</p>
-        <p v-if="vrmObject.children !== null">Polygon Count: {{getPolygonCount(vrmObject.children)}}</p>
-        <p v-if="vrmObject.children !== null">Bone Count: {{getBoneCount(vrmObject.children)}}</p>
-        <p v-if="vrmObject.children !== null">BlendShape Count: {{getBlendShapeCount(vrmObject.children)}}</p>
+      <v-simple-table>
+        <tbody>
+          <tr v-if="vrmObject.children !== null">
+            <td>Mesh Count</td>
+            <td>{{getMeshCount(vrmObject.children)}}</td>
+          </tr>
+          <tr v-if="materials !== null">
+            <td>SubMesh Count</td>
+            <td>{{materials.length}}</td>
+          </tr>
+          <tr v-if="vrmObject.children !== null">
+            <td>Polygon Count</td>
+            <td>{{getPolygonCount(vrmObject.children)}}</td>
+          </tr>
+          <tr v-if="vrmObject.children !== null">
+            <td>Bone Count</td>
+            <td>{{getBoneCount(vrmObject.children)}}</td>
+          </tr>
+          <tr v-if="vrmObject.children !== null">
+            <td>BlendShape Count</td>
+            <td>{{getBlendShapeCount(vrmObject.children)}}</td>
+          </tr>
+        </tbody>
+      </v-simple-table>
     </div>
 </template>
 

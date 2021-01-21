@@ -1,14 +1,14 @@
 <template>
     <div v-if="materials">
         <div id="material-list" v-for="(material, index) in materials">
-            <div>
-                <p>
-                    {{material.name}}
-                    {{convertRGB2Hex(material.color)}}
-                    {{material.map.image.width}}x{{material.map.image.height}}
-                    {{material.userData.vrmMaterialProperties.shader}}
-                </p>
-            </div>
+            <v-card
+              dark
+            >
+                <p>{{material.name}}</p>
+                <p>{{convertRGB2Hex(material.color)}}</p>
+                <p>{{material.map.image.width}}x{{material.map.image.height}}</p>
+                <p>{{material.userData.vrmMaterialProperties.shader}}</p>
+            </v-card>
         </div>
     </div>
 </template>

@@ -1,9 +1,14 @@
 <template>
   <div class="home">
     <center>  
-      <p><b>VRM Avatar Editor</b></p>
-      <p>ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-      <div class="top layer-size">
+      <v-app-bar
+        danse
+        dark
+      >
+        <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
+      </v-app-bar>
+      <p class="contents">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
+      <div class="top layer-size contents">
         <div
           class="layer2 layer-size layer"
           :class="{outline:isDragOver}"
@@ -15,12 +20,17 @@
         </div>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
       </div>
-      <ul v-if="vrmObject" class="tabs">
-        <li @click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
-        <li @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
-        <li @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</li>
-      </ul>
-      <div>
+      <v-card v-if="vrmObject">
+        <v-tabs
+          fixed-tabs
+          dark
+        >
+          <v-tab @click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</v-tab>
+          <v-tab @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</v-tab>
+          <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
+        </v-tabs>
+      </v-card>
+      <div class="contents">
         <div v-show="currentTab === 0">
           <MetaView :meta="meta" />
         </div>
@@ -181,5 +191,8 @@ export default class Home extends Vue
   }
   .outline {
     outline: 5px dashed red;
+  }
+  .contents {
+    margin: 20px;
   }
 </style>
