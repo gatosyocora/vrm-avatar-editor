@@ -112,41 +112,7 @@
       const file = e.dataTransfer.files[0];
       const url:string = window.URL.createObjectURL(file);
 
-      const loader = new GLTFLoader();
-      loader.load(
-
-	      // URL of the VRM you want to load
-	      url,
-
-	      // called when the resource is loaded
-	      ( gltf ) => {
-
-		      // generate a VRM instance from gltf
-		      VRM.from( gltf ).then( ( vrm ) => {
-
-                  if (this.vrmObject !== null) {
-                    this.scene.remove(this.vrmObject!);
-                  }
-
-			      // add the loaded vrm to the scene
-			      this.scene.add( vrm.scene );
-
-			      // deal with vrm features
-            this.meta = vrm.meta;
-            this.materials = vrm.materials;
-            this.vrmObject = vrm.scene;
-			      console.log( vrm );
-	      	} );
-
-	      },
-
-      	// called while loading is progressing
-      	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
-
-      	// called when loading has errors
-      	( error ) => console.error( error )
-
-      );
+      this.loadVrm(url);
     }
 
     @Prop()
@@ -189,6 +155,10 @@
       const file = e.target.files[0];
       const url:string = window.URL.createObjectURL(file);
 
+      this.loadVrm(url);
+    }
+
+    public loadVrm(url: string) {
       const loader = new GLTFLoader();
       loader.load(
 
@@ -202,7 +172,7 @@
 		      VRM.from( gltf ).then( ( vrm ) => {
 
                   if (this.vrmObject !== null) {
-                    this.scene.remove(this.vrmObject);
+                    this.scene.remove(this.vrmObject!);
                   }
 
 			      // add the loaded vrm to the scene
@@ -210,6 +180,7 @@
 
 			      // deal with vrm features
             this.meta = vrm.meta;
+            this.materials = vrm.materials;
             this.vrmObject = vrm.scene;
 			      console.log( vrm );
 	      	} );
