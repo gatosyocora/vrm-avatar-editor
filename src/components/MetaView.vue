@@ -47,6 +47,16 @@
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
 
+  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh> {}
+
+  interface VRMSkinnedMesh extends THREE.SkinnedMesh {
+    geometry: THREE.BufferGeometry;
+  }
+
+  interface VRMGroup extends THREE.Group {
+    children: Array<VRMSkinnedMesh>;
+  }
+
   @Component
   export default class MetaView extends Vue {
     @Prop()
@@ -55,32 +65,32 @@
     @Prop()
     public vrmObject: THREE.Scene | THREE.Group | null = null;
 
-    public getMeshCount(objects: object[]): Number {
+    public getMeshCount(objects: Arrays): Number {
       return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
     }
 
-    public getPolygonCount(objects: object[]): Number {
+    public getPolygonCount(objects: Arrays): Number {
       return objects
               .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
               .map((object) => 
               {
                 if (object.type === "Group") {
                   return object.children
-                          .map((mesh) => mesh.geometry.groups[0].count)
+                          .map((mesh) => (mesh as VRMSkinnedMesh).geometry.groups[0].count)
                           .reduce((sum, value) => sum + value, 0);
                 }
                 else {
-                  return object.geometry.groups[0].count;
+                  return (object as VRMSkinnedMesh).geometry.groups[0].count;
                 }
               })
               .reduce((sum, value) => sum + value, 0) / 3;
     }
 
-    public getBlendShapeCount(objects: object[]): Number {
+    public getBlendShapeCount(objects: Arrays): Number {
       let count = 0;
       objects.forEach((object) => {
         if (object.type === "Group") {
-          count += object.children[0].geometry.userData.targetNames.length;
+          count += (object as VRMGroup).children[0].geometry.userData.targetNames.length;
         }
       });
       return count;

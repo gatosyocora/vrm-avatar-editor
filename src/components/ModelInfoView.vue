@@ -12,6 +12,16 @@
   import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
 
+  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh> {}
+
+  interface VRMSkinnedMesh extends THREE.SkinnedMesh {
+    geometry: THREE.BufferGeometry;
+  }
+
+  interface VRMGroup extends THREE.Group {
+    children: Array<VRMSkinnedMesh>;
+  }
+
   @Component
   export default class ModelInfoView extends Vue {
 
@@ -21,46 +31,46 @@
     @Prop()
     public vrmObject: THREE.Scene | THREE.Group | null = null;
 
-    public getMeshCount(objects: object[]): Number {
+    public getMeshCount(objects: Arrays): Number {
       return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
     }
 
-    public getPolygonCount(objects: object[]): Number {
+    public getPolygonCount(objects: Arrays): Number {
       return objects
               .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
               .map((object) => 
               {
                 if (object.type === "Group") {
                   return object.children
-                          .map((mesh) => mesh.geometry.groups[0].count)
+                          .map((mesh) => (mesh as VRMSkinnedMesh).geometry.groups[0].count)
                           .reduce((sum, value) => sum + value, 0);
                 }
                 else {
-                  return object.geometry.groups[0].count;
+                  return (object as VRMSkinnedMesh).geometry.groups[0].count;
                 }
               })
               .reduce((sum, value) => sum + value, 0) / 3;
     }
 
-    public getBoneCount(objects: object[]): Number {
+    public getBoneCount(objects: Arrays): Number {
         return this.getChildrenCount(objects.filter((object) => object.name === "Armature")[0]);
     }
 
-    public getChildrenCount(parent: object): Number {
+    public getChildrenCount(parent: THREE.Object3D|THREE.Group|THREE.SkinnedMesh): number {
         if (parent.children.length === 0) return 0;
         else {
             return parent.children
                     .map((child) => this.getChildrenCount(child))
-                    .reduce((sum, value) => sum + value, 0)
+                    .reduce((sum: number, value: number) => sum + value, 0)
                     + parent.children.length;
         }
     }
 
-    public getBlendShapeCount(objects: object[]): Number {
+    public getBlendShapeCount(objects: Arrays): Number {
       let count = 0;
       objects.forEach((object) => {
         if (object.type === "Group") {
-          count += object.children[0].geometry.userData.targetNames.length;
+          count += (object as VRMGroup).children[0].geometry.userData.targetNames.length;
         }
       });
       return count;
