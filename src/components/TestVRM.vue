@@ -1,93 +1,9 @@
 <template>
-  <div>
-    <p><b>VRM Avatar Editor</b></p>
-    <p>ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-    <div class="top layer-size">
-      <div
-        class="layer2 layer-size layer white"
-        :class="{outline:isDragOver}"
-        @dragover.prevent="onDrag('over')"
-        @dragleave.prevent="onDrag('leave')"
-        @drop.prevent="onDrop">
-        <div>VRMをドラッグ&ドロップ</div>
-        <p><input type="file" @change="onFileChange" accept=".vrm"></p>
-      </div>
-      <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
-    </div>
-    <ul v-if="vrmObject" class="tabs">
-      <li @click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
-      <li @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
-      <li @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</li>
-    </ul>
-    <div>
-      <div v-show="currentTab === 0">
-        <div v-if="meta">
-          <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
-          <img v-else class="license-img" src="@/assets/license/com-ng.png" />
-
-          <img v-if="meta.sexualUssageName === 'Allow'" class="license-img" src="@/assets/license/sex-ok.png" />
-          <img v-else class="license-img" src="@/assets/license/sex-ng.png" />
-
-          <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
-          <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
-        </div>
-        <div v-if="meta" class="undot-list centering-list my-list">
-          <ul>
-            <li>Title : {{meta.title}}</li>
-            <li>Version : {{meta.version}}</li>
-            <li>Author : {{meta.author}}</li>
-            <li>AllowUser : {{meta.allowedUserName}}</li>
-            <li>CommercialUssage : {{meta.commercialUssageName}}</li>
-            <li>SexualUssage : {{meta.sexualUssageName}}</li>
-            <li>ViolentUssage : {{meta.violentUssageName}}</li>
-            <li>LicenseName : {{meta.licenseName}}</li>
-            <li>OtherLicense : 
-              <a :href="meta.otherLicenseUrl" target="_blank">
-                {{meta.otherLicenseUrl}}
-              </a>
-            </li>
-            <li>OtherPermission : 
-              <a :href="meta.otherPermissionUrl" target="_blank">
-                {{meta.otherPermissionUrl}}
-              </a>
-            </li>
-            <li>ContactInformation : 
-              <a :href="meta.contactInformation" target="_blank">
-                {{meta.contactInformation}}
-              </a>
-            </li>
-            <li>Reference : {{meta.reference}}</li>
-          </ul>
-        </div>
-      </div>
-      <div v-show="currentTab === 1">
-        <div v-if="materials">
-          <div id="material-list" v-for="(material, index) in materials">
-            <div class="border">
-              <p>
-                {{material.name}}
-                {{convertRGB2Hex(material.color)}}
-                {{material.map.image.width}}x{{material.map.image.height}}
-                {{material.userData.vrmMaterialProperties.shader}}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-show="currentTab === 2">
-        <div v-if="vrmObject">
-          <p v-if="vrmObject.children !== null">Mesh Count: {{getMeshCount(vrmObject.children)}}</p>
-          <p v-if="materials !== null">SubMesh Count: {{materials.length}}</p>
-          <p v-if="vrmObject.children !== null">Polygon Count: {{getPolygonCount(vrmObject.children)}}</p>
-          <p v-if="vrmObject.children !== null">BlendShape Count: {{getBlendShapeCount(vrmObject.children)}}</p>
-        </div>
-      </div>
-    </div>
-  </div>
+  <canvas id="canvas" width="600" height="400" />
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from "vue-property-decorator";
+  import { Component, Prop, Vue, Watch } from "vue-property-decorator";
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
@@ -102,26 +18,6 @@
     private renderer: THREE.WebGLRenderer | null = null;
     private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
     private light = new THREE.DirectionalLight(0xffffff);
-    
-    public isDragOver: boolean = false;
-
-    public onDrag(type: string) {
-      this.isDragOver = type === "over";
-    }
-    public onDrop(e: DragEvent) {
-
-      if (e.dataTransfer === null || 
-          e.dataTransfer.files === null) return;
-
-      this.isDragOver = false;
-      const file = e.dataTransfer.files[0];
-      const url:string = window.URL.createObjectURL(file);
-
-      this.loadVrm(url);
-    }
-
-    @Prop()
-    public currentTab: Number = 0;
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
@@ -152,169 +48,20 @@
         requestAnimationFrame(this.animate);
         this.renderer!.render(this.scene, this.camera);
     }
-    
-    public onFileChange (e: HTMLInputEvent) {
 
-      if (e.target.files === null) return;
+    @Watch("vrmObject", {immediate: true})
+    public updateVrm(newObject: THREE.Scene | THREE.Group) {
+      if (this.vrmObject) {
+        this.scene = new THREE.Scene();
+        this.scene.add(this.light);
+        this.animate();
+      }
+      this.vrmObject = newObject;
 
-      const file = e.target.files[0];
-      const url:string = window.URL.createObjectURL(file);
-
-      this.loadVrm(url);
-    }
-
-    public loadVrm(url: string) {
-      const loader = new GLTFLoader();
-      loader.load(
-
-	      // URL of the VRM you want to load
-	      url,
-
-	      // called when the resource is loaded
-	      ( gltf ) => {
-
-		      // generate a VRM instance from gltf
-		      VRM.from( gltf ).then( ( vrm ) => {
-
-                  if (this.vrmObject !== null) {
-                    this.scene.remove(this.vrmObject!);
-                  }
-
-			      // add the loaded vrm to the scene
-			      this.scene.add( vrm.scene );
-
-			      // deal with vrm features
-            this.meta = vrm.meta;
-            this.materials = vrm.materials;
-            this.vrmObject = vrm.scene;
-			      console.log( vrm );
-	      	} );
-
-	      },
-
-      	// called while loading is progressing
-      	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
-
-      	// called when loading has errors
-      	( error ) => console.error( error )
-
-      );
-    }
-
-    public convertRGB2Hex(color: THREE.Color): String {
-      const r = Math.round(Number(color.r) * 255);
-      const g = Math.round(Number(color.g) * 255);
-      const b = Math.round(Number(color.b) * 255);
-      return "#" + r.toString(16) + g.toString(16) + b.toString(16);
-    }
-
-    public changeTab(tabNumber: Number) {
-      this.currentTab = tabNumber;
-    }
-
-    public getMeshCount(objects: object[]): Number {
-      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
-    }
-
-    public getPolygonCount(objects: object[]): Number {
-      return objects
-              .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
-              .map((object) => 
-              {
-                if (object.type === "Group") {
-                  return object.children
-                          .map((mesh) => mesh.geometry.groups[0].count)
-                          .reduce((sum, value) => sum + value, 0);
-                }
-                else {
-                  return object.geometry.groups[0].count;
-                }
-              })
-              .reduce((sum, value) => sum + value, 0) / 3;
-    }
-
-    public getBlendShapeCount(objects: object[]): Number {
-      let count = 0;
-      objects.forEach((object) => {
-        if (object.type === "Group") {
-          count += object.children[0].geometry.userData.targetNames.length;
-        }
-      });
-      return count;
+      // add the loaded vrm to the scene
+      this.scene.add( this.vrmObject );
     }
   };
 </script>
 <style>
-  .tabs {
-    overflow: hidden;
-  }
-  .tabs li {
-    width: 100px;
-    font-size: 20px;
-    text-align: center;
-    margin: 15px;
-    padding: 5px;
-    color: black;
-    background: white;
-    border: 1px solid black;
-    list-style: none;
-    display: inline;
-  }
-  .tabs li.active{
-    color: white;
-    background: black;
-  }
-  .top {
-    position: relative;
-  }
-  .layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-  .layer-size {
-    width: 600px;
-    height: 400px;
-    margin: auto;
-  }
-  .layer1 {
-    z-index: 1;
-  }
-  .layer2 {
-    z-index: 2;
-  }
-  .white {
-    color: #ffffff;
-  }
-  .outline {
-    outline: 5px dashed red;
-  }
-  .license-img {
-    width: 100px;
-    height: auto;
-  }
-  .centering-list{
-    text-align: center;
-  }
-  .centering-list ul{
-    text-align: left;
-    display: inline-block;
-  }
-  .undot-list ul {
-    list-style: none;
-  }
-  .my-list li{
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-  .border {
-    border: 1px solid black;
-  }
-  #material-list div {
-    width:30%;
-    text-align:left;
-    margin: 10px;
-    padding: 10px;
-  }
 </style>
