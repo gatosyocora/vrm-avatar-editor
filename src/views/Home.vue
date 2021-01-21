@@ -7,8 +7,8 @@
       >
         <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
       </v-app-bar>
-      <p class="contents">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-      <div class="top layer-size contents">
+      <p class="margin-area">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
+      <div class="top layer-size margin-area">
         <div
           class="layer2 layer-size layer"
           :class="{outline:isDragOver}"
@@ -30,15 +30,15 @@
           <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
         </v-tabs>
       </v-card>
-      <div class="contents">
+      <div class="margin-area">
         <div v-show="currentTab === 0">
-          <MetaView :meta="meta" />
+          <MetaView :meta="meta"  class="contents"/>
         </div>
         <div v-show="currentTab === 1">
           <MaterialView :materials="materials" />
         </div>
         <div v-show="currentTab === 2">
-          <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
+          <ModelInfoView :vrmObject="vrmObject" :materials="materials"  class="contents"/>
         </div>
       </div>
     </center>
@@ -192,7 +192,10 @@ export default class Home extends Vue
   .outline {
     outline: 5px dashed red;
   }
-  .contents {
+  .margin-area {
     margin: 20px;
+  }
+  .contents {
+    max-width: 70%;
   }
 </style>
