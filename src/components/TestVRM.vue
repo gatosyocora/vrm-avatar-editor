@@ -14,52 +14,62 @@
       </div>
       <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
     </div>
-    <div v-if="meta !== null">
-      <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
-      <img v-else class="license-img" src="@/assets/license/com-ng.png" />
+    <ul v-show="vrmObject !== null"class="tabs">
+      <li v-on:click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
+      <li v-on:click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
+    </ul>
+    <div>
+      <div v-show="currentTab === 0">
+        <div v-if="meta !== null">
+          <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
+          <img v-else class="license-img" src="@/assets/license/com-ng.png" />
 
-      <img v-if="meta.sexualUssageName === 'Allow'" class="license-img" src="@/assets/license/sex-ok.png" />
-      <img v-else class="license-img" src="@/assets/license/sex-ng.png" />
+          <img v-if="meta.sexualUssageName === 'Allow'" class="license-img" src="@/assets/license/sex-ok.png" />
+          <img v-else class="license-img" src="@/assets/license/sex-ng.png" />
 
-      <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
-      <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
-    </div>
-    <div v-if="meta !== null" class="undot-list centering-list my-list">
-      <ul>
-        <li>Title : {{meta.title}}</li>
-        <li>Version : {{meta.version}}</li>
-        <li>Author : {{meta.author}}</li>
-        <li>AllowUser : {{meta.allowedUserName}}</li>
-        <li>CommercialUssage : {{meta.commercialUssageName}}</li>
-        <li>SexualUssage : {{meta.sexualUssageName}}</li>
-        <li>ViolentUssage : {{meta.violentUssageName}}</li>
-        <li>LicenseName : {{meta.licenseName}}</li>
-        <li>OtherLicense : 
-          <a v-bind:href="meta.otherLicenseUrl" target="_blank">
-            {{meta.otherLicenseUrl}}
-          </a>
-        </li>
-        <li>OtherPermission : 
-          <a v-bind:href="meta.otherPermissionUrl" target="_blank">
-            {{meta.otherPermissionUrl}}
-          </a>
-        </li>
-        <li>ContactInformation : 
-          <a v-bind:href="meta.contactInformation" target="_blank">
-            {{meta.contactInformation}}
-          </a>
-        </li>
-        <li>Reference : {{meta.reference}}</li>
-      </ul>
-    </div>
-    <div v-if="materials !== null">
-      <div v-for="(material, index) in materials">
-        <p>
-          {{material.name}}
-          {{convertRGB2Hex(material.color)}}
-          {{material.map.image.width}}x{{material.map.image.height}}
-          {{material.userData.vrmMaterialProperties.shader}}
-        </p>
+          <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
+          <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
+        </div>
+        <div v-if="meta !== null" class="undot-list centering-list my-list">
+          <ul>
+            <li>Title : {{meta.title}}</li>
+            <li>Version : {{meta.version}}</li>
+            <li>Author : {{meta.author}}</li>
+            <li>AllowUser : {{meta.allowedUserName}}</li>
+            <li>CommercialUssage : {{meta.commercialUssageName}}</li>
+            <li>SexualUssage : {{meta.sexualUssageName}}</li>
+            <li>ViolentUssage : {{meta.violentUssageName}}</li>
+            <li>LicenseName : {{meta.licenseName}}</li>
+            <li>OtherLicense : 
+              <a v-bind:href="meta.otherLicenseUrl" target="_blank">
+                {{meta.otherLicenseUrl}}
+              </a>
+            </li>
+            <li>OtherPermission : 
+              <a v-bind:href="meta.otherPermissionUrl" target="_blank">
+                {{meta.otherPermissionUrl}}
+              </a>
+            </li>
+            <li>ContactInformation : 
+              <a v-bind:href="meta.contactInformation" target="_blank">
+                {{meta.contactInformation}}
+              </a>
+            </li>
+            <li>Reference : {{meta.reference}}</li>
+          </ul>
+        </div>
+      </div>
+      <div v-show="currentTab === 1">
+        <div v-if="materials !== null">
+          <div v-for="(material, index) in materials">
+            <p>
+              {{material.name}}
+              {{convertRGB2Hex(material.color)}}
+              {{material.map.image.width}}x{{material.map.image.height}}
+              {{material.userData.vrmMaterialProperties.shader}}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -134,12 +144,16 @@
     }
 
     @Prop()
+    public currentTab: Number = 0;
+
+    @Prop()
     public meta: VRMMeta | undefined | null = null;
 
     @Prop()
     public materials: THREE.Material[] | undefined | null = null;
 
-    private vrmObject: THREE.Scene | THREE.Group | null = null;
+    @Prop()
+    public vrmObject: THREE.Scene | THREE.Group | null = null;
 
     mounted() {
       const $canvas = <HTMLCanvasElement> document.getElementById("canvas");
@@ -211,9 +225,32 @@
       const b = Math.round(Number(color.b) * 255);
       return "#" + r.toString(16) + g.toString(16) + b.toString(16);
     }
+
+    public changeTab(tabNumber: Number) {
+      this.currentTab = tabNumber;
+    }
   };
 </script>
 <style>
+  .tabs {
+    overflow: hidden;
+  }
+  .tabs li {
+    width: 100px;
+    font-size: 20px;
+    text-align: center;
+    margin: 15px;
+    padding: 5px;
+    color: black;
+    background: white;
+    border: 1px solid black;
+    list-style: none;
+    display: inline;
+  }
+  .tabs li.active{
+    color: white;
+    background: black;
+  }
   .top {
     position: relative;
   }
