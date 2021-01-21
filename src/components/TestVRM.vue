@@ -10,18 +10,18 @@
         @dragleave.prevent="onDrag('leave')"
         @drop.prevent="onDrop">
         <div>VRMをドラッグ&ドロップ</div>
-        <p><input type="file" v-on:change="onFileChange" accept=".vrm"></p>
+        <p><input type="file" @change="onFileChange" accept=".vrm"></p>
       </div>
       <canvas id="canvas" width="600" height="400" class="layer1 layer-size layer"></canvas>
     </div>
-    <ul v-show="vrmObject !== null"class="tabs">
-      <li v-on:click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
-      <li v-on:click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
-      <li v-on:click="changeTab(2)" :class="{'active': currentTab === 2}">Model</li>
+    <ul v-if="vrmObject" class="tabs">
+      <li @click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</li>
+      <li @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</li>
+      <li @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</li>
     </ul>
     <div>
       <div v-show="currentTab === 0">
-        <div v-if="meta !== null">
+        <div v-if="meta">
           <img v-if="meta.commercialUssageName === 'Allow'" class="license-img" src="@/assets/license/com-ok.png" />
           <img v-else class="license-img" src="@/assets/license/com-ng.png" />
 
@@ -31,7 +31,7 @@
           <img v-if="meta.violentUssageName === 'Allow'" class="license-img" src="@/assets/license/vio-ok.png" />
           <img v-else class="license-img" src="@/assets/license/vio-ng.png" />
         </div>
-        <div v-if="meta !== null" class="undot-list centering-list my-list">
+        <div v-if="meta" class="undot-list centering-list my-list">
           <ul>
             <li>Title : {{meta.title}}</li>
             <li>Version : {{meta.version}}</li>
@@ -42,17 +42,17 @@
             <li>ViolentUssage : {{meta.violentUssageName}}</li>
             <li>LicenseName : {{meta.licenseName}}</li>
             <li>OtherLicense : 
-              <a v-bind:href="meta.otherLicenseUrl" target="_blank">
+              <a :href="meta.otherLicenseUrl" target="_blank">
                 {{meta.otherLicenseUrl}}
               </a>
             </li>
             <li>OtherPermission : 
-              <a v-bind:href="meta.otherPermissionUrl" target="_blank">
+              <a :href="meta.otherPermissionUrl" target="_blank">
                 {{meta.otherPermissionUrl}}
               </a>
             </li>
             <li>ContactInformation : 
-              <a v-bind:href="meta.contactInformation" target="_blank">
+              <a :href="meta.contactInformation" target="_blank">
                 {{meta.contactInformation}}
               </a>
             </li>
@@ -61,7 +61,7 @@
         </div>
       </div>
       <div v-show="currentTab === 1">
-        <div v-if="materials !== null">
+        <div v-if="materials">
           <div v-for="(material, index) in materials">
             <p>
               {{material.name}}
@@ -73,7 +73,7 @@
         </div>
       </div>
       <div v-show="currentTab === 2">
-        <div v-if="vrmObject !== null">
+        <div v-if="vrmObject">
           <p v-if="vrmObject.children !== null">Mesh Count: {{getMeshCount(vrmObject.children)}}</p>
           <p v-if="materials !== null">SubMesh Count: {{materials.length}}</p>
           <p v-if="vrmObject.children !== null">Polygon Count: {{getPolygonCount(vrmObject.children)}}</p>
@@ -211,7 +211,7 @@
     }
 
     public getMeshCount(objects: object[]): Number {
-      return objects.filter((object) => object.type === "Group" || object.type === "SkinnedMesh").length;
+      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
     }
 
     public getPolygonCount(objects: object[]): Number {
