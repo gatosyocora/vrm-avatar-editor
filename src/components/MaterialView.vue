@@ -4,10 +4,16 @@
             <v-card
               dark
             >
-                <p>{{material.name}}</p>
-                <p>{{convertRGB2Hex(material.color)}}</p>
-                <p>{{material.map.image.width}}x{{material.map.image.height}}</p>
-                <p>{{material.userData.vrmMaterialProperties.shader}}</p>
+              <v-card-title>
+                {{material.name}}
+              </v-card-title>
+              <v-card-text>
+                <p class="display-1">{{material.map.image.width}}x{{material.map.image.height}}</p>
+                <p class="display-1">{{material.userData.vrmMaterialProperties.shader}}</p>
+              </v-card-text>
+              <v-card
+                :color="convertRGB2Hex(material.color)"
+              ></v-card>
             </v-card>
         </div>
     </div>
@@ -38,6 +44,5 @@
     text-align:left;
     margin: 10px;
     padding: 10px;
-    border: 1px solid black;
   }
 </style>
