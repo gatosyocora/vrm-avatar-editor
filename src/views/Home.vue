@@ -46,6 +46,10 @@ import MetaView from '@/components/MetaView.vue';
 import MaterialView from '@/components/MaterialView.vue';
 import ModelInfoView from '@/components/ModelInfoView.vue';
 
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
+}
+
 @Component({
   components: {
     VRMCanvas,

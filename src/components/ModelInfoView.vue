@@ -12,10 +12,6 @@
   import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
 
-  interface HTMLInputEvent extends Event {
-    target: HTMLInputElement & EventTarget;
-  }
-
   @Component
   export default class ModelInfoView extends Vue {
 

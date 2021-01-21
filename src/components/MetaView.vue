@@ -47,10 +47,6 @@
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
 
-  interface HTMLInputEvent extends Event {
-    target: HTMLInputElement & EventTarget;
-  }
-
   @Component
   export default class MetaView extends Vue {
     @Prop()

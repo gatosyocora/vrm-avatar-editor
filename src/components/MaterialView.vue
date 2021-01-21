@@ -18,10 +18,6 @@
   import * as THREE from 'three';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
 
-  interface HTMLInputEvent extends Event {
-    target: HTMLInputElement & EventTarget;
-  }
-
   @Component
   export default class MaterialView extends Vue {
 
