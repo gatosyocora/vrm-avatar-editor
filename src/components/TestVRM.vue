@@ -211,7 +211,7 @@
     }
 
     public getMeshCount(objects: object[]): Number {
-      return objects.filter((object) => object.type === "Group").length;
+      return objects.filter((object) => object.type === "Group" || object.type === "SkinnedMesh").length;
     }
 
     public getPolygonCount(objects: object[]): Number {
