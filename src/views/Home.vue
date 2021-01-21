@@ -5,13 +5,13 @@
       <p>ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
       <div class="top layer-size">
         <div
-          class="layer2 layer-size layer white"
+          class="layer2 layer-size layer"
           :class="{outline:isDragOver}"
           @dragover.prevent="onDrag('over')"
           @dragleave.prevent="onDrag('leave')"
           @drop.prevent="onDrop">
-          <div>VRMをドラッグ&ドロップ</div>
-          <p><input type="file" @change="onFileChange" accept=".vrm"></p>
+          <div class="white-color">VRMをドラッグ&ドロップ</div>
+          <p><input type="file" class="white-color" @change="onFileChange" accept=".vrm"></p>
         </div>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
       </div>
@@ -176,7 +176,7 @@ export default class Home extends Vue
   .layer2 {
     z-index: 2;
   }
-  .white {
+  .white-color {
     color: #ffffff;
   }
   .outline {
