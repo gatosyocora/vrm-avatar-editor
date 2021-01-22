@@ -1,19 +1,56 @@
 <template>
     <div v-if="materials">
-        <div id="material-list" v-for="(material, index) in materials">
+        <div v-for="(material, index) in materials">
             <v-card
               dark
+              class="card"
             >
-              <v-card-title>
-                {{material.name}}
-              </v-card-title>
-              <v-card-text>
-                <p class="display-1">{{material.map.image.width}}x{{material.map.image.height}}</p>
-                <p class="display-1">{{material.userData.vrmMaterialProperties.shader}}</p>
-              </v-card-text>
-              <v-card
-                :color="convertRGB2Hex(material.color)"
-              ></v-card>
+              <v-list-item three-line>
+                <v-list-item-content>
+                  <v-list-item-title class="headline">
+                    {{material.name}}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{material.userData.vrmMaterialProperties.shader}}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+
+                <v-list-item-avatar
+                  size="80"
+                  :color="convertRGB2Hex(material.color)"
+                />
+                <div
+                  style="margin:0 10px 0 10px;"
+                >
+                  <v-hover v-slot="{ hover }">
+                    <v-list-item-avatar
+                      rounded
+                      size="80"
+                      color="white"
+                    >
+                      <v-img
+                        v-if="material.map&&material.map.image"
+                        :src="convertImageBitmap2Base64(material.map.image)"
+                      >
+                        <div
+                          v-if="hover"
+                          class="tex-info"
+                        >
+                          {{material.map.image.width}}x{{material.map.image.height}}
+                        </div>
+                      </v-img>
+                      <span
+                        style="color:black;"
+                        v-else
+                      >
+                          none
+                      </span>
+                    </v-list-item-avatar>
+                  </v-hover>
+                </div>
+              </v-list-item>
             </v-card>
         </div>
     </div>
@@ -36,13 +73,26 @@
       const b = Math.round(Number(color.b) * 255);
       return "#" + r.toString(16) + g.toString(16) + b.toString(16);
     }
+
+    public convertImageBitmap2Base64(image: THREE.ImageBitmap): string {
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      canvas.getContext('2d').drawImage(image, 0, 0);
+      return canvas.toDataURL();
+    }
   };
 </script>
 <style>
-  #material-list div {
-    width:30%;
-    text-align:left;
+  .card {
     margin: 10px;
-    padding: 10px;
+    width: 50%;
+  }
+  .tex-info {
+    font-size: 10px;
+    background: grey;
+    opacity: 0.75;
+    width: 100%;
+    height: 100%;
   }
 </style>

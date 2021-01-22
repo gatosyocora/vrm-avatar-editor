@@ -30,15 +30,15 @@
           <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
         </v-tabs>
       </v-card>
-      <div class="margin-area">
+      <div class="margin-area contents">
         <div v-show="currentTab === 0">
-          <MetaView :meta="meta"  class="contents"/>
+          <MetaView :meta="meta"/>
         </div>
         <div v-show="currentTab === 1">
-          <MaterialView :materials="materials" />
+          <MaterialView :materials="materials"/>
         </div>
         <div v-show="currentTab === 2">
-          <ModelInfoView :vrmObject="vrmObject" :materials="materials"  class="contents"/>
+          <ModelInfoView :vrmObject="vrmObject" :materials="materials"/>
         </div>
       </div>
     </center>
