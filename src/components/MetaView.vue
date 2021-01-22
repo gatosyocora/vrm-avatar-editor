@@ -61,16 +61,21 @@
 
     public getPolygonCount(objects: Arrays): Number {
       return objects
-              .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
+              .filter((object) => ["Group", "SkinnedMesh", "Object3D"].includes(object.type))
               .map((object) => 
               {
-                if (object.type === "Group") {
+                if (["Group", "Object3D"].includes(object.type)) {
+                  if (object.children.length <= 0) return 0;
                   return object.children
                           .map((mesh) => (mesh as VRMSkinnedMesh).geometry.groups[0].count)
                           .reduce((sum, value) => sum + value, 0);
                 }
-                else {
+                else if (object.type === "SkinnedMesh"){
                   return (object as VRMSkinnedMesh).geometry.groups[0].count;
+                }
+                else {
+                  return object.children.map((mesh) => (mesh as VRMSkinnedMesh).geometry.groups[0].count)
+                          .reduce((sum, value) => sum + value, 0);
                 }
               })
               .reduce((sum, value) => sum + value, 0) / 3;
