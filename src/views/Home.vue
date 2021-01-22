@@ -20,7 +20,7 @@
         </div>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
       </div>
-      <v-card v-if="vrmObject">
+      <v-card>
         <v-tabs
           fixed-tabs
           dark
