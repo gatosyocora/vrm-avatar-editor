@@ -198,4 +198,8 @@ export default class Home extends Vue
   .contents {
     max-width: 70%;
   }
+  
+  .v-data-table__wrapper tr:hover {
+    background: white !important;
+  }
 </style>
