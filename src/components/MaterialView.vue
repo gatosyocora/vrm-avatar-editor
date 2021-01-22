@@ -19,6 +19,7 @@
 
                 <v-list-item-avatar
                   size="80"
+                  v-if="material.color"
                   :color="convertRGB2Hex(material.color)"
                 />
                 <div
