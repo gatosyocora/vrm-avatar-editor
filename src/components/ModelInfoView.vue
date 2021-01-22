@@ -76,7 +76,7 @@
     }
 
     public getBoneCount(objects: Arrays): Number {
-        return this.getChildrenCount(objects.filter((object) => ["Armature", "Root"].includes(object.name))[0]);
+        return this.getChildrenCount(objects.filter((object) => object.children.length > 0 && object.children[0].type === "Bone")[0]);
     }
 
     public getChildrenCount(parent: THREE.Object3D|THREE.Bone): number {
