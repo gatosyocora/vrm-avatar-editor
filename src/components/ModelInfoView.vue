@@ -31,7 +31,7 @@
   import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
 
-  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh> {}
+  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh|THREE.Bone> {}
 
   interface VRMSkinnedMesh extends THREE.SkinnedMesh {
     geometry: THREE.BufferGeometry;
@@ -51,7 +51,11 @@
     public vrmObject: THREE.Scene | THREE.Group | null = null;
 
     public getMeshCount(objects: Arrays): Number {
-      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
+      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length + 
+              objects
+                .filter((object) => object.type === "Object3D" && object.children.length > 0)
+                .map((object) => object.children[0].children.length)
+                .reduce((sum, value) => sum + value, 0);
     }
 
     public getPolygonCount(objects: Arrays): Number {
@@ -72,10 +76,10 @@
     }
 
     public getBoneCount(objects: Arrays): Number {
-        return this.getChildrenCount(objects.filter((object) => object.name === "Armature")[0]);
+        return this.getChildrenCount(objects.filter((object) => ["Armature", "Root"].includes(object.name))[0]);
     }
 
-    public getChildrenCount(parent: THREE.Object3D|THREE.Group|THREE.SkinnedMesh): number {
+    public getChildrenCount(parent: THREE.Object3D|THREE.Bone): number {
         if (parent.children.length === 0) return 0;
         else {
             return parent.children
@@ -89,7 +93,8 @@
       let count = 0;
       objects.forEach((object) => {
         if (object.type === "Group") {
-          count += (object as VRMGroup).children[0].geometry.userData.targetNames.length;
+          const userData = (object as VRMGroup).children[0].geometry.userData;
+          count += userData.targetNames ? userData.targetNames.length : 0;
         }
       });
       return count;
