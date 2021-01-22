@@ -67,10 +67,10 @@
     @Prop()
     public materials: THREE.Material[] | undefined | null = null;
 
-    public convertRGB2Hex(color: THREE.Color): String {
-      const r = Math.round(Number(color.r) * 255);
-      const g = Math.round(Number(color.g) * 255);
-      const b = Math.round(Number(color.b) * 255);
+    public convertRGB2Hex(color: Vector3|Vector4): String {
+      const r = Math.round(Number(color.x) * 255);
+      const g = Math.round(Number(color.y) * 255);
+      const b = Math.round(Number(color.z) * 255);
       return "#" + r.toString(16) + g.toString(16) + b.toString(16);
     }
 
