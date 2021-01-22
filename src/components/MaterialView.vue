@@ -74,11 +74,11 @@
       return "#" + r.toString(16) + g.toString(16) + b.toString(16);
     }
 
-    public convertImageBitmap2Base64(image: THREE.ImageBitmap): string {
+    public convertImageBitmap2Base64(image: ImageBitmap): string {
       const canvas = document.createElement("canvas");
       canvas.width = image.width;
       canvas.height = image.height;
-      canvas.getContext('2d').drawImage(image, 0, 0);
+      canvas.getContext('2d')!.drawImage(image, 0, 0);
       return canvas.toDataURL();
     }
   };
