@@ -96,6 +96,10 @@
           const userData = (object as VRMGroup).children[0].geometry.userData;
           count += userData.targetNames ? userData.targetNames.length : 0;
         }
+        else if (object.type === "SkinnedMesh") {
+          const userData = (object as VRMSkinnedMesh).geometry.userData;
+          count += userData.targetNames ? userData.targetNames.length : 0;
+        }
       });
       return count;
     }
