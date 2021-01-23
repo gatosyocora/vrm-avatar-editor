@@ -37,15 +37,7 @@
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
 
-  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh> {}
-
-  interface VRMSkinnedMesh extends THREE.SkinnedMesh {
-    geometry: THREE.BufferGeometry;
-  }
-
-  interface VRMGroup extends THREE.Group {
-    children: Array<VRMSkinnedMesh>;
-  }
+  import { Arrays, VRMSkinnedMesh, VRMGroup } from '@/scripts/VRMInterface';
 
   @Component
   export default class MetaView extends Vue {
