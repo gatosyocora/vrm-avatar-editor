@@ -20,6 +20,7 @@
         </div>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
       </div>
+      <ExportButton :vrm="vrm"/>
       <v-card>
         <v-tabs
           fixed-tabs
@@ -55,6 +56,7 @@ import VRMCanvas from '@/components/VRMCanvasView.vue'; // @ is an alias to /src
 import MetaView from '@/components/MetaView.vue';
 import MaterialView from '@/components/MaterialView.vue';
 import ModelInfoView from '@/components/ModelInfoView.vue';
+import ExportButton from '@/components/ExportButton.vue';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -66,11 +68,15 @@ interface HTMLInputEvent extends Event {
     MetaView,
     MaterialView,
     ModelInfoView,
+    ExportButton,
   },
 })
 
 export default class Home extends Vue 
 {
+    @Prop()
+    public vrm: THREE.Scene | null = null;
+
     @Prop()
     public meta: VRMMeta | undefined | null = null;
 
@@ -123,6 +129,7 @@ export default class Home extends Vue
 		      // generate a VRM instance from gltf
 		      VRM.from( gltf ).then( ( vrm ) => {
               // deal with vrm features
+              this.vrm = vrm;
               this.meta = vrm.meta;
               this.materials = vrm.materials;
               this.vrmObject = vrm.scene;
