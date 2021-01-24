@@ -30,16 +30,8 @@
 <script lang="ts">
   import { Component, Prop, Vue } from "vue-property-decorator";
   import * as THREE from 'three';
-
-  interface Arrays extends Array<THREE.Object3D|THREE.Group|THREE.SkinnedMesh|THREE.Bone> {}
-
-  interface VRMSkinnedMesh extends THREE.SkinnedMesh {
-    geometry: THREE.BufferGeometry;
-  }
-
-  interface VRMGroup extends THREE.Group {
-    children: Array<VRMSkinnedMesh>;
-  }
+  
+  import { Arrays, VRMSkinnedMesh, VRMGroup } from '@/scripts/VRMInterface';
 
   @Component
   export default class ModelInfoView extends Vue {
