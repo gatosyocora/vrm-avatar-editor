@@ -289,8 +289,16 @@ export default class VRMExporter {
             "textures":　outputTextures
         };
     
-        const header = "";
-        onDone(header + JSON.stringify(outputData, undefined, 2) + buffers.join());
+        const jsonData = JSON.stringify(outputData, undefined, 2);
+        const jsonSize = calculateByteSize(jsonData);
+        const jsonChunk = parseNumber2Int32Byte(jsonSize) + "JSON";
+        const bufferData = buffers.map(buffer => parseNumber2Int32Byte(buffer.length) + "BIN\x00" + buffer);
+        const fileData = jsonChunk + jsonData + bufferData;
+        const fileSize = calculateByteSize(fileData);
+        console.log(jsonSize);
+        console.log(fileSize);
+        const header = "glTF" + parseNumber2Int32Byte(2) + parseNumber2Int32Byte(fileSize);
+        onDone(header + fileData);
     }
 }
 
@@ -310,4 +318,15 @@ function imageBitmap2png(image) {
     canvas.getContext('2d').drawImage(image, 0, 0);
     var pngUrl = canvas.toDataURL("image/png");
     return atob(pngUrl.split(',')[1]);
+}
+
+function parseNumber2Int32Byte(number) {
+    const buf = new ArrayBuffer(4);
+    const view = new DataView(buf);
+    view.setInt32(0, number, true);
+    return String.fromCharCode.apply("", new Int32Array(buf));
+}
+
+function calculateByteSize(str) {
+    return encodeURIComponent(str).replace(/%../g, "x").length;
 }
