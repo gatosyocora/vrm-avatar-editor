@@ -12,7 +12,7 @@ const REPEAT = 10497;
 
 export default class VRMExporter {
     constructor() {}
-    parse(scene, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
+    parse(scene, humanoid, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
 
         const exporterInfo = { // データがなくて取得できない
             "generator": "UniGLTF-2.0.0",
@@ -181,6 +181,24 @@ export default class VRMExporter {
             }))
         };
 
+        const vrmHumanoid = {
+            "armStreatch": humanoid.armStreatch,
+            "feetSpacing": humanoid.feetSpacing,
+            "hasTranslationDoF": humanoid.hasTranslationDoF,
+            "humanBones": Object.entries(humanoid.humanBones)
+                            .filter(x => x[1].length > 0)
+                            .map(x => ({
+                                "bone": x[0],
+                                "node": nodeNames.indexOf(x[1][0].node.name),
+                                "useDefaultValues": true // TODO
+                            })),
+            "legStretch": humanoid.legStretch,
+            "lowerArmTwist": humanoid.lowerArmTwist,
+            "lowerLegTwist": humanoid.lowerLegTwist,
+            "upperArmTwist": humanoid.upperArmTwist,
+            "upperLegTwist": humanoid.upperLegTwist
+        };
+
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
         vrmMeta.texture = -1; // TODO データがなくなっているので復元不可で添え字なし
@@ -260,13 +278,13 @@ export default class VRMExporter {
                     "byteLength": bufferOffset
                 }
             ],
-            "bufferViews": bufferViews, // 35
+            "bufferViews": bufferViews, // 35 (texture:2, icon:1, )
             "extensions":{
                 "VRM": {
                     "blendShapeMaster": blendShapeMaster,
                     "exporterVersion": exporterVersion,
                     "firstPerson": vrmFirstPerson,
-                    "humanoid": {}, // TODO
+                    "humanoid": vrmHumanoid,
                     "materialProperties": materialProperties,
                     "meta": vrmMeta,
                     "secondaryAnimation": secondaryAnimation,
