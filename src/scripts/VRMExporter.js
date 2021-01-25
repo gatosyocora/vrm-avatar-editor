@@ -73,7 +73,7 @@ export default class VRMExporter {
         }));
 
         const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[0];
-        const nodes = getNodes(rootNode).reverse();
+        const nodes = getNodes(rootNode);
         const nodeNames = nodes.map(node => node.name);
         const outputNodes = nodes.map(node => ({
             "children": node.children.map(childNode => nodeNames.indexOf(childNode.name)),
@@ -300,7 +300,7 @@ function radian2Degree(radian) {
 
 function getNodes(parentNode) {
     if (parentNode.children.length <= 0) return parentNode;
-    return parentNode.children.map(child => getNodes(child)).concat(parentNode).flat();
+    return [parentNode].concat(parentNode.children.map(child => getNodes(child)).flat());
 }
 
 function imageBitmap2png(image) {
