@@ -96,38 +96,174 @@ export default class VRMExporter {
             ]
         }));
 
+        const accessors = [];
+
         const meshes = scene.children.filter(child => child.type === "Group");
+
+        let meshDatas = [];
+        meshes.forEach(group => {
+            const attributes = group.children[0].geometry.attributes;
+            meshDatas.push(attributes.position.array);
+            meshDatas.push(attributes.normal.array);
+            meshDatas.push(attributes.uv.array);
+            meshDatas.push(attributes.skinWeight.array);
+            meshDatas.push(attributes.skinIndex.array);
+
+            group.children.forEach(subMesh => {
+                meshDatas.push(subMesh.geometry.index.array);
+            });
+
+            group.children[0].userData.targetNames.forEach(_ => {
+                meshDatas.push(attributes.position.array); // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(attributes.normal.array); // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+            });
+
+            // position
+            accessors.push({
+                "bufferView": -1,
+                "byteOffset": 0, // TODO とりあえず0
+                "componentType": FLOAT,
+                "count": attributes.position.count,
+                "max": [
+                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
+                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
+                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
+                ],
+                "min": [
+                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
+                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
+                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
+                ],
+                "normalized": false,
+                "type": "VEC3"
+            });
+
+            // normal
+            accessors.push({
+                "bufferView": -1,
+                "byteOffset": 0, // TODO とりあえず0
+                "componentType": FLOAT,
+                "count": attributes.normal.count,
+                "normalized": false,
+                "type": "VEC3"
+            });
+
+            // uv
+            accessors.push({
+                "bufferView": -1,
+                "byteOffset": 0, // TODO とりあえず0
+                "componentType": FLOAT,
+                "count": attributes.uv.count,
+                "normalized": false,
+                "type": "VEC2"
+            });
+
+            // skinWeight
+            accessors.push({
+                "bufferView": -1,
+                "byteOffset": 0, // TODO とりあえず0
+                "componentType": FLOAT,
+                "count": attributes.skinWeight.count,
+                "normalized": false,
+                "type": "VEC4"
+            });
+
+            // skinIndex
+            accessors.push({
+                "bufferView": -1,
+                "byteOffset": 0, // TODO とりあえず0
+                "componentType": UNSIGNED_SHORT,
+                "count": attributes.skinWeight.count,
+                "normalized": false,
+                "type": "VEC4"
+            });
+
+            // index
+            group.children.forEach(subMesh => {
+                accessors.push({
+                    "bufferView": -1,
+                    "byteOffset": 0, // TODO とりあえず0
+                    "componentType": UNSIGNED_INT,
+                    "count": subMesh.geometry.index.count,
+                    "normalized": false,
+                    "type": "SCALAR"
+                });
+            });
+
+            // blendShape position, normal
+            group.children[0].userData.targetNames.forEach(_ => {
+
+                accessors.push({
+                    "bufferView": -1,
+                    "byteOffset": 0, // TODO とりあえず0
+                    "componentType": FLOAT,
+                    "count": attributes.position.count,
+                    "max": [
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    ],
+                    "min": [
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    ],
+                    "normalized": false,
+                    "type": "VEC3"
+                });
+
+                accessors.push({
+                    "bufferView": -1,
+                    "byteOffset": 0, // TODO とりあえず0
+                    "componentType": FLOAT,
+                    "count": attributes.normal.count,
+                    "normalized": false,
+                    "type": "VEC3"
+                });
+            });
+
+        });
+
+        // inverseBindMatrices
+        meshDatas.push([]); // TODO
+        accessors.push({
+            "bufferView": -1,
+            "byteOffset": 0,
+            "componentType": FLOAT,
+            "count": nodes.length,
+            "normalized": false,
+            "type": "MAT4"
+        });
 
         const outputMeshes = meshes.map(group => ({
                                     "extras": {
                                         "targetNames": group.children[0].geometry.userData.targetNames,
                                     },
                                     "name": group.name, // TODO なんか違う名前になっている
-                                    "primitives": group.children.map(subMesh => ({
+                                    "primitives": group.children.map((subMesh, index) => ({
                                         "attributes": {
-                                            "JOINTS_0": 4, // TODO とりあえずこの数字
-                                            "NORMAL": 1, // TODO とりあえずこの数字
-                                            "POSITION": 0, // TODO とりあえずこの数字
-                                            "TEXCOORD_0": 2, // TODO とりあえずこの数字
-                                            "WEIGHTS_0": 3 // TODO とりあえずこの数字
+                                            "JOINTS_0": 4, // TODO とりあえずこの数字 accessorsの添え字
+                                            "NORMAL": 1, // TODO とりあえずこの数字 accessorsの添え字
+                                            "POSITION": 0, // TODO とりあえずこの数字 accessorsの添え字
+                                            "TEXCOORD_0": 2, // TODO とりあえずこの数字 accessorsの添え字
+                                            "WEIGHTS_0": 3 // TODO とりあえずこの数字 accessorsの添え字
                                         },
                                         "extras": {
                                             "targetNames": subMesh.geometry.userData.targetNames
                                         },
-                                        "indices": -1, // TODO
+                                        "indices": 5 + index, // TODO 5, 6
                                         "material": uniqueMaterialNames.indexOf(subMesh.material[0].name),
                                         "mode": 4, // TODO とりあえず4にした
-                                        "targets": [ // 12
-                                            {
-                                                "NORMAL": -1, // TODO
-                                                "POSITION": -1 // TODO
-                                            }
-                                        ]
+                                        "targets": subMesh.geometry.userData.targetNames.map((_, i) => 
+                                        ({
+                                            "NORMAL": 8 + i * 2, // TODO accessorsの添え字
+                                            "POSITION": 7 + i * 2 // TODO accessorsの添え字
+                                        }))
                                     }))
                                 }));
 
         const outputSkins = meshes.map(group => ({
-                                    "inverseBindMatrices": -1, // TODO
+                                    "inverseBindMatrices": accessors.length - 1, // TODO accessorsの最後に入っている
                                     "joints": [], // TODO
                                     "skeleton": 1 // TODO とりあえず1にした
                                 }));
@@ -208,13 +344,11 @@ export default class VRMExporter {
             "colliderGroups": springBone.colliderGroups
         };
 
-        const accessors = [];
-
         let buffers = [];
         let bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
-        //buffers.push()
+        buffers.push(...meshDatas.map(data => parseNumber2Int32Byte(data)));
         if (icon) {
             buffers.push(imageBitmap2png(icon));
         }
