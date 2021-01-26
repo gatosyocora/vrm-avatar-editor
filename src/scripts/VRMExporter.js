@@ -230,7 +230,7 @@ export default class VRMExporter {
             "bufferView": -1,
             "byteOffset": 0,
             "componentType": FLOAT,
-            "count": nodes.length,
+            "count": nodes.length - 1, // TODO: rootNodeを抜くから-1 ?
             "normalized": false,
             "type": "MAT4"
         });
