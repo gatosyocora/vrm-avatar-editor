@@ -286,7 +286,7 @@ export default class VRMExporter {
         })));
 
         // secondary
-        const secondaryRootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[1];
+        const secondaryRootNode = scene.children.filter(child => child.type === "Object3D")[1]; // TODO: 取得方法を見直す必要がある
         outputNodes.push({
             "name": secondaryRootNode.name,
             "rotation": [
