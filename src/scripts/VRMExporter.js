@@ -393,7 +393,7 @@ export default class VRMExporter {
         let bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
-        buffers.push(...meshDatas.map(data => parseNumber2Int32Byte(data)));
+        buffers.push(...meshDatas.map(data => data));
         if (icon) {
             buffers.push(imageBitmap2png(icon));
         }
