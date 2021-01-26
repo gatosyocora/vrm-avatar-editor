@@ -262,6 +262,51 @@ export default class VRMExporter {
                                     }))
                                 }));
 
+        // mesh
+        outputNodes.push(meshes.map(group => ({
+            "mesh": 0, // TODO
+            "name": group.name,
+            "rotation": [
+                node.quaternion._x,
+                node.quaternion._y,
+                node.quaternion._z,
+                node.quaternion._w
+            ],
+            "scale": [
+                group.scake.x,
+                group.scake.y,
+                group.scake.z
+            ],
+            "skin": 0, // TODO
+            "translation": [
+                group.position.x,
+                group.position.y,
+                group.position.z
+            ]
+        })));
+
+        // secondary
+        const secondaryRootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[1];
+        outputNodes.push({
+            "name": secondaryRootNode.name,
+            "rotation": [
+                secondaryRootNode.quaternion._x,
+                secondaryRootNode.quaternion._y,
+                secondaryRootNode.quaternion._z,
+                secondaryRootNode.quaternion._w
+            ],
+            "scale": [
+                secondaryRootNode.scale.x,
+                secondaryRootNode.scale.y,
+                secondaryRootNode.scale.z
+            ],
+            "translation": [
+                secondaryRootNode.position.x,
+                secondaryRootNode.position.y,
+                secondaryRootNode.position.z
+            ]
+        });
+
         const outputSkins = meshes.map(group => ({
                                     "inverseBindMatrices": accessors.length - 1, // TODO: accessorsの最後に入っている
                                     "joints": [], // TODO:
