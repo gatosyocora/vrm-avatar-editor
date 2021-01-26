@@ -24,30 +24,30 @@ export default class VRMExporter {
                                             self.findIndex(e => e.name === material.name) === index);
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
 
-        const icon = null; // TODO vrmMeta.texture.image; ここにあると思ったけどここになかった
+        const icon = null; // TODO: vrmMeta.texture.image; ここにあると思ったけどここになかった
         const images = uniqueMaterials.map(material => material.map.image);
         const outputImage = images/*.concat(icon)*/.map(_ => ({ // データが無くなっているので復元できない
             "bufferView": -1,
-            "mimeType": "image\/png", // TODO とりあえずpngをいれた
-            "name": "" // TODO
+            "mimeType": "image\/png", // TODO: とりあえずpngをいれた
+            "name": "" // TODO:
         }));
         const outputSamplers = outputImage.map(_ =>({ // imagesに対応していることだけ分かっている
-            "magFilter": LINEAR, // TODO だいたいこれだった
-            "minFilter": LINEAR, // TODO だいたいこれだった
-            "wrapS": REPEAT, // TODO だいたいこれだったからとりあえず直打ちした
-            "wrapT": REPEAT // TODO だいたいこれだった
+            "magFilter": LINEAR, // TODO: だいたいこれだった
+            "minFilter": LINEAR, // TODO: だいたいこれだった
+            "wrapS": REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
+            "wrapT": REPEAT // TODO: だいたいこれだった
         }));
         const outputTextures = outputImage.map((_, index) => ({ // imagesに対応していることだけ分かっている
-            "sampler": index, // TODO 全パターンでindexなのか不明
-            "source": index // TODO 全パターンでindexなのか不明
+            "sampler": index, // TODO: 全パターンでindexなのか不明
+            "source": index // TODO: 全パターンでindexなのか不明
         }));
 
         const outputMaterials = uniqueMaterials.map((material, index) => 
         ({
-            "alphaMode": "OPAQUE", // TODO
-            "doubleSided": false, // TODO
+            "alphaMode": "OPAQUE", // TODO:
+            "doubleSided": false, // TODO:
             "extensions": {
-                "KHR_materials_unlit": {} // TODO
+                "KHR_materials_unlit": {} // TODO:
             },
             "name": material.name,
             "pbrMetallicRoughness": {
@@ -55,7 +55,7 @@ export default class VRMExporter {
                     material.color.r,
                     material.color.g,
                     material.color.b,
-                    1 // TODO
+                    1 // TODO:
                 ],
                 "baseColorTexture": {
                     "extensions": {
@@ -64,11 +64,11 @@ export default class VRMExporter {
                             "scale": [1, 1]
                         }
                     },
-                    "index": index, // TODO とりあえずindexにした
-                    "texCoord": 0 // TODO
+                    "index": index, // TODO: とりあえずindexにした
+                    "texCoord": 0 // TODO:
                 },
-                "metallicFactor": 0, // TODO
-                "roughnessFactor": 0.9 // TODO
+                "metallicFactor": 0, // TODO:
+                "roughnessFactor": 0.9 // TODO:
             }
         }));
 
@@ -114,14 +114,14 @@ export default class VRMExporter {
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(attributes.position.array); // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(attributes.normal.array); // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(attributes.position.array); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(attributes.normal.array); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
 
             // position
             accessors.push({
                 "bufferView": -1,
-                "byteOffset": 0, // TODO とりあえず0
+                "byteOffset": 0, // TODO: とりあえず0
                 "componentType": FLOAT,
                 "count": attributes.position.count,
                 "max": [
@@ -141,7 +141,7 @@ export default class VRMExporter {
             // normal
             accessors.push({
                 "bufferView": -1,
-                "byteOffset": 0, // TODO とりあえず0
+                "byteOffset": 0, // TODO: とりあえず0
                 "componentType": FLOAT,
                 "count": attributes.normal.count,
                 "normalized": false,
@@ -151,7 +151,7 @@ export default class VRMExporter {
             // uv
             accessors.push({
                 "bufferView": -1,
-                "byteOffset": 0, // TODO とりあえず0
+                "byteOffset": 0, // TODO: とりあえず0
                 "componentType": FLOAT,
                 "count": attributes.uv.count,
                 "normalized": false,
@@ -161,7 +161,7 @@ export default class VRMExporter {
             // skinWeight
             accessors.push({
                 "bufferView": -1,
-                "byteOffset": 0, // TODO とりあえず0
+                "byteOffset": 0, // TODO: とりあえず0
                 "componentType": FLOAT,
                 "count": attributes.skinWeight.count,
                 "normalized": false,
@@ -171,7 +171,7 @@ export default class VRMExporter {
             // skinIndex
             accessors.push({
                 "bufferView": -1,
-                "byteOffset": 0, // TODO とりあえず0
+                "byteOffset": 0, // TODO: とりあえず0
                 "componentType": UNSIGNED_SHORT,
                 "count": attributes.skinWeight.count,
                 "normalized": false,
@@ -182,7 +182,7 @@ export default class VRMExporter {
             group.children.forEach(subMesh => {
                 accessors.push({
                     "bufferView": -1,
-                    "byteOffset": 0, // TODO とりあえず0
+                    "byteOffset": 0, // TODO: とりあえず0
                     "componentType": UNSIGNED_INT,
                     "count": subMesh.geometry.index.count,
                     "normalized": false,
@@ -195,18 +195,18 @@ export default class VRMExporter {
 
                 accessors.push({
                     "bufferView": -1,
-                    "byteOffset": 0, // TODO とりあえず0
+                    "byteOffset": 0, // TODO: とりあえず0
                     "componentType": FLOAT,
                     "count": attributes.position.count,
                     "max": [
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     ],
                     "min": [
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     ],
                     "normalized": false,
                     "type": "VEC3"
@@ -214,7 +214,7 @@ export default class VRMExporter {
 
                 accessors.push({
                     "bufferView": -1,
-                    "byteOffset": 0, // TODO とりあえず0
+                    "byteOffset": 0, // TODO: とりあえず0
                     "componentType": FLOAT,
                     "count": attributes.normal.count,
                     "normalized": false,
@@ -225,7 +225,7 @@ export default class VRMExporter {
         });
 
         // inverseBindMatrices
-        meshDatas.push([]); // TODO
+        meshDatas.push([]); // TODO:
         accessors.push({
             "bufferView": -1,
             "byteOffset": 0,
@@ -239,33 +239,33 @@ export default class VRMExporter {
                                     "extras": {
                                         "targetNames": group.children[0].geometry.userData.targetNames,
                                     },
-                                    "name": group.name, // TODO なんか違う名前になっている
+                                    "name": group.name, // TODO: なんか違う名前になっている
                                     "primitives": group.children.map((subMesh, index) => ({
                                         "attributes": {
-                                            "JOINTS_0": 4, // TODO とりあえずこの数字 accessorsの添え字
-                                            "NORMAL": 1, // TODO とりあえずこの数字 accessorsの添え字
-                                            "POSITION": 0, // TODO とりあえずこの数字 accessorsの添え字
-                                            "TEXCOORD_0": 2, // TODO とりあえずこの数字 accessorsの添え字
-                                            "WEIGHTS_0": 3 // TODO とりあえずこの数字 accessorsの添え字
+                                            "JOINTS_0": 4, // TODO: とりあえずこの数字 accessorsの添え字
+                                            "NORMAL": 1, // TODO: とりあえずこの数字 accessorsの添え字
+                                            "POSITION": 0, // TODO: とりあえずこの数字 accessorsの添え字
+                                            "TEXCOORD_0": 2, // TODO: とりあえずこの数字 accessorsの添え字
+                                            "WEIGHTS_0": 3 // TODO: とりあえずこの数字 accessorsの添え字
                                         },
                                         "extras": {
                                             "targetNames": subMesh.geometry.userData.targetNames
                                         },
-                                        "indices": 5 + index, // TODO 5, 6
+                                        "indices": 5 + index, // TODO: 5, 6
                                         "material": uniqueMaterialNames.indexOf(subMesh.material[0].name),
-                                        "mode": 4, // TODO とりあえず4にした
+                                        "mode": 4, // TODO: とりあえず4にした
                                         "targets": subMesh.geometry.userData.targetNames.map((_, i) => 
                                         ({
-                                            "NORMAL": 8 + i * 2, // TODO accessorsの添え字
-                                            "POSITION": 7 + i * 2 // TODO accessorsの添え字
+                                            "NORMAL": 8 + i * 2, // TODO: accessorsの添え字
+                                            "POSITION": 7 + i * 2 // TODO: accessorsの添え字
                                         }))
                                     }))
                                 }));
 
         const outputSkins = meshes.map(group => ({
-                                    "inverseBindMatrices": accessors.length - 1, // TODO accessorsの最後に入っている
-                                    "joints": [], // TODO
-                                    "skeleton": 1 // TODO とりあえず1にした
+                                    "inverseBindMatrices": accessors.length - 1, // TODO: accessorsの最後に入っている
+                                    "joints": [], // TODO:
+                                    "skeleton": 1 // TODO: とりあえず1にした
                                 }));
 
         const blendShapeMaster = {
@@ -274,7 +274,7 @@ export default class VRMExporter {
                                     binds: blendShape._binds.map(bind => 
                                     ({
                                         index: bind.morphTargetIndex,
-                                        mesh: outputMeshes.map(mesh => mesh.name).indexOf(bind.meshes[0].name), // TODO なんかおかしい
+                                        mesh: outputMeshes.map(mesh => mesh.name).indexOf(bind.meshes[0].name), // TODO: なんかおかしい
                                         weight: bind.weight * 100
                                     })),
                                     isBinary: blendShape.isBinary,
@@ -284,9 +284,9 @@ export default class VRMExporter {
                                 }))
         };
 
-        const exporterVersion = "UniVRM-0.64.0"; // TODO
+        const exporterVersion = "UniVRM-0.64.0"; // TODO:
 
-        lookAt.firstPerson._firstPersonBoneOffset.z *= -1; // TODO
+        lookAt.firstPerson._firstPersonBoneOffset.z *= -1; // TODO:
         const vrmFirstPerson = {
             "firstPersonBone": nodeNames.indexOf(lookAt.firstPerson._firstPersonBone.name),
             "firstPersonBoneOffset": lookAt.firstPerson._firstPersonBoneOffset,
@@ -312,8 +312,8 @@ export default class VRMExporter {
                 "yRange": radian2Degree(lookAt.applyer._curveVerticalUp.curveYRangeDegree)
             },
             "meshAnnotations": lookAt.firstPerson._meshAnnotations.map(annotation => ({
-                "firstPersonFlag": annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO 別の数字のとき何になるか
-                "mesh" : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.name) // TODO とりあえず対応
+                "firstPersonFlag": annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
+                "mesh" : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.name) // TODO: とりあえず対応
             }))
         };
 
@@ -326,7 +326,7 @@ export default class VRMExporter {
                             .map(x => ({
                                 "bone": x[0],
                                 "node": nodeNames.indexOf(x[1][0].node.name),
-                                "useDefaultValues": true // TODO
+                                "useDefaultValues": true // TODO:
                             })),
             "legStretch": humanoid.legStretch,
             "lowerArmTwist": humanoid.lowerArmTwist,
@@ -337,10 +337,10 @@ export default class VRMExporter {
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
-        vrmMeta.texture = -1; // TODO データがなくなっているので復元不可で添え字なし
+        vrmMeta.texture = -1; // TODO: データがなくなっているので復元不可で添え字なし
     
         const secondaryAnimation = {
-            "boneGroups": [], // TODO
+            "boneGroups": [], // TODO:
             "colliderGroups": springBone.colliderGroups
         };
 
@@ -387,7 +387,7 @@ export default class VRMExporter {
                     "buffer": 0,
                     "byteLength": buffer.length,
                     "byteOffset": bufferOffset,
-                    "target": ARRAY_BUFFER // TODO だいたいこれだったの　34962, 34963
+                    "target": ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
                 });
 
                 accessors[index - images.length].bufferView = index;
@@ -406,7 +406,7 @@ export default class VRMExporter {
 
         const outputData = {
             "accessors": accessors, // 32 (buffer数 - 画像数)
-            "asset": exporterInfo, // TODO
+            "asset": exporterInfo, // TODO:
             "buffers":[
                 {
                     "byteLength": bufferOffset
@@ -422,11 +422,11 @@ export default class VRMExporter {
                     "materialProperties": materialProperties,
                     "meta": vrmMeta,
                     "secondaryAnimation": secondaryAnimation,
-                    "specVersion": "0.0" // TODO
+                    "specVersion": "0.0" // TODO:
                 }
             },
             "extensionsUsed":[
-                "KHR_materials_unlit", // TODO
+                "KHR_materials_unlit", // TODO:
                 "KHR_texture_transform", // TOD
                 "VRM"
             ],
@@ -436,7 +436,7 @@ export default class VRMExporter {
             "nodes": outputNodes,
             "samplers": outputSamplers,
             "scene": 0,
-            "scenes":[{"nodes": [0, 90, 91]}], // TODO
+            "scenes":[{"nodes": [0, 90, 91]}], // TODO:
             "skins": outputSkins,
             "textures":　outputTextures
         };

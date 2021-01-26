@@ -125,7 +125,7 @@ export default class Home extends Vue
 
 	      // called when the resource is loaded
 	      ( gltf ) => {
-
+          console.log(gltf);
 		      // generate a VRM instance from gltf
 		      VRM.from( gltf ).then( ( vrm ) => {
               // deal with vrm features
@@ -135,7 +135,6 @@ export default class Home extends Vue
               this.vrmObject = vrm.scene;
               console.log( vrm );
 	      	} );
-
 	      },
 
       	// called while loading is progressing
