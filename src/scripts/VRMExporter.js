@@ -267,15 +267,15 @@ export default class VRMExporter {
             "mesh": 0, // TODO
             "name": group.name,
             "rotation": [
-                node.quaternion._x,
-                node.quaternion._y,
-                node.quaternion._z,
-                node.quaternion._w
+                group.quaternion._x,
+                group.quaternion._y,
+                group.quaternion._z,
+                group.quaternion._w
             ],
             "scale": [
-                group.scake.x,
-                group.scake.y,
-                group.scake.z
+                group.scale.x,
+                group.scale.y,
+                group.scale.z
             ],
             "skin": 0, // TODO
             "translation": [
