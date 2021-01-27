@@ -224,8 +224,9 @@ export default class VRMExporter {
 
         });
 
-        // inverseBindMatrices
-        meshDatas.push([]); // TODO:
+        // inverseBindMatrices 5696 = 16(matrixの要素数) * 4(バイト) * 89(ボーン数)
+        // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
+        meshDatas.push(new Float32Array(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat()));
         accessors.push({
             "bufferView": -1,
             "byteOffset": 0,
@@ -443,12 +444,12 @@ export default class VRMExporter {
             else if (index < images.length + accessors.length) {
                 bufferViews.push({
                     "buffer": 0,
-                    "byteLength": buffer.length,
+                    "byteLength": buffer.length * buffer.BYTES_PER_ELEMENT,
                     "byteOffset": bufferOffset
                 });
 
                 accessors[index - images.length].bufferView = index;            
-                bufferOffset += buffer.length;
+                bufferOffset += buffer.length * buffer.BYTES_PER_ELEMENT;
             }
             // アイコン画像情報
             else {
