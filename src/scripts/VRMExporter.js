@@ -427,12 +427,22 @@ export default class VRMExporter {
 
                 outputImage[index].bufferView = index;
             }
-            else if (index < images.length + accessors.length){
+            else if (index < images.length + accessors.length - 1){
                 bufferViews.push({
                     "buffer": 0,
                     "byteLength": buffer.length,
                     "byteOffset": bufferOffset,
                     "target": ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
+                });
+
+                accessors[index - images.length].bufferView = index;
+            }
+            // inverseBindMatrices
+            else if (index < images.length + accessors.length) {
+                bufferViews.push({
+                    "buffer": 0,
+                    "byteLength": buffer.length,
+                    "byteOffset": bufferOffset
                 });
 
                 accessors[index - images.length].bufferView = index;
