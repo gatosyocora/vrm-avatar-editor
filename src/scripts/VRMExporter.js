@@ -100,7 +100,7 @@ export default class VRMExporter {
 
         const meshes = scene.children.filter(child => child.type === "Group");
 
-        let meshDatas = [];
+        const meshDatas = [];
         meshes.forEach(group => {
             const attributes = group.children[0].geometry.attributes;
             meshDatas.push(attributes.position.array);
@@ -389,8 +389,8 @@ export default class VRMExporter {
             "colliderGroups": springBone.colliderGroups
         };
 
-        let buffers = [];
-        let bufferViews = [];
+        const buffers = [];
+        const bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
         buffers.push(...meshDatas.map(data => data));
