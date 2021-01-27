@@ -394,7 +394,7 @@ export default class VRMExporter {
         const bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
-        buffers.push(...meshDatas.map(data => data));
+        buffers.push(...meshDatas.map(data => float32Array2Base64(data)));
         if (icon) {
             buffers.push(imageBitmap2png(icon));
         }
@@ -427,29 +427,29 @@ export default class VRMExporter {
                 });
 
                 outputImage[index].bufferView = index;
-                bufferOffset += buffer.length;
             }
             else if (index < images.length + accessors.length - 1){
                 bufferViews.push({
                     "buffer": 0,
-                    "byteLength": buffer.length * buffer.BYTES_PER_ELEMENT, // float32なので1要素あたり4バイト
+                    "byteLength": buffer.length, // float32なので1要素あたり4バイト
                     "byteOffset": bufferOffset,
                     "target": ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
                 });
 
-                accessors[index - images.length].bufferView = index;             
-                bufferOffset += buffer.length * buffer.BYTES_PER_ELEMENT;
+                console.log(buffer.length);
+
+                accessors[index - images.length].bufferView = index;
             }
             // inverseBindMatrices
             else if (index < images.length + accessors.length) {
                 bufferViews.push({
                     "buffer": 0,
-                    "byteLength": buffer.length * buffer.BYTES_PER_ELEMENT,
+                    "byteLength": buffer.length,
                     "byteOffset": bufferOffset
                 });
 
                 accessors[index - images.length].bufferView = index;            
-                bufferOffset += buffer.length * buffer.BYTES_PER_ELEMENT;
+
             }
             // アイコン画像情報
             else {
@@ -458,9 +458,8 @@ export default class VRMExporter {
                     "byteLength": buffer.length,
                     "byteOffset": bufferOffset
                 });
-                
-                bufferOffset += buffer.length;
             }
+            bufferOffset += buffer.length;
         });
 
         const outputData = {
@@ -539,5 +538,9 @@ function parseNumber2Int32Byte(number) {
 }
 
 function calculateByteSize(str) {
-    return encodeURIComponent(str).replace(/%../g, "x").length;
+    return str.length;//encodeURIComponent(str).replace(/%../g, "x").length;
+}
+
+function float32Array2Base64(array) {
+    return new Uint8Array(array.buffer).reduce((data, byte) => data + String.fromCharCode(byte));
 }
