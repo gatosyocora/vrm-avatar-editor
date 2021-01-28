@@ -24,9 +24,9 @@ export default class VRMExporter {
                                             self.findIndex(e => e.name === material.name) === index);
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
 
-        const icon = null; // TODO: vrmMeta.texture.image; ここにあると思ったけどここになかった
+        const icon = vrmMeta.texture.image; // TODO: ない場合もある
         const images = uniqueMaterials.map(material => material.map.image);
-        const outputImage = images/*.concat(icon)*/.map(_ => ({ // データが無くなっているので復元できない
+        const outputImage = images.concat(icon).map(_ => ({ // データが無くなっているので復元できない
             bufferView: -1,
             mimeType: "image\/png", // TODO: とりあえずpngをいれた
             name: "" // TODO:
@@ -383,7 +383,7 @@ export default class VRMExporter {
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
-        vrmMeta.texture = -1; // TODO: データがなくなっているので復元不可で添え字なし
+        vrmMeta.texture = images.length - 1; // TODO: データがなくなっているので復元不可で添え字なし
     
         const secondaryAnimation = {
             boneGroups: [], // TODO:
@@ -458,6 +458,8 @@ export default class VRMExporter {
                     byteLength: buffer.length,
                     byteOffset: bufferOffset
                 });
+
+                outputImage[outputImage.length - 1].bufferView = index;
             }
             bufferOffset += buffer.length;
         });
