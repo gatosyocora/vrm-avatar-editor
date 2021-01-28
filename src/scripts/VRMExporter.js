@@ -394,7 +394,7 @@ export default class VRMExporter {
         const bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
-        buffers.push(...meshDatas.map(data => float32Array2Base64(data)));
+        buffers.push(...meshDatas.map(data => float32Array2Binary(data)));
         if (icon) {
             buffers.push(imageBitmap2png(icon));
         }
@@ -548,8 +548,8 @@ function parseNumber2Binary(number, size) {
     return new Uint8Array(buf);
 }
 
-function float32Array2Base64(array) {
-    return new Uint8Array(array.buffer).reduce((data, byte) => data + String.fromCharCode(byte));
+function float32Array2Binary(array) {
+    return new Uint8Array(array.buffer);
 }
 
 function parseString2Binary(str) {
