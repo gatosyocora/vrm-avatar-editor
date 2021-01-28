@@ -74,10 +74,10 @@
            this.vrm.blendShapeProxy,
            this.vrm.lookAt,
            this.vrm.springBoneManager,
-           (vrm, textures) => {
+           (vrm) => {
 
                 const fileName = "test.vrm";
-                const blob = new Blob([vrm], {type:'text/plain'}, fileName);
+                const blob = new Blob([vrm], {type:'octet/stream'}, fileName);
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
                 link.download = fileName;

@@ -499,16 +499,27 @@ export default class VRMExporter {
             textures: outputTextures
         };
     
-        const jsonData = JSON.stringify(outputData, undefined, 2);
-        const jsonSize = calculateByteSize(jsonData);
-        const jsonChunk = parseNumber2Int32Byte(jsonSize) + "JSON";
-        const bufferData = buffers.map(buffer => parseNumber2Int32Byte(buffer.length) + "BIN\x00" + buffer);
-        const fileData = jsonChunk + jsonData + bufferData;
-        const fileSize = calculateByteSize(fileData);
+        const jsonData = parseString2Binary(JSON.stringify(outputData, undefined, 2));
+        const jsonSize = jsonData.length;
+        const jsonChunk = new Uint8Array([
+                            ...parseNumber2Binary(jsonSize, 4),
+                            ...parseString2Binary("JSON")]);
+        const bufferData = buffers.map(buffer => new Uint8Array([
+                                                    ...parseNumber2Binary(buffer.length, 4),
+                                                    ...parseString2Binary("BIN\x00"), 
+                                                    ...buffer]));
+        const fileData = new Uint8Array([
+                                ...jsonChunk,
+                                ...jsonData,
+                                ...bufferData]);
+        const fileSize = fileData.length;
         console.log(jsonSize);
         console.log(fileSize);
-        const header = "glTF" + parseNumber2Int32Byte(2) + parseNumber2Int32Byte(fileSize);
-        onDone(header + fileData);
+        const header = new Uint8Array([
+                            ...parseString2Binary("glTF"),
+                            ...parseNumber2Binary(2, 4),
+                            ...parseNumber2Binary(fileSize, 4)]);
+        onDone(new Uint8Array([...header, ...fileData]));
     }
 }
 
@@ -530,17 +541,17 @@ function imageBitmap2png(image) {
     return atob(pngUrl.split(',')[1]);
 }
 
-function parseNumber2Int32Byte(number) {
-    const buf = new ArrayBuffer(4);
+function parseNumber2Binary(number, size) {
+    const buf = new ArrayBuffer(size);
     const view = new DataView(buf);
     view.setInt32(0, number, true);
-    return String.fromCharCode.apply("", new Int32Array(buf));
-}
-
-function calculateByteSize(str) {
-    return encodeURIComponent(str).replace(/%../g, "x").length;
+    return new Uint8Array(buf);
 }
 
 function float32Array2Base64(array) {
     return new Uint8Array(array.buffer).reduce((data, byte) => data + String.fromCharCode(byte));
+}
+
+function parseString2Binary(str) {
+    return new TextEncoder().encode(str);
 }
