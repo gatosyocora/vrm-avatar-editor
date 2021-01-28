@@ -540,8 +540,13 @@ function imageBitmap2png(image) {
     canvas.width = image.width;
     canvas.height = image.height;
     canvas.getContext('2d').drawImage(image, 0, 0);
-    var pngUrl = canvas.toDataURL("image/png");
-    return new Uint8Array(atob(pngUrl.split(',')[1]));
+    const pngUrl = canvas.toDataURL("image/png");
+    const data = atob(pngUrl.split(',')[1]);
+    const array = new Uint8Array(new ArrayBuffer(data.length));
+    for (let i = 0; i < data.length; i++) {
+        array[i] = data.charCodeAt(i);
+    }
+    return array;
 }
 
 function parseNumber2Binary(number, size) {
