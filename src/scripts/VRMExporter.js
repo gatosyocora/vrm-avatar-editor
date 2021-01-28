@@ -433,7 +433,7 @@ export default class VRMExporter {
                     buffer: 0,
                     byteLength: buffer.length, // float32なので1要素あたり4バイト
                     byteOffset: bufferOffset,
-                    target: ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
+                    target: index === 7 || index === 8 ? ELEMENT_ARRAY_BUFFER : ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
                 });
 
                 console.log(buffer.length);
