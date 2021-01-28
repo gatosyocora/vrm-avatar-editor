@@ -511,7 +511,7 @@ export default class VRMExporter {
         const fileData = new Uint8Array([
                                 ...jsonChunk,
                                 ...jsonData,
-                                ...bufferData]);
+                                ...bufferData.reduce((pre, current) => new Uint8Array([...pre, ...current]))]); // TODO: 時間がかかる
         const fileSize = fileData.length;
         console.log(jsonSize);
         console.log(fileSize);
@@ -538,7 +538,7 @@ function imageBitmap2png(image) {
     canvas.height = image.height;
     canvas.getContext('2d').drawImage(image, 0, 0);
     var pngUrl = canvas.toDataURL("image/png");
-    return atob(pngUrl.split(',')[1]);
+    return parseString2Binary(atob(pngUrl.split(',')[1]));
 }
 
 function parseNumber2Binary(number, size) {
