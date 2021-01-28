@@ -488,7 +488,7 @@ export default class VRMExporter {
                 KHR_texture_transform, // TOD
                 VRM
             ],
-            images:　outputImage,
+            images: outputImage,
             materials: outputMaterials,
             meshes: outputMeshes,
             nodes: outputNodes,
@@ -496,7 +496,7 @@ export default class VRMExporter {
             scene: 0,
             scenes:[{nodes: [0, 90, 91]}], // TODO:
             skins: outputSkins,
-            textures:　outputTextures
+            textures: outputTextures
         };
     
         const jsonData = JSON.stringify(outputData, undefined, 2);
