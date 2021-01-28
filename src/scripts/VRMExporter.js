@@ -484,9 +484,9 @@ export default class VRMExporter {
                 }
             },
             extensionsUsed:[
-                KHR_materials_unlit, // TODO:
-                KHR_texture_transform, // TOD
-                VRM
+                "KHR_materials_unlit", // TODO:
+                "KHR_texture_transform", // TOD
+                "VRM"
             ],
             images: outputImage,
             materials: outputMaterials,
