@@ -538,7 +538,7 @@ function parseNumber2Int32Byte(number) {
 }
 
 function calculateByteSize(str) {
-    return str.length;//encodeURIComponent(str).replace(/%../g, "x").length;
+    return encodeURIComponent(str).replace(/%../g, "x").length;
 }
 
 function float32Array2Base64(array) {
