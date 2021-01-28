@@ -506,14 +506,15 @@ export default class VRMExporter {
         const jsonChunk = new Uint8Array([
                             ...parseNumber2Binary(jsonSize, 4),
                             ...parseString2Binary("JSON")]);
-        const bufferData = buffers.map(buffer => new Uint8Array([
-                                                    ...parseNumber2Binary(buffer.length, 4),
-                                                    ...parseString2Binary("BIN\x00"), 
-                                                    ...buffer]));
+        const bufferData = buffers.reduce((pre, current) => new Uint8Array([...pre, ...current])); // TODO: 時間がかかる
+        const bufferChunk = new Uint8Array([
+                                ...parseNumber2Binary(bufferData.length, 4),
+                                ...parseString2Binary("BIN\x00")]);
         const fileData = new Uint8Array([
                                 ...jsonChunk,
                                 ...jsonData,
-                                ...bufferData.reduce((pre, current) => new Uint8Array([...pre, ...current]))]); // TODO: 時間がかかる
+                                ...bufferChunk,
+                                ...bufferData]);
         const fileSize = fileData.length;
         console.log(jsonSize);
         console.log(fileSize);
