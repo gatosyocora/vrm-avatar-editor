@@ -240,7 +240,7 @@ export default class VRMExporter {
                                     extras: {
                                         targetNames: group.children[0].geometry.userData.targetNames,
                                     },
-                                    name: group.name, // TODO: なんか違う名前になっている
+                                    name: group.children[0].name, // TODO: なんか違う名前になっている
                                     primitives: group.children.map((subMesh, index) => ({
                                         attributes: {
                                             JOINTS_0: 4, // TODO: とりあえずこの数字 accessorsの添え字
@@ -320,7 +320,7 @@ export default class VRMExporter {
                                     binds: blendShape._binds.map(bind => 
                                     ({
                                         index: bind.morphTargetIndex,
-                                        mesh: outputMeshes.map(mesh => mesh.name).indexOf(bind.meshes[0].name), // TODO: なんかおかしい
+                                        mesh: outputMeshes.map(mesh => mesh.name).indexOf(bind.meshes[0].name),
                                         weight: bind.weight * 100
                                     })),
                                     isBinary: blendShape.isBinary,
@@ -359,7 +359,7 @@ export default class VRMExporter {
             },
             meshAnnotations: lookAt.firstPerson._meshAnnotations.map(annotation => ({
                 firstPersonFlag: annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
-                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.name) // TODO: とりあえず対応
+                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.children[0].name) // TODO: とりあえず対応
             }))
         };
 
