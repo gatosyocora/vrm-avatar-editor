@@ -541,7 +541,7 @@ function imageBitmap2png(image) {
     canvas.height = image.height;
     canvas.getContext('2d').drawImage(image, 0, 0);
     var pngUrl = canvas.toDataURL("image/png");
-    return parseString2Binary(atob(pngUrl.split(',')[1]));
+    return new Uint8Array(atob(pngUrl.split(',')[1]));
 }
 
 function parseNumber2Binary(number, size) {
