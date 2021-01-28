@@ -14,30 +14,30 @@ export default class VRMExporter {
     constructor() {}
     parse(scene, humanoid, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
 
-        const exporterInfo = { // データがなくて取得できない
+        const exporterInfo = { // TODO: データがなくて取得できない
             generator: "UniGLTF-2.0.0",
             version: "2.0"
         };
 
-        // name基準で重複除外
+        // TODO: name基準で重複除外 これでいいのか？
         const uniqueMaterials = materials.filter((material, index, self) => 
                                             self.findIndex(e => e.name === material.name) === index);
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
 
         const icon = vrmMeta.texture.image; // TODO: ない場合もある
         const images = uniqueMaterials.map(material => material.map.image);
-        const outputImage = images.concat(icon).map(_ => ({ // データが無くなっているので復元できない
+        const outputImage = images.concat(icon).map(_ => ({
             bufferView: -1,
             mimeType: "image\/png", // TODO: とりあえずpngをいれた
             name: "" // TODO:
         }));
-        const outputSamplers = outputImage.map(_ =>({ // imagesに対応していることだけ分かっている
+        const outputSamplers = outputImage.map(_ =>({
             magFilter: LINEAR, // TODO: だいたいこれだった
             minFilter: LINEAR, // TODO: だいたいこれだった
             wrapS: REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
             wrapT: REPEAT // TODO: だいたいこれだった
         }));
-        const outputTextures = outputImage.map((_, index) => ({ // imagesに対応していることだけ分かっている
+        const outputTextures = outputImage.map((_, index) => ({
             sampler: index, // TODO: 全パターンでindexなのか不明
             source: index // TODO: 全パターンでindexなのか不明
         }));
@@ -224,7 +224,7 @@ export default class VRMExporter {
 
         });
 
-        // inverseBindMatrices 5696 = 16(matrixの要素数) * 4(バイト) * 89(ボーン数)
+        // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         meshDatas.push(new Float32Array(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat()));
         accessors.push({
@@ -383,7 +383,7 @@ export default class VRMExporter {
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
-        vrmMeta.texture = images.length - 1; // TODO: データがなくなっているので復元不可で添え字なし
+        vrmMeta.texture = images.length - 1;
     
         const secondaryAnimation = {
             boneGroups: [], // TODO:
@@ -431,7 +431,7 @@ export default class VRMExporter {
             else if (index < images.length + accessors.length - 1){
                 bufferViews.push({
                     buffer: 0,
-                    byteLength: buffer.length, // float32なので1要素あたり4バイト
+                    byteLength: buffer.length,
                     byteOffset: bufferOffset,
                     target: index === 7 || index === 8 ? ELEMENT_ARRAY_BUFFER : ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
                 });
@@ -465,14 +465,14 @@ export default class VRMExporter {
         });
 
         const outputData = {
-            accessors: accessors, // 32 (buffer数 - 画像数)
+            accessors: accessors, // buffer数 - 画像数
             asset: exporterInfo, // TODO:
             buffers:[
                 {
                     byteLength: bufferOffset
                 }
             ],
-            bufferViews: bufferViews, // 35 (texture:2, icon:1, )
+            bufferViews: bufferViews, // accessors + images
             extensions:{
                 VRM: {
                     blendShapeMaster: blendShapeMaster,
@@ -487,7 +487,7 @@ export default class VRMExporter {
             },
             extensionsUsed:[
                 "KHR_materials_unlit", // TODO:
-                "KHR_texture_transform", // TOD
+                "KHR_texture_transform", // TODO:
                 "VRM"
             ],
             images: outputImage,
