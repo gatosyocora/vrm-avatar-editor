@@ -268,10 +268,10 @@ export default class VRMExporter {
             mesh: 0, // TODO
             name: group.name,
             rotation: [
-                group.quaternion._x,
-                group.quaternion._y,
-                group.quaternion._z,
-                group.quaternion._w
+                group.quaternion.x,
+                group.quaternion.y,
+                group.quaternion.z,
+                group.quaternion.w
             ],
             scale: [
                 group.scale.x,
@@ -291,10 +291,10 @@ export default class VRMExporter {
         outputNodes.push({
             name: secondaryRootNode.name,
             rotation: [
-                secondaryRootNode.quaternion._x,
-                secondaryRootNode.quaternion._y,
-                secondaryRootNode.quaternion._z,
-                secondaryRootNode.quaternion._w
+                secondaryRootNode.quaternion.x,
+                secondaryRootNode.quaternion.y,
+                secondaryRootNode.quaternion.z,
+                secondaryRootNode.quaternion.w
             ],
             scale: [
                 secondaryRootNode.scale.x,
