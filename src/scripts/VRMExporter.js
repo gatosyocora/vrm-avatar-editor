@@ -15,8 +15,8 @@ export default class VRMExporter {
     parse(scene, humanoid, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
 
         const exporterInfo = { // データがなくて取得できない
-            "generator": "UniGLTF-2.0.0",
-            "version": "2.0"
+            generator: "UniGLTF-2.0.0",
+            version: "2.0"
         };
 
         // name基準で重複除外
@@ -27,48 +27,48 @@ export default class VRMExporter {
         const icon = null; // TODO: vrmMeta.texture.image; ここにあると思ったけどここになかった
         const images = uniqueMaterials.map(material => material.map.image);
         const outputImage = images/*.concat(icon)*/.map(_ => ({ // データが無くなっているので復元できない
-            "bufferView": -1,
-            "mimeType": "image\/png", // TODO: とりあえずpngをいれた
-            "name": "" // TODO:
+            bufferView: -1,
+            mimeType: "image\/png", // TODO: とりあえずpngをいれた
+            name: "" // TODO:
         }));
         const outputSamplers = outputImage.map(_ =>({ // imagesに対応していることだけ分かっている
-            "magFilter": LINEAR, // TODO: だいたいこれだった
-            "minFilter": LINEAR, // TODO: だいたいこれだった
-            "wrapS": REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
-            "wrapT": REPEAT // TODO: だいたいこれだった
+            magFilter: LINEAR, // TODO: だいたいこれだった
+            minFilter: LINEAR, // TODO: だいたいこれだった
+            wrapS: REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
+            wrapT: REPEAT // TODO: だいたいこれだった
         }));
         const outputTextures = outputImage.map((_, index) => ({ // imagesに対応していることだけ分かっている
-            "sampler": index, // TODO: 全パターンでindexなのか不明
-            "source": index // TODO: 全パターンでindexなのか不明
+            sampler: index, // TODO: 全パターンでindexなのか不明
+            source: index // TODO: 全パターンでindexなのか不明
         }));
 
         const outputMaterials = uniqueMaterials.map((material, index) => 
         ({
-            "alphaMode": "OPAQUE", // TODO:
-            "doubleSided": false, // TODO:
-            "extensions": {
-                "KHR_materials_unlit": {} // TODO:
+            alphaMode: "OPAQUE", // TODO:
+            doubleSided: false, // TODO:
+            extensions: {
+                KHR_materials_unlit: {} // TODO:
             },
-            "name": material.name,
-            "pbrMetallicRoughness": {
-                "baseColorFactor": [
+            name: material.name,
+            pbrMetallicRoughness: {
+                baseColorFactor: [
                     material.color.r,
                     material.color.g,
                     material.color.b,
                     1 // TODO:
                 ],
-                "baseColorTexture": {
-                    "extensions": {
-                        "KHR_texture_transform": {
-                            "offset": [0, 0],
-                            "scale": [1, 1]
+                baseColorTexture: {
+                    extensions: {
+                        KHR_texture_transform: {
+                            offset: [0, 0],
+                            scale: [1, 1]
                         }
                     },
-                    "index": index, // TODO: とりあえずindexにした
-                    "texCoord": 0 // TODO:
+                    index: index, // TODO: とりあえずindexにした
+                    texCoord: 0 // TODO:
                 },
-                "metallicFactor": 0, // TODO:
-                "roughnessFactor": 0.9 // TODO:
+                metallicFactor: 0, // TODO:
+                roughnessFactor: 0.9 // TODO:
             }
         }));
 
@@ -76,20 +76,20 @@ export default class VRMExporter {
         const nodes = getNodes(rootNode);
         const nodeNames = nodes.map(node => node.name);
         const outputNodes = nodes.map(node => ({
-            "children": node.children.map(childNode => nodeNames.indexOf(childNode.name)),
-            "name": node.name,
-            "rotation": [
+            children: node.children.map(childNode => nodeNames.indexOf(childNode.name)),
+            name: node.name,
+            rotation: [
                 node.quaternion._x,
                 node.quaternion._y,
                 node.quaternion._z,
                 node.quaternion._w
             ],
-            "scale": [
+            scale: [
                 node.scale.x,
                 node.scale.y,
                 node.scale.z
             ],
-            "translation": [
+            translation: [
                 node.position.x,
                 node.position.y,
                 node.position.z
@@ -120,73 +120,73 @@ export default class VRMExporter {
 
             // position
             accessors.push({
-                "bufferView": -1,
-                "byteOffset": 0, // TODO: とりあえず0
-                "componentType": FLOAT,
-                "count": attributes.position.count,
-                "max": [
+                bufferView: -1,
+                byteOffset: 0, // TODO: とりあえず0
+                componentType: FLOAT,
+                count: attributes.position.count,
+                max: [
                     Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
                     Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
                     Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
                 ],
-                "min": [
+                min: [
                     Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
                     Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
                     Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
                 ],
-                "normalized": false,
-                "type": "VEC3"
+                normalized: false,
+                type: "VEC3"
             });
 
             // normal
             accessors.push({
-                "bufferView": -1,
-                "byteOffset": 0, // TODO: とりあえず0
-                "componentType": FLOAT,
-                "count": attributes.normal.count,
-                "normalized": false,
-                "type": "VEC3"
+                bufferView: -1,
+                byteOffset: 0, // TODO: とりあえず0
+                componentType: FLOAT,
+                count: attributes.normal.count,
+                normalized: false,
+                type: "VEC3"
             });
 
             // uv
             accessors.push({
-                "bufferView": -1,
-                "byteOffset": 0, // TODO: とりあえず0
-                "componentType": FLOAT,
-                "count": attributes.uv.count,
-                "normalized": false,
-                "type": "VEC2"
+                bufferView: -1,
+                byteOffset: 0, // TODO: とりあえず0
+                componentType: FLOAT,
+                count: attributes.uv.count,
+                normalized: false,
+                type: "VEC2"
             });
 
             // skinWeight
             accessors.push({
-                "bufferView": -1,
-                "byteOffset": 0, // TODO: とりあえず0
-                "componentType": FLOAT,
-                "count": attributes.skinWeight.count,
-                "normalized": false,
-                "type": "VEC4"
+                bufferView: -1,
+                byteOffset: 0, // TODO: とりあえず0
+                componentType: FLOAT,
+                count: attributes.skinWeight.count,
+                normalized: false,
+                type: "VEC4"
             });
 
             // skinIndex
             accessors.push({
-                "bufferView": -1,
-                "byteOffset": 0, // TODO: とりあえず0
-                "componentType": UNSIGNED_SHORT,
-                "count": attributes.skinWeight.count,
-                "normalized": false,
-                "type": "VEC4"
+                bufferView: -1,
+                byteOffset: 0, // TODO: とりあえず0
+                componentType: UNSIGNED_SHORT,
+                count: attributes.skinWeight.count,
+                normalized: false,
+                type: "VEC4"
             });
 
             // index
             group.children.forEach(subMesh => {
                 accessors.push({
-                    "bufferView": -1,
-                    "byteOffset": 0, // TODO: とりあえず0
-                    "componentType": UNSIGNED_INT,
-                    "count": subMesh.geometry.index.count,
-                    "normalized": false,
-                    "type": "SCALAR"
+                    bufferView: -1,
+                    byteOffset: 0, // TODO: とりあえず0
+                    componentType: UNSIGNED_INT,
+                    count: subMesh.geometry.index.count,
+                    normalized: false,
+                    type: "SCALAR"
                 });
             });
 
@@ -194,31 +194,31 @@ export default class VRMExporter {
             group.children[0].userData.targetNames.forEach(_ => {
 
                 accessors.push({
-                    "bufferView": -1,
-                    "byteOffset": 0, // TODO: とりあえず0
-                    "componentType": FLOAT,
-                    "count": attributes.position.count,
-                    "max": [
+                    bufferView: -1,
+                    byteOffset: 0, // TODO: とりあえず0
+                    componentType: FLOAT,
+                    count: attributes.position.count,
+                    max: [
                         Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                         Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                         Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     ],
-                    "min": [
+                    min: [
                         Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                         Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                         Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     ],
-                    "normalized": false,
-                    "type": "VEC3"
+                    normalized: false,
+                    type: "VEC3"
                 });
 
                 accessors.push({
-                    "bufferView": -1,
-                    "byteOffset": 0, // TODO: とりあえず0
-                    "componentType": FLOAT,
-                    "count": attributes.normal.count,
-                    "normalized": false,
-                    "type": "VEC3"
+                    bufferView: -1,
+                    byteOffset: 0, // TODO: とりあえず0
+                    componentType: FLOAT,
+                    count: attributes.normal.count,
+                    normalized: false,
+                    type: "VEC3"
                 });
             });
 
@@ -228,58 +228,58 @@ export default class VRMExporter {
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         meshDatas.push(new Float32Array(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat()));
         accessors.push({
-            "bufferView": -1,
-            "byteOffset": 0,
-            "componentType": FLOAT,
-            "count": nodes.length - 1, // TODO: rootNodeを抜くから-1 ?
-            "normalized": false,
-            "type": "MAT4"
+            bufferView: -1,
+            byteOffset: 0,
+            componentType: FLOAT,
+            count: nodes.length - 1, // TODO: rootNodeを抜くから-1 ?
+            normalized: false,
+            type: "MAT4"
         });
 
         const outputMeshes = meshes.map(group => ({
-                                    "extras": {
-                                        "targetNames": group.children[0].geometry.userData.targetNames,
+                                    extras: {
+                                        targetNames: group.children[0].geometry.userData.targetNames,
                                     },
-                                    "name": group.name, // TODO: なんか違う名前になっている
-                                    "primitives": group.children.map((subMesh, index) => ({
-                                        "attributes": {
-                                            "JOINTS_0": 4, // TODO: とりあえずこの数字 accessorsの添え字
-                                            "NORMAL": 1, // TODO: とりあえずこの数字 accessorsの添え字
-                                            "POSITION": 0, // TODO: とりあえずこの数字 accessorsの添え字
-                                            "TEXCOORD_0": 2, // TODO: とりあえずこの数字 accessorsの添え字
-                                            "WEIGHTS_0": 3 // TODO: とりあえずこの数字 accessorsの添え字
+                                    name: group.name, // TODO: なんか違う名前になっている
+                                    primitives: group.children.map((subMesh, index) => ({
+                                        attributes: {
+                                            JOINTS_0: 4, // TODO: とりあえずこの数字 accessorsの添え字
+                                            NORMAL: 1, // TODO: とりあえずこの数字 accessorsの添え字
+                                            POSITION: 0, // TODO: とりあえずこの数字 accessorsの添え字
+                                            TEXCOORD_0: 2, // TODO: とりあえずこの数字 accessorsの添え字
+                                            WEIGHTS_0: 3 // TODO: とりあえずこの数字 accessorsの添え字
                                         },
-                                        "extras": {
-                                            "targetNames": subMesh.geometry.userData.targetNames
+                                        extras: {
+                                            targetNames: subMesh.geometry.userData.targetNames
                                         },
-                                        "indices": 5 + index, // TODO: 5, 6
-                                        "material": uniqueMaterialNames.indexOf(subMesh.material[0].name),
-                                        "mode": 4, // TODO: とりあえず4にした
-                                        "targets": subMesh.geometry.userData.targetNames.map((_, i) => 
+                                        indices: 5 + index, // TODO: 5, 6
+                                        material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
+                                        mode: 4, // TODO: とりあえず4にした
+                                        targets: subMesh.geometry.userData.targetNames.map((_, i) => 
                                         ({
-                                            "NORMAL": 8 + i * 2, // TODO: accessorsの添え字
-                                            "POSITION": 7 + i * 2 // TODO: accessorsの添え字
+                                            NORMAL: 8 + i * 2, // TODO: accessorsの添え字
+                                            POSITION: 7 + i * 2 // TODO: accessorsの添え字
                                         }))
                                     }))
                                 }));
 
         // mesh
         outputNodes.push(meshes.map(group => ({
-            "mesh": 0, // TODO
-            "name": group.name,
-            "rotation": [
+            mesh: 0, // TODO
+            name: group.name,
+            rotation: [
                 group.quaternion._x,
                 group.quaternion._y,
                 group.quaternion._z,
                 group.quaternion._w
             ],
-            "scale": [
+            scale: [
                 group.scale.x,
                 group.scale.y,
                 group.scale.z
             ],
-            "skin": 0, // TODO
-            "translation": [
+            skin: 0, // TODO
+            translation: [
                 group.position.x,
                 group.position.y,
                 group.position.z
@@ -289,19 +289,19 @@ export default class VRMExporter {
         // secondary
         const secondaryRootNode = scene.children.filter(child => child.type === "Object3D")[1]; // TODO: 取得方法を見直す必要がある
         outputNodes.push({
-            "name": secondaryRootNode.name,
-            "rotation": [
+            name: secondaryRootNode.name,
+            rotation: [
                 secondaryRootNode.quaternion._x,
                 secondaryRootNode.quaternion._y,
                 secondaryRootNode.quaternion._z,
                 secondaryRootNode.quaternion._w
             ],
-            "scale": [
+            scale: [
                 secondaryRootNode.scale.x,
                 secondaryRootNode.scale.y,
                 secondaryRootNode.scale.z
             ],
-            "translation": [
+            translation: [
                 secondaryRootNode.position.x,
                 secondaryRootNode.position.y,
                 secondaryRootNode.position.z
@@ -309,13 +309,13 @@ export default class VRMExporter {
         });
 
         const outputSkins = meshes.map(group => ({
-                                    "inverseBindMatrices": accessors.length - 1, // TODO: accessorsの最後に入っている
-                                    "joints": [...Array(nodes.length - 1)].map((_, i) => i + 1), // TODO: とりあえず1～89（ボーン数）の連番をつくった
-                                    "skeleton": 1 // TODO: とりあえず1にした
+                                    inverseBindMatrices: accessors.length - 1, // TODO: accessorsの最後に入っている
+                                    joints: [...Array(nodes.length - 1)].map((_, i) => i + 1), // TODO: とりあえず1～89（ボーン数）の連番をつくった
+                                    skeleton: 1 // TODO: とりあえず1にした
                                 }));
 
         const blendShapeMaster = {
-            "blendShapeGroups": Object.values(blendShapeProxy._blendShapeGroups).map(blendShape => 
+            blendShapeGroups: Object.values(blendShapeProxy._blendShapeGroups).map(blendShape => 
                                 ({
                                     binds: blendShape._binds.map(bind => 
                                     ({
@@ -334,51 +334,51 @@ export default class VRMExporter {
 
         lookAt.firstPerson._firstPersonBoneOffset.z *= -1; // TODO:
         const vrmFirstPerson = {
-            "firstPersonBone": nodeNames.indexOf(lookAt.firstPerson._firstPersonBone.name),
-            "firstPersonBoneOffset": lookAt.firstPerson._firstPersonBoneOffset,
-            "lookAtHorizontalInner": {
-                "curve":lookAt.applyer._curveHorizontalInner.curve,
-                "xRange": radian2Degree(lookAt.applyer._curveHorizontalInner.curveXRangeDegree),
-                "yRange": radian2Degree(lookAt.applyer._curveHorizontalInner.curveYRangeDegree)
+            firstPersonBone: nodeNames.indexOf(lookAt.firstPerson._firstPersonBone.name),
+            firstPersonBoneOffset: lookAt.firstPerson._firstPersonBoneOffset,
+            lookAtHorizontalInner: {
+                curve:lookAt.applyer._curveHorizontalInner.curve,
+                xRange: radian2Degree(lookAt.applyer._curveHorizontalInner.curveXRangeDegree),
+                yRange: radian2Degree(lookAt.applyer._curveHorizontalInner.curveYRangeDegree)
             },
-            "lookAtHorizontalOuter": {
-                "curve":lookAt.applyer._curveHorizontalOuter.curve,
-                "xRange": radian2Degree(lookAt.applyer._curveHorizontalOuter.curveXRangeDegree),
-                "yRange": radian2Degree(lookAt.applyer._curveHorizontalOuter.curveYRangeDegree)
+            lookAtHorizontalOuter: {
+                curve:lookAt.applyer._curveHorizontalOuter.curve,
+                xRange: radian2Degree(lookAt.applyer._curveHorizontalOuter.curveXRangeDegree),
+                yRange: radian2Degree(lookAt.applyer._curveHorizontalOuter.curveYRangeDegree)
             },
-            "lookAtTypeName": lookAt.applyer.type,
-            "lookAtVerticalDown": {
-                "curve":lookAt.applyer._curveVerticalDown.curve,
-                "xRange": radian2Degree(lookAt.applyer._curveVerticalDown.curveXRangeDegree),
-                "yRange": radian2Degree(lookAt.applyer._curveVerticalDown.curveYRangeDegree)
+            lookAtTypeName: lookAt.applyer.type,
+            lookAtVerticalDown: {
+                curve:lookAt.applyer._curveVerticalDown.curve,
+                xRange: radian2Degree(lookAt.applyer._curveVerticalDown.curveXRangeDegree),
+                yRange: radian2Degree(lookAt.applyer._curveVerticalDown.curveYRangeDegree)
             },
-            "lookAtVerticalUp": {
-                "curve":lookAt.applyer._curveVerticalUp.curve,
-                "xRange": radian2Degree(lookAt.applyer._curveVerticalUp.curveXRangeDegree),
-                "yRange": radian2Degree(lookAt.applyer._curveVerticalUp.curveYRangeDegree)
+            lookAtVerticalUp: {
+                curve:lookAt.applyer._curveVerticalUp.curve,
+                xRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveXRangeDegree),
+                yRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveYRangeDegree)
             },
-            "meshAnnotations": lookAt.firstPerson._meshAnnotations.map(annotation => ({
-                "firstPersonFlag": annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
-                "mesh" : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.name) // TODO: とりあえず対応
+            meshAnnotations: lookAt.firstPerson._meshAnnotations.map(annotation => ({
+                firstPersonFlag: annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
+                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.name) // TODO: とりあえず対応
             }))
         };
 
         const vrmHumanoid = {
-            "armStreatch": humanoid.armStreatch,
-            "feetSpacing": humanoid.feetSpacing,
-            "hasTranslationDoF": humanoid.hasTranslationDoF,
-            "humanBones": Object.entries(humanoid.humanBones)
+            armStreatch: humanoid.armStreatch,
+            feetSpacing: humanoid.feetSpacing,
+            hasTranslationDoF: humanoid.hasTranslationDoF,
+            humanBones: Object.entries(humanoid.humanBones)
                             .filter(x => x[1].length > 0)
                             .map(x => ({
-                                "bone": x[0],
-                                "node": nodeNames.indexOf(x[1][0].node.name),
-                                "useDefaultValues": true // TODO:
+                                bone: x[0],
+                                node: nodeNames.indexOf(x[1][0].node.name),
+                                useDefaultValues: true // TODO:
                             })),
-            "legStretch": humanoid.legStretch,
-            "lowerArmTwist": humanoid.lowerArmTwist,
-            "lowerLegTwist": humanoid.lowerLegTwist,
-            "upperArmTwist": humanoid.upperArmTwist,
-            "upperLegTwist": humanoid.upperLegTwist
+            legStretch: humanoid.legStretch,
+            lowerArmTwist: humanoid.lowerArmTwist,
+            lowerLegTwist: humanoid.lowerLegTwist,
+            upperArmTwist: humanoid.upperArmTwist,
+            upperLegTwist: humanoid.upperLegTwist
         };
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
@@ -386,8 +386,8 @@ export default class VRMExporter {
         vrmMeta.texture = -1; // TODO: データがなくなっているので復元不可で添え字なし
     
         const secondaryAnimation = {
-            "boneGroups": [], // TODO:
-            "colliderGroups": springBone.colliderGroups
+            boneGroups: [], // TODO:
+            colliderGroups: springBone.colliderGroups
         };
 
         const buffers = [];
@@ -421,19 +421,19 @@ export default class VRMExporter {
             // bufferの最初は画像情報が入っている
             if (index < images.length) {
                 bufferViews.push({
-                    "buffer": 0,
-                    "byteLength": buffer.length,
-                    "byteOffset": bufferOffset
+                    buffer: 0,
+                    byteLength: buffer.length,
+                    byteOffset: bufferOffset
                 });
 
                 outputImage[index].bufferView = index;
             }
             else if (index < images.length + accessors.length - 1){
                 bufferViews.push({
-                    "buffer": 0,
-                    "byteLength": buffer.length, // float32なので1要素あたり4バイト
-                    "byteOffset": bufferOffset,
-                    "target": ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
+                    buffer: 0,
+                    byteLength: buffer.length, // float32なので1要素あたり4バイト
+                    byteOffset: bufferOffset,
+                    target: ARRAY_BUFFER // TODO: だいたいこれだったの　34962, 34963
                 });
 
                 console.log(buffer.length);
@@ -443,9 +443,9 @@ export default class VRMExporter {
             // inverseBindMatrices
             else if (index < images.length + accessors.length) {
                 bufferViews.push({
-                    "buffer": 0,
-                    "byteLength": buffer.length,
-                    "byteOffset": bufferOffset
+                    buffer: 0,
+                    byteLength: buffer.length,
+                    byteOffset: bufferOffset
                 });
 
                 accessors[index - images.length].bufferView = index;            
@@ -454,49 +454,49 @@ export default class VRMExporter {
             // アイコン画像情報
             else {
                 bufferViews.push({
-                    "buffer": 0,
-                    "byteLength": buffer.length,
-                    "byteOffset": bufferOffset
+                    buffer: 0,
+                    byteLength: buffer.length,
+                    byteOffset: bufferOffset
                 });
             }
             bufferOffset += buffer.length;
         });
 
         const outputData = {
-            "accessors": accessors, // 32 (buffer数 - 画像数)
-            "asset": exporterInfo, // TODO:
-            "buffers":[
+            accessors: accessors, // 32 (buffer数 - 画像数)
+            asset: exporterInfo, // TODO:
+            buffers:[
                 {
-                    "byteLength": bufferOffset
+                    byteLength: bufferOffset
                 }
             ],
-            "bufferViews": bufferViews, // 35 (texture:2, icon:1, )
-            "extensions":{
-                "VRM": {
-                    "blendShapeMaster": blendShapeMaster,
-                    "exporterVersion": exporterVersion,
-                    "firstPerson": vrmFirstPerson,
-                    "humanoid": vrmHumanoid,
-                    "materialProperties": materialProperties,
-                    "meta": vrmMeta,
-                    "secondaryAnimation": secondaryAnimation,
-                    "specVersion": "0.0" // TODO:
+            bufferViews: bufferViews, // 35 (texture:2, icon:1, )
+            extensions:{
+                VRM: {
+                    blendShapeMaster: blendShapeMaster,
+                    exporterVersion: exporterVersion,
+                    firstPerson: vrmFirstPerson,
+                    humanoid: vrmHumanoid,
+                    materialProperties: materialProperties,
+                    meta: vrmMeta,
+                    secondaryAnimation: secondaryAnimation,
+                    specVersion: "0.0" // TODO:
                 }
             },
-            "extensionsUsed":[
-                "KHR_materials_unlit", // TODO:
-                "KHR_texture_transform", // TOD
-                "VRM"
+            extensionsUsed:[
+                KHR_materials_unlit, // TODO:
+                KHR_texture_transform, // TOD
+                VRM
             ],
-            "images":　outputImage,
-            "materials": outputMaterials,
-            "meshes": outputMeshes,
-            "nodes": outputNodes,
-            "samplers": outputSamplers,
-            "scene": 0,
-            "scenes":[{"nodes": [0, 90, 91]}], // TODO:
-            "skins": outputSkins,
-            "textures":　outputTextures
+            images:　outputImage,
+            materials: outputMaterials,
+            meshes: outputMeshes,
+            nodes: outputNodes,
+            samplers: outputSamplers,
+            scene: 0,
+            scenes:[{nodes: [0, 90, 91]}], // TODO:
+            skins: outputSkins,
+            textures:　outputTextures
         };
     
         const jsonData = JSON.stringify(outputData, undefined, 2);
