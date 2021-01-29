@@ -364,9 +364,9 @@ export default class VRMExporter {
         };
 
         const vrmHumanoid = {
-            armStreatch: humanoid.armStreatch,
-            feetSpacing: humanoid.feetSpacing,
-            hasTranslationDoF: humanoid.hasTranslationDoF,
+            armStreatch: humanoid.humanDescription.armStretch,
+            feetSpacing: humanoid.humanDescription.feetSpacing,
+            hasTranslationDoF: humanoid.humanDescription.hasTranslationDoF,
             humanBones: Object.entries(humanoid.humanBones)
                             .filter(x => x[1].length > 0)
                             .map(x => ({
@@ -374,11 +374,11 @@ export default class VRMExporter {
                                 node: nodeNames.indexOf(x[1][0].node.name),
                                 useDefaultValues: true // TODO:
                             })),
-            legStretch: humanoid.legStretch,
-            lowerArmTwist: humanoid.lowerArmTwist,
-            lowerLegTwist: humanoid.lowerLegTwist,
-            upperArmTwist: humanoid.upperArmTwist,
-            upperLegTwist: humanoid.upperLegTwist
+            legStretch: humanoid.humanDescription.legStretch,
+            lowerArmTwist: humanoid.humanDescription.lowerArmTwist,
+            lowerLegTwist: humanoid.humanDescription.lowerLegTwist,
+            upperArmTwist: humanoid.humanDescription.upperArmTwist,
+            upperLegTwist: humanoid.humanDescription.upperLegTwist
         };
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
