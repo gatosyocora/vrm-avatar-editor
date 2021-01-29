@@ -518,26 +518,15 @@ export default class VRMExporter {
     
         const jsonData = parseString2Binary(JSON.stringify(outputData, undefined, 2));
         const jsonSize = jsonData.length;
-        const jsonChunk = new Uint8Array([
-                            ...parseNumber2Binary(jsonSize, 4),
-                            ...parseString2Binary("JSON")]);
-        const bufferData = buffers.reduce((pre, current) => new Uint8Array([...pre, ...current])); // TODO: 時間がかかる
-        const bufferChunk = new Uint8Array([
-                                ...parseNumber2Binary(bufferData.length, 4),
-                                ...parseString2Binary("BIN\x00")]);
-        const fileData = new Uint8Array([
-                                ...jsonChunk,
-                                ...jsonData,
-                                ...bufferChunk,
-                                ...bufferData]);
+        const jsonChunk = concatUint8Arrays([parseNumber2Binary(jsonSize, 4), parseString2Binary("JSON")]);
+        const bufferData = concatUint8Arrays(buffers);
+        const bufferChunk = concatUint8Arrays([parseNumber2Binary(bufferData.length, 4), parseString2Binary("BIN\x00")]);
+        const fileData = concatUint8Arrays([jsonChunk, jsonData, bufferChunk, bufferData]);
         const fileSize = fileData.length;
         console.log(jsonSize);
         console.log(fileSize);
-        const header = new Uint8Array([
-                            ...parseString2Binary("glTF"),
-                            ...parseNumber2Binary(2, 4),
-                            ...parseNumber2Binary(fileSize, 4)]);
-        onDone(new Uint8Array([...header, ...fileData]));
+        const header = concatUint8Arrays([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileSize, 4)]);
+        onDone(concatUint8Arrays([header, fileData]));
     }
 }
 
@@ -577,4 +566,18 @@ function float32Array2Binary(array) {
 
 function parseString2Binary(str) {
     return new TextEncoder().encode(str);
+}
+
+function concatUint8Arrays(arrays) {
+    let sumLength = 0;
+    for (let i = 0; i < arrays.length; i++) {
+        sumLength += arrays[i].length;
+    }
+    const output = new Uint8Array(sumLength);
+    let pos = 0;
+    for (let i = 0; i < arrays.length; ++i) {
+        output.set(new Uint8Array(arrays[i]), pos);
+        pos += arrays[i].length;
+    }
+    return output;
 }
