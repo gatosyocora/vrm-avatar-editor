@@ -79,10 +79,10 @@ export default class VRMExporter {
             children: node.children.map(childNode => nodeNames.indexOf(childNode.name)),
             name: node.name,
             rotation: [
-                node.quaternion._x,
-                node.quaternion._y,
-                node.quaternion._z,
-                node.quaternion._w
+                node.quaternion.x,
+                node.quaternion.y,
+                node.quaternion.z,
+                node.quaternion.w
             ],
             scale: [
                 node.scale.x,
