@@ -1,13 +1,15 @@
 // WebGL(OpenGL)マクロ定数
-const ARRAY_BUFFER = 34962;
-const ELEMENT_ARRAY_BUFFER = 34963;
+const WEBGL_CONST = {
+    ARRAY_BUFFER: 34962,
+    ELEMENT_ARRAY_BUFFER: 34963,
+    UNSIGNED_SHORT: 5123,
+    UNSIGNED_INT: 5125,
+    FLOAT: 5126,
+    LINEAR: 9729,
+    REPEAT: 10497
+};
 
-const UNSIGNED_SHORT = 5123;
-const UNSIGNED_INT = 5125;
-const FLOAT = 5126;
 
-const LINEAR = 9729;
-const REPEAT = 10497;
 
 
 export default class VRMExporter {
@@ -32,10 +34,10 @@ export default class VRMExporter {
             name: "" // TODO:
         }));
         const outputSamplers = outputImage.map(_ =>({
-            magFilter: LINEAR, // TODO: だいたいこれだった
-            minFilter: LINEAR, // TODO: だいたいこれだった
-            wrapS: REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
-            wrapT: REPEAT // TODO: だいたいこれだった
+            magFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
+            minFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
+            wrapS: WEBGL_CONST.REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
+            wrapT: WEBGL_CONST.REPEAT // TODO: だいたいこれだった
         }));
         const outputTextures = outputImage.map((_, index) => ({
             sampler: index, // TODO: 全パターンでindexなのか不明
@@ -122,7 +124,7 @@ export default class VRMExporter {
             accessors.push({
                 bufferView: -1,
                 byteOffset: 0, // TODO: とりあえず0
-                componentType: FLOAT,
+                componentType: WEBGL_CONST.FLOAT,
                 count: attributes.position.count,
                 max: [
                     Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
@@ -142,7 +144,7 @@ export default class VRMExporter {
             accessors.push({
                 bufferView: -1,
                 byteOffset: 0, // TODO: とりあえず0
-                componentType: FLOAT,
+                componentType: WEBGL_CONST.FLOAT,
                 count: attributes.normal.count,
                 normalized: false,
                 type: "VEC3"
@@ -152,7 +154,7 @@ export default class VRMExporter {
             accessors.push({
                 bufferView: -1,
                 byteOffset: 0, // TODO: とりあえず0
-                componentType: FLOAT,
+                componentType: WEBGL_CONST.FLOAT,
                 count: attributes.uv.count,
                 normalized: false,
                 type: "VEC2"
@@ -162,7 +164,7 @@ export default class VRMExporter {
             accessors.push({
                 bufferView: -1,
                 byteOffset: 0, // TODO: とりあえず0
-                componentType: FLOAT,
+                componentType: WEBGL_CONST.FLOAT,
                 count: attributes.skinWeight.count,
                 normalized: false,
                 type: "VEC4"
@@ -172,7 +174,7 @@ export default class VRMExporter {
             accessors.push({
                 bufferView: -1,
                 byteOffset: 0, // TODO: とりあえず0
-                componentType: UNSIGNED_SHORT,
+                componentType: WEBGL_CONST.UNSIGNED_SHORT,
                 count: attributes.skinWeight.count,
                 normalized: false,
                 type: "VEC4"
@@ -183,7 +185,7 @@ export default class VRMExporter {
                 accessors.push({
                     bufferView: -1,
                     byteOffset: 0, // TODO: とりあえず0
-                    componentType: UNSIGNED_INT,
+                    componentType: WEBGL_CONST.UNSIGNED_INT,
                     count: subMesh.geometry.index.count,
                     normalized: false,
                     type: "SCALAR"
@@ -196,7 +198,7 @@ export default class VRMExporter {
                 accessors.push({
                     bufferView: -1,
                     byteOffset: 0, // TODO: とりあえず0
-                    componentType: FLOAT,
+                    componentType: WEBGL_CONST.FLOAT,
                     count: attributes.position.count,
                     max: [
                         Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
@@ -215,7 +217,7 @@ export default class VRMExporter {
                 accessors.push({
                     bufferView: -1,
                     byteOffset: 0, // TODO: とりあえず0
-                    componentType: FLOAT,
+                    componentType: WEBGL_CONST.FLOAT,
                     count: attributes.normal.count,
                     normalized: false,
                     type: "VEC3"
@@ -448,7 +450,7 @@ export default class VRMExporter {
                     buffer: 0,
                     byteLength: buffer.length,
                     byteOffset: bufferOffset,
-                    target: index === 7 || index === 8 ? ELEMENT_ARRAY_BUFFER : ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
+                    target: index === 7 || index === 8 ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
                 });
 
                 console.log(buffer.length);
