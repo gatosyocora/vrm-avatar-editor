@@ -386,7 +386,22 @@ export default class VRMExporter {
         vrmMeta.texture = outputImage.length - 1;
     
         const secondaryAnimation = {
-            boneGroups: [], // TODO:
+            boneGroups: [
+                {
+                    bones: [], // TODO:
+                    center: -1, // TODO:
+                    colliderGroups: [], // TODO:
+                    dragForce: 0.4, // TODO:
+                    gravityDir: {
+                        x: 0, // TODO:
+                        y: -1, // TODO:
+                        z: 0 // TODO:
+                    },
+                    gravityPower: 0, // TODO:
+                    hitRadius: 0.02, // TODO:
+                    stiffiness: 1 // TODO:
+                }
+            ],
             colliderGroups: springBone.colliderGroups
         };
 
