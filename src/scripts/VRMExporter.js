@@ -105,19 +105,19 @@ export default class VRMExporter {
         const meshDatas = [];
         meshes.forEach(group => {
             const attributes = group.children[0].geometry.attributes;
-            meshDatas.push(attributes.position.array);
-            meshDatas.push(attributes.normal.array);
-            meshDatas.push(attributes.uv.array);
-            meshDatas.push(attributes.skinWeight.array);
-            meshDatas.push(attributes.skinIndex.array);
+            meshDatas.push(parseBinary(attributes.position.array, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.normal.array, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.uv.array, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.skinWeight.array, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.skinIndex.array, WEBGL_CONST.UNSIGNED_SHORT));
 
             group.children.forEach(subMesh => {
-                meshDatas.push(subMesh.geometry.index.array);
+                meshDatas.push(parseBinary(subMesh.geometry.index.array, WEBGL_CONST.UNSIGNED_INT));
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(attributes.position.array); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(attributes.normal.array); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.position.array, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.normal.array, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
 
             // position
@@ -576,6 +576,27 @@ function concatUint8Arrays(arrays) {
         pos += arrays[i].length;
     }
     return output;
+}
+
+function parseBinary(array, type) {
+
+    const typeSize = type === WEBGL_CONST.UNSIGNED_SHORT ? 2 : 4;
+    let offset = 0;
+    const buf = new ArrayBuffer(array.length * typeSize);
+    const view = new DataView(buf);
+    for (let i = 0; i < array.length; i++) {
+        if (type === WEBGL_CONST.UNSIGNED_SHORT) {
+            view.setUint16(offset, array[i], true);
+        }
+        else if (type === WEBGL_CONST.UNSIGNED_INT) {
+            view.setUint32(offset, array[i], true);
+        }
+        else {
+            view.setFloat32(offset, array[i], true);
+        }
+        offset += typeSize;
+    }
+    return new Uint8Array(buf);
 }
 
 class GlbChunk {
