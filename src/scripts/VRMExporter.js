@@ -516,16 +516,10 @@ export default class VRMExporter {
             textures: outputTextures
         };
     
-        const jsonData = parseString2Binary(JSON.stringify(outputData, undefined, 2));
-        const jsonSize = jsonData.length;
-        const jsonChunk = concatUint8Arrays([parseNumber2Binary(jsonSize, 4), parseString2Binary("JSON")]);
-        const bufferData = concatUint8Arrays(buffers);
-        const bufferChunk = concatUint8Arrays([parseNumber2Binary(bufferData.length, 4), parseString2Binary("BIN\x00")]);
-        const fileData = concatUint8Arrays([jsonChunk, jsonData, bufferChunk, bufferData]);
-        const fileSize = fileData.length;
-        console.log(jsonSize);
-        console.log(fileSize);
-        const header = concatUint8Arrays([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileSize, 4)]);
+        const jsonChunk = new GlbChunk(parseString2Binary(JSON.stringify(outputData, undefined, 2)), "JSON");
+        const binaryChunk = new GlbChunk(concatUint8Arrays(buffers), "BIN\x00");
+        const fileData = concatUint8Arrays([jsonChunk.buffer, binaryChunk.buffer]);
+        const header = concatUint8Arrays([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.length, 4)]);
         onDone(concatUint8Arrays([header, fileData]));
     }
 }
@@ -580,4 +574,13 @@ function concatUint8Arrays(arrays) {
         pos += arrays[i].length;
     }
     return output;
+}
+
+class GlbChunk {
+    constructor(data, type) {
+        this.data = data;
+        this.type = type;
+        this.length = this.data.length;
+        this.buffer = concatUint8Arrays([parseNumber2Binary(this.length, 4), parseString2Binary(this.type), this.data]);
+    }
 }
