@@ -522,10 +522,10 @@ export default class VRMExporter {
         };
     
         const jsonChunk = new GlbChunk(parseString2Binary(JSON.stringify(outputData, undefined, 2)), "JSON");
-        const binaryChunk = new GlbChunk(concatUint8Arrays(buffers), "BIN\x00");
-        const fileData = concatUint8Arrays([jsonChunk.buffer, binaryChunk.buffer]);
-        const header = concatUint8Arrays([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.byteLength, 4)]);
-        onDone(concatUint8Arrays([header, fileData]));
+        const binaryChunk = new GlbChunk(concatBinary(buffers), "BIN\x00");
+        const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
+        const header = concatBinary([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.byteLength, 4)]);
+        onDone(concatBinary([header, fileData]));
     }
 }
 
@@ -568,7 +568,7 @@ function parseString2Binary(str) {
     return new TextEncoder().encode(str).buffer;
 }
 
-function concatUint8Arrays(arrays) {
+function concatBinary(arrays) {
     let sumLength = 0;
     for (let i = 0; i < arrays.length; i++) {
         sumLength += arrays[i].byteLength;
@@ -629,6 +629,6 @@ class GlbChunk {
         this.data = data;
         this.type = type;
         this.length = this.data.byteLength;
-        this.buffer = concatUint8Arrays([parseNumber2Binary(this.length, 4), parseString2Binary(this.type), this.data]);
+        this.buffer = concatBinary([parseNumber2Binary(this.length, 4), parseString2Binary(this.type), this.data]);
     }
 }
