@@ -1,3 +1,5 @@
+import { BufferAttribute } from "three";
+
 // WebGL(OpenGL)マクロ定数
 const WEBGL_CONST = {
     ARRAY_BUFFER: 34962,
@@ -105,19 +107,19 @@ export default class VRMExporter {
         const meshDatas = [];
         meshes.forEach(group => {
             const attributes = group.children[0].geometry.attributes;
-            meshDatas.push(parseBinary(attributes.position.array, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.normal.array, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.uv.array, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.skinWeight.array, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.skinIndex.array, WEBGL_CONST.UNSIGNED_SHORT));
+            meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT, "VEC3"));
+            meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT, "VEC3"));
+            meshDatas.push(parseBinary(attributes.uv, WEBGL_CONST.FLOAT, "VEC2"));
+            meshDatas.push(parseBinary(attributes.skinWeight, WEBGL_CONST.FLOAT, "VEC4"));
+            meshDatas.push(parseBinary(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "VEC4"));
 
             group.children.forEach(subMesh => {
-                meshDatas.push(parseBinary(subMesh.geometry.index.array, WEBGL_CONST.UNSIGNED_INT));
+                meshDatas.push(parseBinary(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "SCALAR"));
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(parseBinary(attributes.position.array, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(parseBinary(attributes.normal.array, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT, "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT, "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
 
             // position
@@ -228,7 +230,8 @@ export default class VRMExporter {
 
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
-        meshDatas.push(parseBinary(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat(), WEBGL_CONST.FLOAT));
+        const inverseBindMatrices = new Float32Array([...(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat())]);
+        meshDatas.push(parseBinary(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "MAT4"));
         accessors.push({
             bufferView: -1,
             byteOffset: 0,
@@ -578,23 +581,44 @@ function concatUint8Arrays(arrays) {
     return output;
 }
 
-function parseBinary(array, type) {
+function parseBinary(attr, componentType, type) {
 
-    const typeSize = type === WEBGL_CONST.UNSIGNED_SHORT ? 2 : 4;
+    const componentTypeSize = componentType === WEBGL_CONST.UNSIGNED_SHORT ? 2 : 4;
+    const typeSize =    type === "SCALAR" ? 1 :
+                        type === "VEC2" ? 2 :
+                        type === "VEC3" ? 3 :
+                        type === "MAT3" ? 9 :
+                        type === "MAT4" ? 16 : 4;
+    const array = attr.array;
     let offset = 0;
-    const buf = new ArrayBuffer(array.length * typeSize);
+    const buf = new ArrayBuffer(attr.count * attr.itemSize * componentTypeSize);
     const view = new DataView(buf);
-    for (let i = 0; i < array.length; i++) {
-        if (type === WEBGL_CONST.UNSIGNED_SHORT) {
-            view.setUint16(offset, array[i], true);
+    for (let i = 0; i < attr.count; i++) {
+        for (var a = 0; a < attr.itemSize; a++) {
+
+            let value;
+            if (attr.itemSize > 4) {
+                value = array[i * attr.itemSize + a];
+            }
+            else {
+                if (a === 0) value = attr.getX(i);
+                else if (a === 1) value = attr.getY(i);
+                else if (a === 2) value = attr.getZ(i);
+                else if (a === 3) value = attr.getW(i);
+            }
+
+            if (componentType === WEBGL_CONST.UNSIGNED_SHORT) {
+                view.setUint16(offset, value, true);
+            }
+            else if (componentType === WEBGL_CONST.UNSIGNED_INT) {
+                view.setUint32(offset, value, true);
+            }
+            else {
+                view.setFloat32(offset, value, true);
+            }
+            offset += componentTypeSize;
         }
-        else if (type === WEBGL_CONST.UNSIGNED_INT) {
-            view.setUint32(offset, array[i], true);
-        }
-        else {
-            view.setFloat32(offset, array[i], true);
-        }
-        offset += typeSize;
+
     }
     return new Uint8Array(buf);
 }
