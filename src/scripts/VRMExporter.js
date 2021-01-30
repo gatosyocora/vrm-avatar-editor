@@ -438,11 +438,13 @@ export default class VRMExporter {
 
         buffers.forEach((buffer, index) => {
 
+            console.log(buffer);
+
             // bufferの最初は画像情報が入っている
             if (index < images.length) {
                 bufferViews.push({
                     buffer: 0,
-                    byteLength: buffer.length,
+                    byteLength: buffer.byteLength,
                     byteOffset: bufferOffset
                 });
 
@@ -451,12 +453,10 @@ export default class VRMExporter {
             else if (index < images.length + accessors.length - 1){
                 bufferViews.push({
                     buffer: 0,
-                    byteLength: buffer.length,
+                    byteLength: buffer.byteLength,
                     byteOffset: bufferOffset,
                     target: index === 7 || index === 8 ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
                 });
-
-                console.log(buffer.length);
 
                 accessors[index - images.length].bufferView = index;
             }
@@ -464,7 +464,7 @@ export default class VRMExporter {
             else if (index < images.length + accessors.length) {
                 bufferViews.push({
                     buffer: 0,
-                    byteLength: buffer.length,
+                    byteLength: buffer.byteLength,
                     byteOffset: bufferOffset
                 });
 
@@ -475,13 +475,13 @@ export default class VRMExporter {
             else {
                 bufferViews.push({
                     buffer: 0,
-                    byteLength: buffer.length,
+                    byteLength: buffer.byteLength,
                     byteOffset: bufferOffset
                 });
 
                 outputImage[outputImage.length - 1].bufferView = index;
             }
-            bufferOffset += buffer.length;
+            bufferOffset += buffer.byteLength;
         });
 
         const outputData = {
@@ -525,6 +525,9 @@ export default class VRMExporter {
         const binaryChunk = new GlbChunk(concatUint8Arrays(buffers), "BIN\x00");
         const fileData = concatUint8Arrays([jsonChunk.buffer, binaryChunk.buffer]);
         const header = concatUint8Arrays([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.length, 4)]);
+        console.log(jsonChunk.buffer);
+        console.log(binaryChunk.buffer);
+        console.log(fileData);
         onDone(concatUint8Arrays([header, fileData]));
     }
 }
@@ -545,9 +548,10 @@ function imageBitmap2png(image) {
     canvas.getContext('2d').drawImage(image, 0, 0);
     const pngUrl = canvas.toDataURL("image/png");
     const data = atob(pngUrl.split(',')[1]);
-    const array = new Uint8Array(new ArrayBuffer(data.length));
+    const array = new ArrayBuffer(data.length);
+    const view = new DataView(array);
     for (let i = 0; i < data.length; i++) {
-        array[i] = data.charCodeAt(i);
+        view.setUint8(i, data.charCodeAt(i));
     }
     return array;
 }
@@ -555,30 +559,30 @@ function imageBitmap2png(image) {
 function parseNumber2Binary(number, size) {
     const buf = new ArrayBuffer(size);
     const view = new DataView(buf);
-    view.setInt32(0, number, true);
-    return new Uint8Array(buf);
+    view.setUint32(0, number, true);
+    return buf;
 }
 
 function float32Array2Binary(array) {
-    return new Uint8Array(array.buffer);
+    return array;   
 }
 
 function parseString2Binary(str) {
-    return new TextEncoder().encode(str);
+    return new TextEncoder().encode(str).buffer;
 }
 
 function concatUint8Arrays(arrays) {
     let sumLength = 0;
     for (let i = 0; i < arrays.length; i++) {
-        sumLength += arrays[i].length;
+        sumLength += arrays[i].byteLength;
     }
     const output = new Uint8Array(sumLength);
     let pos = 0;
     for (let i = 0; i < arrays.length; ++i) {
         output.set(new Uint8Array(arrays[i]), pos);
-        pos += arrays[i].length;
+        pos += arrays[i].byteLength;
     }
-    return output;
+    return output.buffer;
 }
 
 function parseBinary(attr, componentType, type) {
@@ -620,14 +624,14 @@ function parseBinary(attr, componentType, type) {
         }
 
     }
-    return new Uint8Array(buf);
+    return buf;
 }
 
 class GlbChunk {
     constructor(data, type) {
         this.data = data;
         this.type = type;
-        this.length = this.data.length;
+        this.length = this.data.byteLength;
         this.buffer = concatUint8Arrays([parseNumber2Binary(this.length, 4), parseString2Binary(this.type), this.data]);
     }
 }
