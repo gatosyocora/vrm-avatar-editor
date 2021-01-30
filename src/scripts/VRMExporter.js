@@ -312,7 +312,7 @@ export default class VRMExporter {
 
         const outputSkins = meshes.map(group => ({
                                     inverseBindMatrices: accessors.length - 1, // TODO: accessorsの最後に入っている
-                                    joints: [...Array(nodes.length - 1)].map((_, i) => i + 1), // TODO: とりあえず1～89（ボーン数）の連番をつくった
+                                    joints: group.children[0].skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
                                     skeleton: 1 // TODO: とりあえず1にした
                                 }));
 
