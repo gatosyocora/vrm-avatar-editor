@@ -228,11 +228,11 @@ export default class VRMExporter {
 
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
-        meshDatas.push(new Float32Array(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat()));
+        meshDatas.push(parseBinary(nodes.filter((_, i) => i != 0).map(node => node.matrix.elements).flat(), WEBGL_CONST.FLOAT));
         accessors.push({
             bufferView: -1,
             byteOffset: 0,
-            componentType: FLOAT,
+            componentType: WEBGL_CONST.FLOAT,
             count: nodes.length - 1, // TODO: rootNodeを抜くから-1 ?
             normalized: false,
             type: "MAT4"
