@@ -107,139 +107,37 @@ export default class VRMExporter {
         const meshDatas = [];
         meshes.forEach(group => {
             const attributes = group.children[0].geometry.attributes;
-            meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.uv, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.skinWeight, WEBGL_CONST.FLOAT));
-            meshDatas.push(parseBinary(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT));
+            meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3"));
+            meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3"));
+            meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, "UV", "VEC2"));
+            meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, "SKIN_WEIGHT", "VEC4"));
+            meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4"));
 
             group.children.forEach(subMesh => {
-                meshDatas.push(parseBinary(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT));
+                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR"));
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
-
-            // position
-            accessors.push({
-                bufferView: -1,
-                byteOffset: 0, // TODO: とりあえず0
-                componentType: WEBGL_CONST.FLOAT,
-                count: attributes.position.count,
-                max: [
-                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
-                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
-                    Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
-                ],
-                min: [
-                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),
-                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),
-                    Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))
-                ],
-                normalized: false,
-                type: "VEC3"
-            });
-
-            // normal
-            accessors.push({
-                bufferView: -1,
-                byteOffset: 0, // TODO: とりあえず0
-                componentType: WEBGL_CONST.FLOAT,
-                count: attributes.normal.count,
-                normalized: false,
-                type: "VEC3"
-            });
-
-            // uv
-            accessors.push({
-                bufferView: -1,
-                byteOffset: 0, // TODO: とりあえず0
-                componentType: WEBGL_CONST.FLOAT,
-                count: attributes.uv.count,
-                normalized: false,
-                type: "VEC2"
-            });
-
-            // skinWeight
-            accessors.push({
-                bufferView: -1,
-                byteOffset: 0, // TODO: とりあえず0
-                componentType: WEBGL_CONST.FLOAT,
-                count: attributes.skinWeight.count,
-                normalized: false,
-                type: "VEC4"
-            });
-
-            // skinIndex
-            accessors.push({
-                bufferView: -1,
-                byteOffset: 0, // TODO: とりあえず0
-                componentType: WEBGL_CONST.UNSIGNED_SHORT,
-                count: attributes.skinWeight.count,
-                normalized: false,
-                type: "VEC4"
-            });
-
-            // index
-            group.children.forEach(subMesh => {
-                accessors.push({
-                    bufferView: -1,
-                    byteOffset: 0, // TODO: とりあえず0
-                    componentType: WEBGL_CONST.UNSIGNED_INT,
-                    count: subMesh.geometry.index.count,
-                    normalized: false,
-                    type: "SCALAR"
-                });
-            });
-
-            // blendShape position, normal
-            group.children[0].userData.targetNames.forEach(_ => {
-
-                accessors.push({
-                    bufferView: -1,
-                    byteOffset: 0, // TODO: とりあえず0
-                    componentType: WEBGL_CONST.FLOAT,
-                    count: attributes.position.count,
-                    max: [
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.max.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                    ],
-                    min: [
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 0)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 1)),　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                        Math.min.apply(null, attributes.position.array.filter((_, i) => i % 3 === 2))　 // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                    ],
-                    normalized: false,
-                    type: "VEC3"
-                });
-
-                accessors.push({
-                    bufferView: -1,
-                    byteOffset: 0, // TODO: とりあえず0
-                    componentType: WEBGL_CONST.FLOAT,
-                    count: attributes.normal.count,
-                    normalized: false,
-                    type: "VEC3"
-                });
-            });
-
         });
 
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         const inverseBindMatrices = new Float32Array(...(meshes.map(group => group.children[0].skeleton.boneInverses.map(boneInv => boneInv.elements).flat())));
-        meshDatas.push(parseBinary(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT));
-        accessors.push({
+        meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "BIND_MATRIX", "MAT4"));
+
+        accessors.push(...meshDatas.map(meshData => ({
             bufferView: -1,
-            byteOffset: 0,
-            componentType: WEBGL_CONST.FLOAT,
-            count: nodes.length - 1, // TODO: rootNodeを抜くから-1 ?
+            byteOffset: 0, // TODO: とりあえず0
+            componentType: meshData.valueType,
+            count: meshData.attribute.count,
+            max: meshData.max,
+            min: meshData.min,
             normalized: false,
-            type: "MAT4"
-        });
+            type: meshData.accessorsType
+        })));
 
         const outputMeshes = meshes.map(group => ({
                                     extras: {
@@ -414,7 +312,7 @@ export default class VRMExporter {
         const bufferViews = [];
         let bufferOffset = 0;
         buffers.push(...images.map(image => imageBitmap2png(image)));
-        buffers.push(...meshDatas.map(data => float32Array2Binary(data)));
+        buffers.push(...meshDatas.map(data => data.buffer));
         if (icon) {
             buffers.push(imageBitmap2png(icon));
         }
@@ -560,10 +458,6 @@ function parseNumber2Binary(number, size) {
     return buf;
 }
 
-function float32Array2Binary(array) {
-    return array;   
-}
-
 function parseString2Binary(str) {
     return new TextEncoder().encode(str).buffer;
 }
@@ -637,5 +531,25 @@ class GlbChunk {
             paddedArray.set(new Uint8Array(value), i);
         }
         return paddedArray.buffer;
+    }
+}
+
+class MeshData {
+    constructor(attribute, valueType, type, accessorsType) {
+        this.attribute = attribute;
+        this.type = type;
+        this.valueType = valueType;
+        this.accessorsType = accessorsType;
+        this.buffer = parseBinary(this.attribute, this.valueType);
+        this.max = type === "POSITION" ? [
+            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
+            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
+            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
+        ] : undefined;
+        this.min = type === "POSITION" ? [
+            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
+            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
+            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
+        ] : undefined;
     }
 }
