@@ -623,7 +623,7 @@ class GlbChunk {
     constructor(data, type) {
         this.data = data;
         this.type = type;
-        const buf = this.paddingBinary(this.data, this.type === "JSON" ? 0x20 : 0x00);
+        const buf = this.data;//, this.type === "JSON" ? 0x20 : 0x00);
         this.buffer = concatBinary([parseNumber2Binary(buf.byteLength, 4), parseString2Binary(this.type), buf]);
     }
 
