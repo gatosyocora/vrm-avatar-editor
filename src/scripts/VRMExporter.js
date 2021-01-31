@@ -269,7 +269,7 @@ export default class VRMExporter {
                                 }));
 
         // mesh
-        outputNodes.push(meshes.map(group => ({
+        outputNodes.push(...meshes.map(group => ({
             mesh: 0, // TODO
             name: group.name,
             rotation: [
