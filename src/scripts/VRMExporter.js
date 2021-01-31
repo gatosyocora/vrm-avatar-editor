@@ -524,7 +524,7 @@ export default class VRMExporter {
         const jsonChunk = new GlbChunk(parseString2Binary(JSON.stringify(outputData, undefined, 2)), "JSON");
         const binaryChunk = new GlbChunk(concatBinary(buffers), "BIN\x00");
         const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
-        const header = concatBinary([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.byteLength, 4)]);
+        const header = concatBinary([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.byteLength + 12, 4)]);
         onDone(concatBinary([header, fileData]));
     }
 }
