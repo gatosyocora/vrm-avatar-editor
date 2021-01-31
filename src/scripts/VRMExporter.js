@@ -623,7 +623,19 @@ class GlbChunk {
     constructor(data, type) {
         this.data = data;
         this.type = type;
-        this.length = this.data.byteLength;
-        this.buffer = concatBinary([parseNumber2Binary(this.length, 4), parseString2Binary(this.type), this.data]);
+        const buf = this.paddingBinary(this.data, this.type === "JSON" ? 0x20 : 0x00);
+        this.buffer = concatBinary([parseNumber2Binary(buf.byteLength, 4), parseString2Binary(this.type), buf]);
+    }
+
+    // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#structured-json-content
+    paddingBinary(array, value) {
+        const paddedLength = Math.ceil(array.byteLength / 4) * 4;
+        if (array.byteLength === paddedLength) return array;
+        const paddedArray = new Uint8Array(paddedLength);
+        paddedArray.set(new Uint8Array(array), 0);
+        for (let i = array.byteLength; i < paddedLength; i++) {
+            paddedArray.set(new Uint8Array(value), i);
+        }
+        return paddedArray.buffer;
     }
 }
