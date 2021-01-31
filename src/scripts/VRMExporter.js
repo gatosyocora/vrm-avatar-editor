@@ -130,7 +130,7 @@ export default class VRMExporter {
 
         accessors.push(...meshDatas.map(meshData => ({
             bufferView: -1,
-            byteOffset: 0, // TODO: とりあえず0
+            byteOffset: 0,
             componentType: meshData.valueType,
             count: meshData.attribute.count,
             max: meshData.max,
