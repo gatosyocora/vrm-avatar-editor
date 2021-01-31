@@ -107,19 +107,19 @@ export default class VRMExporter {
         const meshDatas = [];
         meshes.forEach(group => {
             const attributes = group.children[0].geometry.attributes;
-            meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT, "VEC3"));
-            meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT, "VEC3"));
-            meshDatas.push(parseBinary(attributes.uv, WEBGL_CONST.FLOAT, "VEC2"));
-            meshDatas.push(parseBinary(attributes.skinWeight, WEBGL_CONST.FLOAT, "VEC4"));
-            meshDatas.push(parseBinary(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "VEC4"));
+            meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.uv, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.skinWeight, WEBGL_CONST.FLOAT));
+            meshDatas.push(parseBinary(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT));
 
             group.children.forEach(subMesh => {
-                meshDatas.push(parseBinary(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "SCALAR"));
+                meshDatas.push(parseBinary(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT));
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT, "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT, "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.position, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(parseBinary(attributes.normal, WEBGL_CONST.FLOAT)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
 
             // position
@@ -231,7 +231,7 @@ export default class VRMExporter {
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         const inverseBindMatrices = new Float32Array(...(meshes.map(group => group.children[0].skeleton.boneInverses.map(boneInv => boneInv.elements).flat())));
-        meshDatas.push(parseBinary(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "MAT4"));
+        meshDatas.push(parseBinary(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT));
         accessors.push({
             bufferView: -1,
             byteOffset: 0,
@@ -582,14 +582,9 @@ function concatBinary(arrays) {
     return output.buffer;
 }
 
-function parseBinary(attr, componentType, type) {
+function parseBinary(attr, componentType) {
 
     const componentTypeSize = componentType === WEBGL_CONST.UNSIGNED_SHORT ? 2 : 4;
-    const typeSize =    type === "SCALAR" ? 1 :
-                        type === "VEC2" ? 2 :
-                        type === "VEC3" ? 3 :
-                        type === "MAT3" ? 9 :
-                        type === "MAT4" ? 16 : 4;
     const array = attr.array;
     let offset = 0;
     const buf = new ArrayBuffer(attr.count * attr.itemSize * componentTypeSize);
