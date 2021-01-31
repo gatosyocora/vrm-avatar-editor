@@ -335,9 +335,6 @@ export default class VRMExporter {
         */
 
         buffers.forEach((buffer, index) => {
-
-            console.log(buffer);
-
             // bufferの最初は画像情報が入っている
             if (index < images.length) {
                 bufferViews.push({
