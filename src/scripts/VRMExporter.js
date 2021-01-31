@@ -214,7 +214,7 @@ export default class VRMExporter {
         const outputSkins = meshes.map(group => ({
                                     inverseBindMatrices: accessors.length - 1, // TODO: accessorsの最後に入っている
                                     joints: group.children[0].skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
-                                    skeleton: 1 // TODO: とりあえず1にした
+                                    skeleton: nodeNames.indexOf(group.children[0].skeleton.bones[0].name)
                                 }));
 
         const blendShapeMaster = {
