@@ -28,7 +28,7 @@ export default class VRMExporter {
                                             self.findIndex(e => e.name === material.name) === index);
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
 
-        const icon = vrmMeta.texture.image; // TODO: ない場合もある
+        const icon = vrmMeta.texture ? vrmMeta.texture.image : null; // TODO: ない場合もある
         const images = uniqueMaterials.map(material => material.map.image);
         const outputImage = images.concat(icon).map(_ => ({
             bufferView: -1,
@@ -308,14 +308,10 @@ export default class VRMExporter {
             colliderGroups: springBone.colliderGroups
         };
 
-        const buffers = [];
         const bufferViews = [];
-        let bufferOffset = 0;
-        buffers.push(...images.map(image => imageBitmap2png(image)));
-        buffers.push(...meshDatas.map(data => data.buffer));
-        if (icon) {
-            buffers.push(imageBitmap2png(icon));
-        }
+        bufferViews.push(...images.map(image => new BufferView(imageBitmap2png(image), "IMAGE")));
+        bufferViews.push(...meshDatas.map(data => new BufferView(data.buffer, data.type)));
+        if (icon) bufferViews.push(new BufferView(imageBitmap2png(icon), "IMAGE"));
 
         /* png画像として書き出しのテスト
         images.forEach((image, index) => {
@@ -334,49 +330,25 @@ export default class VRMExporter {
         });
         */
 
-        buffers.forEach((buffer, index) => {
-            // bufferの最初は画像情報が入っている
-            if (index < images.length) {
-                bufferViews.push({
-                    buffer: 0,
-                    byteLength: buffer.byteLength,
-                    byteOffset: bufferOffset
-                });
-
-                outputImage[index].bufferView = index;
+        let bufferOffset = 0;
+        let imageIndex = 0;
+        let accessorIndex = 0;
+        const outputBufferViews = bufferViews.map((bufferView, index) => {
+            const value = {
+                buffer: 0,
+                byteLength: bufferView.buffer.byteLength,
+                byteOffset: bufferOffset,
+                target: bufferView.type === "IMAGE" || bufferView.type === "BIND_MATRIX" ? undefined :
+                        bufferView.type === "INDEX" ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...           
+            };
+            bufferOffset += bufferView.buffer.byteLength;
+            if (bufferView.type === "IMAGE") {
+                outputImage[imageIndex++].bufferView = index;
             }
-            else if (index < images.length + accessors.length - 1){
-                bufferViews.push({
-                    buffer: 0,
-                    byteLength: buffer.byteLength,
-                    byteOffset: bufferOffset,
-                    target: index === 7 || index === 8 ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
-                });
-
-                accessors[index - images.length].bufferView = index;
-            }
-            // inverseBindMatrices
-            else if (index < images.length + accessors.length) {
-                bufferViews.push({
-                    buffer: 0,
-                    byteLength: buffer.byteLength,
-                    byteOffset: bufferOffset
-                });
-
-                accessors[index - images.length].bufferView = index;            
-
-            }
-            // アイコン画像情報
             else {
-                bufferViews.push({
-                    buffer: 0,
-                    byteLength: buffer.byteLength,
-                    byteOffset: bufferOffset
-                });
-
-                outputImage[outputImage.length - 1].bufferView = index;
+                accessors[accessorIndex++].bufferView = index;
             }
-            bufferOffset += buffer.byteLength;
+            return value;
         });
 
         const outputData = {
@@ -387,7 +359,7 @@ export default class VRMExporter {
                     byteLength: bufferOffset
                 }
             ],
-            bufferViews: bufferViews, // accessors + images
+            bufferViews: outputBufferViews, // accessors + images
             extensions:{
                 VRM: {
                     blendShapeMaster: blendShapeMaster,
@@ -417,7 +389,7 @@ export default class VRMExporter {
         };
     
         const jsonChunk = new GlbChunk(parseString2Binary(JSON.stringify(outputData, undefined, 2)), "JSON");
-        const binaryChunk = new GlbChunk(concatBinary(buffers), "BIN\x00");
+        const binaryChunk = new GlbChunk(concatBinary(bufferViews.map(buf => buf.buffer)), "BIN\x00");
         const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
         const header = concatBinary([parseString2Binary("glTF"), parseNumber2Binary(2, 4), parseNumber2Binary(fileData.byteLength + 12, 4)]);
         onDone(concatBinary([header, fileData]));
@@ -548,5 +520,12 @@ class MeshData {
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
         ] : undefined;
+    }
+}
+
+class BufferView {
+    constructor(buffer, type) {
+        this.buffer = buffer;
+        this.type = type;
     }
 }
