@@ -281,7 +281,7 @@ export default class VRMExporter {
             },
             meshAnnotations: lookAt.firstPerson._meshAnnotations.map(annotation => ({
                 firstPersonFlag: annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
-                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.children[0].name) // TODO: とりあえず対応
+                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.children.length > 0 ? annotation.mesh.children[0].name : annotation.mesh.name) // TODO: とりあえず対応
             }))
         };
 
