@@ -118,7 +118,7 @@ export default class VRMExporter {
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
         });
@@ -148,7 +148,7 @@ export default class VRMExporter {
                                         attributes: {
                                             JOINTS_0: 4, // TODO: とりあえずこの数字 accessorsの添え字
                                             NORMAL: 1, // TODO: とりあえずこの数字 accessorsの添え字
-                                            POSITION: 0, // TODO: とりあえずこの数字 accessorsの添え字
+                                            POSITION: meshDatas.map(data => data.type).indexOf("POSITION"),
                                             TEXCOORD_0: 2, // TODO: とりあえずこの数字 accessorsの添え字
                                             WEIGHTS_0: 3 // TODO: とりあえずこの数字 accessorsの添え字
                                         },
@@ -510,12 +510,12 @@ class MeshData {
         this.valueType = valueType;
         this.accessorsType = accessorsType;
         this.buffer = parseBinary(this.attribute, this.valueType);
-        this.max = type === "POSITION" ? [
+        this.max = type === "POSITION" || type === "BLEND_POSITION" ? [
             Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
             Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
             Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
         ] : undefined;
-        this.min = type === "POSITION" ? [
+        this.min = type === "POSITION" || type === "BLEND_POSITION" ? [
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
