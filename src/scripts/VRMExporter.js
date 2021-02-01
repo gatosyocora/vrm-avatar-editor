@@ -121,8 +121,8 @@ export default class VRMExporter {
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", mesh.name, subMesh.name));
             });
 
-            if (mesh.userData.targetNames) {
-                mesh.userData.targetNames.forEach(targetName => {
+            if (mesh.geometry.userData.targetNames) {
+                mesh.geometry.userData.targetNames.forEach(targetName => {
                     meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 });
@@ -172,7 +172,7 @@ export default class VRMExporter {
                         indices: meshDatas.map(data => data.type === "INDEX" && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
                         mode: 4, // TRIANGLES
-                        targets: subMesh.geometry.userData.targetNames ? subMesh.geometry.userData.targetNames.map(targetName => 
+                        targets: mesh.geometry.userData.targetNames ? mesh.geometry.userData.targetNames.map(targetName => 
                         ({
                             NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
                             POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
