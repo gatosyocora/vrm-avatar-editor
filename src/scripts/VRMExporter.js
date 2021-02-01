@@ -230,7 +230,7 @@ export default class VRMExporter {
         const outputSkins = meshes.map(object => {
             const mesh = object.type === "Group" ? object.children[0] : object;
             return {
-                inverseBindMatrices: meshDatas.map(data => data.type === "MAT4" && data.meshName === mesh.name ? data.name : null).indexOf(mesh.name),
+                inverseBindMatrices: meshDatas.map(data => data.type === "BIND_MATRIX" ? data.meshName : null).indexOf(mesh.name),
                 joints: mesh.skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
                 skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name)
             }
