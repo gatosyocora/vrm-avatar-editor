@@ -157,7 +157,7 @@ export default class VRMExporter {
                                         },
                                         indices: 5 + index, // TODO: 5, 6
                                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
-                                        mode: 4, // TODO: とりあえず4にした
+                                        mode: 4, // TRIANGLES
                                         targets: subMesh.geometry.userData.targetNames.map((_, i) => 
                                         ({
                                             NORMAL: 8 + i * 2, // TODO: accessorsの添え字
