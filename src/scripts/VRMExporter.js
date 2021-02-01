@@ -134,7 +134,7 @@ export default class VRMExporter {
         meshes.forEach(object => {
             const mesh = object.type === "Group" ? object.children[0] : object;
             const inverseBindMatrices = new Float32Array(mesh.skeleton.boneInverses.map(boneInv => boneInv.elements).flat());
-            meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "BIND_MATRIX", "MAT4", mesh.name));
+            meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "BIND_MATRIX", "MAT4", mesh.name, mesh.name));
         })
 
         accessors.push(...meshDatas.map(meshData => ({
@@ -227,11 +227,14 @@ export default class VRMExporter {
             ]
         });
 
-        const outputSkins = meshes.map(group => ({
-                                    inverseBindMatrices: accessors.length - 1, // TODO: accessorsの最後に入っている
-                                    joints: group.children[0].skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
-                                    skeleton: nodeNames.indexOf(group.children[0].skeleton.bones[0].name)
-                                }));
+        const outputSkins = meshes.map(object => {
+            const mesh = object.type === "Group" ? object.children[0] : object;
+            return {
+                inverseBindMatrices: meshDatas.map(data => data.type === "MAT4" && data.meshName === mesh.name ? data.name : null).indexOf(mesh.name),
+                joints: mesh.skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
+                skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name)
+            }
+        });
 
         const blendShapeMaster = {
             blendShapeGroups: Object.values(blendShapeProxy._blendShapeGroups).map(blendShape => 
