@@ -172,11 +172,11 @@ export default class VRMExporter {
                         indices: meshDatas.map(data => data.type === "INDEX" && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
                         mode: 4, // TRIANGLES
-                        targets: subMesh.geometry.userData.targetNames.map(targetName => 
+                        targets: subMesh.geometry.userData.targetNames ? subMesh.geometry.userData.targetNames.map(targetName => 
                         ({
                             NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
                             POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
-                        }))
+                        })) : undefined
                     };
                 })
             };
