@@ -119,7 +119,7 @@ export default class VRMExporter {
 
             group.children[0].userData.targetNames.forEach(_ => {
                 meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
         });
 
@@ -144,13 +144,13 @@ export default class VRMExporter {
                                         targetNames: group.children[0].geometry.userData.targetNames,
                                     },
                                     name: group.children[0].name, // TODO: なんか違う名前になっている
-                                    primitives: group.children.map((subMesh, index) => ({
+                                    primitives: group.children.map(subMesh => ({
                                         attributes: {
-                                            JOINTS_0: 4, // TODO: とりあえずこの数字 accessorsの添え字
-                                            NORMAL: 1, // TODO: とりあえずこの数字 accessorsの添え字
+                                            JOINTS_0: meshDatas.map(data => data.type).indexOf("SKIN_INDEX"),
+                                            NORMAL: meshDatas.map(data => data.type).indexOf("NORMAL"),
                                             POSITION: meshDatas.map(data => data.type).indexOf("POSITION"),
-                                            TEXCOORD_0: 2, // TODO: とりあえずこの数字 accessorsの添え字
-                                            WEIGHTS_0: 3 // TODO: とりあえずこの数字 accessorsの添え字
+                                            TEXCOORD_0: meshDatas.map(data => data.type).indexOf("UV"),
+                                            WEIGHTS_0: meshDatas.map(data => data.type).indexOf("SKIN_WEIGHT")
                                         },
                                         extras: {
                                             targetNames: subMesh.geometry.userData.targetNames
