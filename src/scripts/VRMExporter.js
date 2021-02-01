@@ -104,23 +104,25 @@ export default class VRMExporter {
 
         const accessors = [];
 
-        const meshes = scene.children.filter(child => child.type === "Group");
+        const meshes = scene.children.filter(child => child.type === "Group" || child.type === "SkinnedMesh");
 
         const meshDatas = [];
-        meshes.forEach(group => {
-            const attributes = group.children[0].geometry.attributes;
+        meshes.forEach(object => {
+            const mesh = object.type === "Group" ? object.children[0] : object;
+            const attributes = mesh.geometry.attributes;
             meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3"));
             meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3"));
             meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, "UV", "VEC2"));
             meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, "SKIN_WEIGHT", "VEC4"));
             meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4"));
 
-            group.children.forEach(subMesh => {
+            const subMeshes = object.type === "Group" ? object.children : [object];
+            subMeshes.forEach(subMesh => {
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", subMesh.name));
             });
 
-            if (group.children[0].userData.targetNames) {
-                group.children[0].userData.targetNames.forEach(targetName => {
+            if (mesh.userData.targetNames) {
+                mesh.userData.targetNames.forEach(targetName => {
                     meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                     meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 });
