@@ -114,7 +114,7 @@ export default class VRMExporter {
             meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4"));
 
             group.children.forEach(subMesh => {
-                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR"));
+                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", subMesh.name));
             });
 
             group.children[0].userData.targetNames.forEach(_ => {
@@ -155,7 +155,7 @@ export default class VRMExporter {
                                         extras: {
                                             targetNames: subMesh.geometry.userData.targetNames
                                         },
-                                        indices: 5 + index, // TODO: 5, 6
+                                        indices: meshDatas.map(data => data.name).indexOf(subMesh.name),
                                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
                                         mode: 4, // TRIANGLES
                                         targets: subMesh.geometry.userData.targetNames.map((_, i) => 
@@ -504,11 +504,12 @@ class GlbChunk {
 }
 
 class MeshData {
-    constructor(attribute, valueType, type, accessorsType) {
+    constructor(attribute, valueType, type, accessorsType, name) {
         this.attribute = attribute;
         this.type = type;
         this.valueType = valueType;
         this.accessorsType = accessorsType;
+        this.name = name;
         this.buffer = parseBinary(this.attribute, this.valueType);
         this.max = type === "POSITION" || type === "BLEND_POSITION" ? [
             Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
