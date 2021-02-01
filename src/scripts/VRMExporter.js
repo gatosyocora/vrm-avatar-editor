@@ -110,21 +110,21 @@ export default class VRMExporter {
         meshes.forEach(object => {
             const mesh = object.type === "Group" ? object.children[0] : object;
             const attributes = mesh.geometry.attributes;
-            meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3"));
-            meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3"));
-            meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, "UV", "VEC2"));
-            meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, "SKIN_WEIGHT", "VEC4"));
-            meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4"));
+            meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3", mesh.name));
+            meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3", mesh.name));
+            meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, "UV", "VEC2", mesh.name));
+            meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, "SKIN_WEIGHT", "VEC4", mesh.name));
+            meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4", mesh.name));
 
             const subMeshes = object.type === "Group" ? object.children : [object];
             subMeshes.forEach(subMesh => {
-                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", subMesh.name));
+                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", mesh.name, subMesh.name));
             });
 
             if (mesh.userData.targetNames) {
                 mesh.userData.targetNames.forEach(targetName => {
-                    meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                    meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 });
             }
         });
@@ -510,11 +510,12 @@ class GlbChunk {
 }
 
 class MeshData {
-    constructor(attribute, valueType, type, accessorsType, name) {
+    constructor(attribute, valueType, type, accessorsType, meshName, name) {
         this.attribute = attribute;
         this.type = type;
         this.valueType = valueType;
         this.accessorsType = accessorsType;
+        this.meshName = meshName;
         this.name = name;
         this.buffer = parseBinary(this.attribute, this.valueType);
         this.max = type === "POSITION" || type === "BLEND_POSITION" ? [
