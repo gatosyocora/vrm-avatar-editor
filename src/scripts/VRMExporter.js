@@ -145,32 +145,39 @@ export default class VRMExporter {
             type: meshData.accessorsType
         })));
 
-        const outputMeshes = meshes.map(group => ({
-                                    extras: {
-                                        targetNames: group.children[0].geometry.userData.targetNames,
-                                    },
-                                    name: group.children[0].name, // TODO: なんか違う名前になっている
-                                    primitives: group.children.map(subMesh => ({
-                                        attributes: {
-                                            JOINTS_0: meshDatas.map(data => data.type).indexOf("SKIN_INDEX"),
-                                            NORMAL: meshDatas.map(data => data.type).indexOf("NORMAL"),
-                                            POSITION: meshDatas.map(data => data.type).indexOf("POSITION"),
-                                            TEXCOORD_0: meshDatas.map(data => data.type).indexOf("UV"),
-                                            WEIGHTS_0: meshDatas.map(data => data.type).indexOf("SKIN_WEIGHT")
-                                        },
-                                        extras: {
-                                            targetNames: subMesh.geometry.userData.targetNames
-                                        },
-                                        indices: meshDatas.map(data => data.name).indexOf(subMesh.name),
-                                        material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
-                                        mode: 4, // TRIANGLES
-                                        targets: subMesh.geometry.userData.targetNames.map(targetName => 
-                                        ({
-                                            NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
-                                            POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
-                                        }))
-                                    }))
-                                }));
+        const outputMeshes = meshes.map(object => {
+            const mesh = object.type === "Group" ? object.children[0] : object;
+            const subMeshes = object.type === "Group" ? object.children : [object];
+            return {
+                extras: {
+                    targetNames: mesh.geometry.userData.targetNames,
+                },
+                name: mesh.name, // TODO: なんか違う名前になっている
+                primitives: subMeshes.map(subMesh => {
+                    const meshTypes = meshDatas.map(data => data.meshName === mesh.name ? data.type : null);
+                    return {
+                        attributes: {
+                            JOINTS_0: meshTypes.indexOf("SKIN_INDEX"),
+                            NORMAL: meshTypes.indexOf("NORMAL"),
+                            POSITION: meshTypes.indexOf("POSITION"),
+                            TEXCOORD_0: meshTypes.indexOf("UV"),
+                            WEIGHTS_0: meshTypes.indexOf("SKIN_WEIGHT")
+                        },
+                        extras: {
+                            targetNames: subMesh.geometry.userData.targetNames
+                        },
+                        indices: meshDatas.map(data => data.type === "INDEX" && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
+                        material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
+                        mode: 4, // TRIANGLES
+                        targets: subMesh.geometry.userData.targetNames.map(targetName => 
+                        ({
+                            NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
+                            POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
+                        }))
+                    };
+                })
+            };
+        });
 
         // mesh
         outputNodes.push(...meshes.map(group => ({
