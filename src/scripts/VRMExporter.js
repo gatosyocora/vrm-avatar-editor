@@ -48,35 +48,40 @@ export default class VRMExporter {
             source: index // TODO: 全パターンでindexなのか不明
         }));
 
-        const outputMaterials = uniqueMaterials.map((material, index) => 
-        ({
-            alphaMode: "OPAQUE", // TODO:
-            doubleSided: false, // TODO:
-            extensions: {
-                KHR_materials_unlit: {} // TODO:
-            },
-            name: material.name,
-            pbrMetallicRoughness: {
-                baseColorFactor: [
-                    material.color.r,
-                    material.color.g,
-                    material.color.b,
-                    1 // TODO:
-                ],
-                baseColorTexture: {
-                    extensions: {
-                        KHR_texture_transform: {
-                            offset: [0, 0],
-                            scale: [1, 1]
-                        }
-                    },
-                    index: index, // TODO: とりあえずindexにした
-                    texCoord: 0 // TODO:
+        let textureIndex = 0;
+        const outputMaterials = uniqueMaterials.map((material, index) => {
+            const baseColor = material.color ? [
+                                                    material.color.r,
+                                                    material.color.g,
+                                                    material.color.b,
+                                                    1 // TODO:
+                                                ] : undefined;
+            const baseTexture = material.map ? {
+                                                    extensions: {
+                                                        KHR_texture_transform: {
+                                                            offset: [0, 0],
+                                                            scale: [1, 1]
+                                                        }
+                                                    },
+                                                    index: textureIndex++,
+                                                    texCoord: 0 // TODO:
+                                                } : undefined;
+            return {
+                alphaMode: "OPAQUE", // TODO:
+                doubleSided: false, // TODO:
+                extensions: {
+                    KHR_materials_unlit: {} // TODO:
                 },
-                metallicFactor: 0, // TODO:
-                roughnessFactor: 0.9 // TODO:
-            }
-        }));
+                name: material.name,
+                pbrMetallicRoughness: {
+                    baseColorFactor: baseColor,
+                    baseColorTexture: baseTexture,
+                    metallicFactor: 0, // TODO:
+                    roughnessFactor: 0.9 // TODO:
+                }
+            };
+        });
+        
 
         const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[0];
         const nodes = getNodes(rootNode);
