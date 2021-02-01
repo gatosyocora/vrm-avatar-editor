@@ -291,7 +291,7 @@ export default class VRMExporter {
         };
 
         const vrmHumanoid = {
-            armStreatch: humanoid.humanDescription.armStretch,
+            armStretch: humanoid.humanDescription.armStretch,
             feetSpacing: humanoid.humanDescription.feetSpacing,
             hasTranslationDoF: humanoid.humanDescription.hasTranslationDoF,
             humanBones: Object.entries(humanoid.humanBones)
