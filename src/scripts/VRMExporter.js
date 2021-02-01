@@ -305,7 +305,7 @@ export default class VRMExporter {
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
-        vrmMeta.texture = outputImage.length - 1;
+        vrmMeta.texture = icon ? outputImage.length - 1 : undefined;
     
         const secondaryAnimation = {
             boneGroups: [
