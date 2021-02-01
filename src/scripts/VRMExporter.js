@@ -32,7 +32,7 @@ export default class VRMExporter {
 
         const icon = vrmMeta.texture ? vrmMeta.texture.image : null; // TODO: ない場合もある
         const images = uniqueMaterials.filter(material => material.map).map(material => material.map.image);
-        const outputImage = images.concat(icon).map(_ => ({
+        const outputImage = images.concat(icon).filter(image => image).map(_ => ({
             bufferView: -1,
             mimeType: "image\/png", // TODO: とりあえずpngをいれた
             name: "" // TODO:
