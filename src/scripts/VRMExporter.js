@@ -14,6 +14,8 @@ const WEBGL_CONST = {
     REPEAT: 10497
 };
 
+const BLENDSHAPE_PREFIX = "blend_";
+
 export default class VRMExporter {
     constructor() {}
     parse(scene, humanoid, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
@@ -117,9 +119,9 @@ export default class VRMExporter {
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", subMesh.name));
             });
 
-            group.children[0].userData.targetNames.forEach(_ => {
-                meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3")); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+            group.children[0].userData.targetNames.forEach(targetName => {
+                meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
             });
         });
 
@@ -158,10 +160,10 @@ export default class VRMExporter {
                                         indices: meshDatas.map(data => data.name).indexOf(subMesh.name),
                                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
                                         mode: 4, // TRIANGLES
-                                        targets: subMesh.geometry.userData.targetNames.map((_, i) => 
+                                        targets: subMesh.geometry.userData.targetNames.map(targetName => 
                                         ({
-                                            NORMAL: 8 + i * 2, // TODO: accessorsの添え字
-                                            POSITION: 7 + i * 2 // TODO: accessorsの添え字
+                                            NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
+                                            POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
                                         }))
                                     }))
                                 }));
