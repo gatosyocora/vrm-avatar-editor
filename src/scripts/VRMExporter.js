@@ -84,10 +84,10 @@ export default class VRMExporter {
         
 
         const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[0];
-        const nodes = getNodes(rootNode);
+        const nodes = getNodes(rootNode).filter(node => node.name !== "vrmColliderSphere");
         const nodeNames = nodes.map(node => node.name);
         const outputNodes = nodes.map(node => ({
-            children: node.children.map(childNode => nodeNames.indexOf(childNode.name)),
+            children: node.children.filter(childNode => childNode.name !== "vrmColliderSphere").map(childNode => nodeNames.indexOf(childNode.name)),
             name: node.name,
             rotation: [
                 node.quaternion.x,
