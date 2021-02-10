@@ -313,22 +313,21 @@ export default class VRMExporter {
         vrmMeta.texture = icon ? outputImage.length - 1 : undefined;
     
         const secondaryAnimation = {
-            boneGroups: [
-                {
-                    bones: [], // TODO:
-                    center: -1, // TODO:
-                    colliderGroups: [], // TODO:
-                    dragForce: 0.4, // TODO:
+            boneGroups: springBone.springBoneGroupList.map(group => 
+                ({
+                    bones: group.map(e => nodeNames.indexOf(e.bone.name)), // TODO: indexが入っているが4つあるのに対して2つしか入っていない
+                    center: group[0].center ? group[0].center : -1, // TODO: nullになっていて実際のデータはわからん
+                    colliderGroups: springBone.colliderGroups.map((_, index) => index), // TODO: とりあえずindex
+                    dragForce: group[0].dragForce, // TODO: それっぽいやつをいれた
                     gravityDir: {
-                        x: 0, // TODO:
-                        y: -1, // TODO:
-                        z: 0 // TODO:
+                        x: group[0].gravityDir.x, // TODO: それっぽいやつをいれた
+                        y: group[0].gravityDir.y, // TODO: それっぽいやつをいれた
+                        z: group[0].gravityDir.z // TODO: それっぽいやつをいれた
                     },
-                    gravityPower: 0, // TODO:
-                    hitRadius: 0.02, // TODO:
-                    stiffiness: 1 // TODO:
-                }
-            ],
+                    gravityPower: group[0].gravityPower, // TODO: それっぽいやつをいれた
+                    hitRadius: group[0].radius, // TODO: それっぽいやつをいれた
+                    stiffiness: group[0].stiffnessForce // TODO: それっぽいやつをいれた
+                })),
             colliderGroups: springBone.colliderGroups.map(group => 
                 ({
                     colliders: [{
