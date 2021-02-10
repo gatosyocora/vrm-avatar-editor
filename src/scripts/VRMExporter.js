@@ -328,7 +328,21 @@ export default class VRMExporter {
                     gravityPower: group[0].gravityPower, // TODO: それっぽいやつをいれた
                     hitRadius: group[0].radius, // TODO: それっぽいやつをいれた
                     stiffiness: group[0].stiffnessForce // TODO: それっぽいやつをいれた
-                })) : [],
+                })) : 
+                [{
+                    bones: [],
+                    center: -1,
+                    colliderGroups: [],
+                    dragForce: 0.4,
+                    gravityDir: {
+                        x: 0,
+                        y: -1,
+                        z: 0
+                    },
+                    gravityPower: 0,
+                    hitRadius: 0.02,
+                    stiffiness: 1
+                }], // TODO: 2重に書いてしまった
             colliderGroups: springBone.colliderGroups.map(group => 
                 ({
                     colliders: [{
