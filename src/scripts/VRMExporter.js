@@ -385,6 +385,8 @@ export default class VRMExporter {
             return value;
         });
 
+        const outputNodeNames = outputNodes.map(node => node.name);
+
         const outputData = {
             accessors: accessors, // buffer数 - 画像数
             asset: exporterInfo, // TODO:
@@ -417,7 +419,14 @@ export default class VRMExporter {
             nodes: outputNodes,
             samplers: outputSamplers,
             scene: 0,
-            scenes:[{nodes: [0, 90, 91]}], // TODO:
+            scenes:[
+                {
+                    nodes: scene.children
+                            .filter(child =>    child.type === "Object3D" || 
+                                                child.type === "SkinnedMesh" || 
+                                                child.type === "Group")
+                            .map(x => outputNodeNames.indexOf(x.name))
+                }],
             skins: outputSkins,
             textures: outputTextures
         };
