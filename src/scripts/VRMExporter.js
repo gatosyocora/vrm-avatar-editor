@@ -329,7 +329,18 @@ export default class VRMExporter {
                     stiffiness: 1 // TODO:
                 }
             ],
-            colliderGroups: springBone.colliderGroups
+            colliderGroups: springBone.colliderGroups.map(group => 
+                ({
+                    colliders: [{
+                        offset: {
+                            x: group.colliders[0].position.x,
+                            y: group.colliders[0].position.y,
+                            z: group.colliders[0].position.z
+                        },
+                        radius: group.colliders[0].geometry.boundingSphere.radius
+                    }],
+                    node: group.node
+                }))
         };
 
         const bufferViews = [];
