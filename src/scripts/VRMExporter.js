@@ -314,7 +314,7 @@ export default class VRMExporter {
         vrmMeta.texture = icon ? outputImage.length - 1 : undefined;
     
         const secondaryAnimation = {
-            boneGroups: springBone.springBoneGroupList[0].length > 0 ? springBone.springBoneGroupList.map(group => 
+            boneGroups: springBone.springBoneGroupList[0] && springBone.springBoneGroupList[0].length > 0 ? springBone.springBoneGroupList.map(group => 
                 ({
                     bones: group.map(e => nodeNames.indexOf(e.bone.name)), // TODO: indexが入っているが4つあるのに対して2つしか入っていない
                     center: group[0].center ? group[0].center : -1, // TODO: nullになっていて実際のデータはわからん
