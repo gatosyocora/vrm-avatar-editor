@@ -188,8 +188,8 @@ export default class VRMExporter {
         });
 
         // mesh
-        outputNodes.push(...meshes.map(group => ({
-            mesh: 0, // TODO
+        outputNodes.push(...meshes.map((group, index) => ({
+            mesh: index,
             name: group.name,
             rotation: [
                 group.quaternion.x,
@@ -202,7 +202,7 @@ export default class VRMExporter {
                 group.scale.y,
                 group.scale.z
             ],
-            skin: 0, // TODO
+            skin: index,
             translation: [
                 group.position.x,
                 group.position.y,
