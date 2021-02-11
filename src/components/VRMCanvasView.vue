@@ -10,7 +10,7 @@
 
   @Component
   export default class VRMCanvasView extends Vue {
-    private scene = new THREE.Scene();
+    private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer | null = null;
     private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
     private light = new THREE.DirectionalLight(0xffffff);
@@ -36,9 +36,7 @@
       this.camera.position.set(0, 1, -1.5);
       this.camera.rotation.set(0, Math.PI, 0);
       this.light.position.set(0, 0, 10);
-      this.scene.add(this.light);
-
-      this.animate();
+      this.initScene();
     }
     animate() {
         requestAnimationFrame(this.animate);
@@ -49,9 +47,7 @@
     public updateVrm(newObject: THREE.Scene | THREE.Group) {
       
       if (this.vrmObject) {
-        this.scene = new THREE.Scene();
-        this.scene.add(this.light);
-        this.animate();
+        this.initScene();
       }
       this.vrmObject = newObject;
 
@@ -59,6 +55,12 @@
 
       // add the loaded vrm to the scene
       this.scene.add( this.vrmObject );
+    }
+
+    initScene() {
+        this.scene = new THREE.Scene();
+        this.scene.add(this.light);
+        this.animate();
     }
   };
 </script>
