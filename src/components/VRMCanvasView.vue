@@ -7,6 +7,7 @@
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
   import { VRM, VRMMeta } from '@pixiv/three-vrm';
+  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
   @Component
   export default class VRMCanvasView extends Vue {
@@ -16,6 +17,7 @@
     private light = new THREE.DirectionalLight(0xffffff);
     private gridHelper = new THREE.GridHelper(10, 10);
     private axesHelper = new THREE.AxesHelper(5);
+    private controls: OrbitControls;
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
@@ -37,6 +39,10 @@
 
       this.camera.position.set(0, 1, -1.5);
       this.camera.rotation.set(0, Math.PI, 0);
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.screenSpacePanning = true;
+      this.controls.target.set(0.0, 1.0, 0.0);
+      this.controls.update();
       this.light.position.set(0, 0, 10);
       this.initScene();
     }
