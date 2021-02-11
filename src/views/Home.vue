@@ -5,11 +5,11 @@
       dark
     >
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
-    </v-app-bar>
+    </v-app-bar>    
     <div id="main">
       <center>
         <p class="margin-area">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-        <div class="top margin-area">
+        <div class="top">
           <div
             v-if="vrmObject === null"
             class="layer2 layer-size layer"
@@ -181,8 +181,8 @@ export default class Home extends Vue
     right: 0;
   }
   .layer-size {
-    width: 600px;
-    height: 400px;
+    width: 100%;
+    height: 100%;
     margin: auto;
   }
   .layer1 {

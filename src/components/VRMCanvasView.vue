@@ -1,5 +1,5 @@
 <template>
-  <canvas id="canvas" width="600" height="400" />
+  <canvas id="canvas" />
 </template>
 
 <script lang="ts">
@@ -13,7 +13,7 @@
   export default class VRMCanvasView extends Vue {
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer | null = null;
-    private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
+    private camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     private light = new THREE.DirectionalLight(0xffffff);
     private gridHelper = new THREE.GridHelper(10, 10);
     private axesHelper = new THREE.AxesHelper(5);
@@ -32,10 +32,15 @@
       const $canvas = <HTMLCanvasElement> document.getElementById("canvas");
       if ($canvas === null) return;
 
+      $canvas.width = window.innerWidth;
+      $canvas.height = window.innerHeight;
+
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
         canvas: $canvas
       });
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setPixelRatio(window.devicePixelRatio);
 
       this.camera.position.set(0, 1, -1.5);
       this.camera.rotation.set(0, Math.PI, 0);
