@@ -10,6 +10,7 @@
       <p class="margin-area">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
       <div class="top layer-size margin-area">
         <div
+          v-if="vrmObject === null"
           class="layer2 layer-size layer"
           :class="{outline:isDragOver}"
           @dragover.prevent="onDrag('over')"
