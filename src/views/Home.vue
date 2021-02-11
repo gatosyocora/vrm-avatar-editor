@@ -5,6 +5,10 @@
       dark
     >
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/issues/new" target="_blank">Issue</v-btn>
+      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor" target="_blank">GitHub</v-btn>
+      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md" target="_blank">License</v-btn>
     </v-app-bar>    
     <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
     <div id="main">
