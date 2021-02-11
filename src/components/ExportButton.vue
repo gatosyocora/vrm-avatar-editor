@@ -5,7 +5,7 @@
        :disabled="vrm === null"
         @click="exportVRM"
     >
-        Export
+        Export VRM (beta)
     </v-btn>
 </template>
 
