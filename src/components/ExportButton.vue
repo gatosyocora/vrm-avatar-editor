@@ -65,6 +65,8 @@
         }, options);
         */
 
+       if (!this.vrm) return;
+
        const exporter = new VRMExporter();
        exporter.parse(
            this.vrm.scene, 
