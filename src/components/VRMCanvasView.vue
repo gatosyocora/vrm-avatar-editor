@@ -11,13 +11,13 @@
 
   @Component
   export default class VRMCanvasView extends Vue {
-    private scene: THREE.Scene;
+    private scene: THREE.Scene | null = null;
     private renderer: THREE.WebGLRenderer | null = null;
     private camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     private light = new THREE.DirectionalLight(0xffffff);
     private gridHelper = new THREE.GridHelper(10, 10);
     private axesHelper = new THREE.AxesHelper(5);
-    private controls: OrbitControls;
+    private controls: OrbitControls | null = null;
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
@@ -52,6 +52,7 @@
       this.initScene();
     }
     animate() {
+        if (!this.scene) return;
         requestAnimationFrame(this.animate);
         this.renderer!.render(this.scene, this.camera);
     }
@@ -59,6 +60,8 @@
     @Watch("vrmObject", {immediate: true})
     public updateVrm(newObject: THREE.Scene | THREE.Group) {
       
+      if (!this.scene) return;
+
       if (this.vrmObject) {
         this.initScene();
       }
