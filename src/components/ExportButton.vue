@@ -1,6 +1,8 @@
 <template>
     <v-btn
         block
+        color="primary"
+       :disabled="vrm === null"
         @click="exportVRM"
     >
         Export
