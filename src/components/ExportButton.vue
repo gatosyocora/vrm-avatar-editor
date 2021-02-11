@@ -18,7 +18,7 @@
   @Component
   export default class ExportButton extends Vue {
     @Prop()
-    public vrm: THREE.Scene | null  = null;
+    public vrm: VRM | null  = null;
 
     public exportVRM() {
         /*
@@ -74,7 +74,7 @@
            this.vrm.blendShapeProxy,
            this.vrm.lookAt,
            this.vrm.springBoneManager,
-           (vrm) => {
+           (vrm: ArrayBuffer) => {
 
                 const fileName = "test.vrm";
                 const blob = new Blob([vrm], {type:'octet/stream'}, fileName);
