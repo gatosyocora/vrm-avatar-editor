@@ -6,9 +6,9 @@
     >
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
     </v-app-bar>    
+    <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
     <div id="main">
       <center>
-        <p class="margin-area">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
         <div class="top">
           <div
             v-if="vrmObject === null"
@@ -218,5 +218,14 @@ export default class Home extends Vue
     width: 30%;
     z-index: 9;
     position: relative;
+  }
+
+  #message {
+    float: left;
+    z-index: 8;
+    position: relative;
+    color: white;
+    font-size: 20px;
+    margin: 10px;
   }
 </style>
