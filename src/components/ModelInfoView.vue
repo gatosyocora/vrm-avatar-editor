@@ -43,11 +43,7 @@
     public vrmObject: THREE.Scene | THREE.Group | null = null;
 
     public getMeshCount(objects: Arrays): Number {
-      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length + 
-              objects
-                .filter((object) => object.type === "Object3D" && object.children.length > 0)
-                .map((object) => object.children[0].children.length)
-                .reduce((sum, value) => sum + value, 0);
+      return objects.filter((object) => ["Group", "SkinnedMesh"].includes(object.type)).length;
     }
 
     public getPolygonCount(objects: Arrays): Number {
