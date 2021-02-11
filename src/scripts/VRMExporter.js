@@ -67,8 +67,9 @@ export default class VRMExporter {
                                                     texCoord: 0 // TODO:
                                                 } : undefined;
             return {
-                alphaCutoff: material.alphaTest > 0 ? material.alphaTest : undefined,
-                alphaMode: material.alphaTest === 0 ?"OPAQUE" : "MASK", // TODO:
+                alphaCutoff: material.alphaTest > 0 ? material.alphaTest : material.userData.vrmMaterialProperties.renderQueue >= 2450 ? 0.5 : undefined,
+                alphaMode:  material.userData.vrmMaterialProperties.renderQueue < 2450 ?"OPAQUE" : 
+                            material.userData.vrmMaterialProperties.renderQueue < 3000 ? "MASK" : "BLEND", // TODO:
                 doubleSided: material.side === 2, // 両面描画であれば2になっている
                 extensions: {
                     KHR_materials_unlit: {} // TODO:
