@@ -116,10 +116,13 @@ export default class VRMExporter {
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", mesh.name, subMesh.name));
             });
 
+            const morphIndexPair = Object.entries(mesh.morphTargetDictionary);
             if (mesh.geometry.userData.targetNames) {
                 mesh.geometry.userData.targetNames.forEach(targetName => {
-                    meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                    meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    const morphIndex = morphIndexPair.filter(pair => pair[0] === targetName)[0][1];
+                    const morphAttribute = mesh.geometry.morphAttributes;
+                    meshDatas.push(new MeshData(morphAttribute.position[morphIndex], WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    meshDatas.push(new MeshData(morphAttribute.normal[morphIndex], WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 });
             }
         });
