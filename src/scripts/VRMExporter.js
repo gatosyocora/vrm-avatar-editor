@@ -30,12 +30,12 @@ export default class VRMExporter {
                                             self.findIndex(e => e.name === material.name) === index);
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
 
-        const icon = vrmMeta.texture ? vrmMeta.texture.image : null; // TODO: ない場合もある
-        const images = uniqueMaterials.filter(material => material.map).map(material => material.map.image);
-        const outputImage = images.concat(icon).filter(image => image).map(_ => ({
+        const icon = vrmMeta.texture ? new ImageData("icon", vrmMeta.texture.image) : null; // TODO: ない場合もある
+        const images = uniqueMaterials.filter(material => material.map).map(material => new ImageData(material.name, material.map.image));
+        const outputImage = images.concat(icon).filter(image => image && image.imageBitmap).map(image => ({
             bufferView: -1,
             mimeType: "image\/png", // TODO: とりあえずpngをいれた
-            name: "" // TODO:
+            name: image.name // TODO: 取得できないので仮のテクスチャ名としてマテリアル名を入れた
         }));
         const outputSamplers = outputImage.map(_ =>({
             magFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
@@ -48,8 +48,7 @@ export default class VRMExporter {
             source: index // TODO: 全パターンでindexなのか不明
         }));
 
-        let textureIndex = 0;
-        const outputMaterials = uniqueMaterials.map((material, index) => {
+        const outputMaterials = uniqueMaterials.map((material) => {
             const baseColor = material.color ? [
                                                     material.color.r,
                                                     material.color.g,
@@ -63,7 +62,7 @@ export default class VRMExporter {
                                                             scale: [1, 1]
                                                         }
                                                     },
-                                                    index: textureIndex++,
+                                                    index: images.map(image => image.name).indexOf(material.name), // TODO: ImageDataにいれたMaterial名で対応付け
                                                     texCoord: 0 // TODO:
                                                 } : undefined;
             return {
@@ -361,17 +360,17 @@ export default class VRMExporter {
         };
 
         const bufferViews = [];
-        bufferViews.push(...images.map(image => new BufferView(imageBitmap2png(image), "IMAGE")));
+        bufferViews.push(...images.map(image => new BufferView(imageBitmap2png(image.imageBitmap), "IMAGE")));
         bufferViews.push(...meshDatas.map(data => new BufferView(data.buffer, data.type)));
-        if (icon) bufferViews.push(new BufferView(imageBitmap2png(icon), "IMAGE"));
+        if (icon) bufferViews.push(new BufferView(imageBitmap2png(icon.imageBitmap), "IMAGE"));
 
         /* png画像として書き出しのテスト
         images.forEach((image, index) => {
             const fileName = "test"+index.toString()+".png";
             const canvas = document.createElement("canvas");
-            canvas.width = image.width;
-            canvas.height = image.height;
-            canvas.getContext('2d').drawImage(image, 0, 0);
+            canvas.width = image.imageBitmap.width;
+            canvas.height = image.imageBitmap.height;
+            canvas.getContext('2d').drawImage(image.imageBitmap, 0, 0);
             canvas.toBlob((blob) =>{
                 console.log(blob);
                 const link = document.createElement("a");
@@ -583,6 +582,13 @@ class MeshData {
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
             Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
         ] : undefined;
+    }
+}
+
+class ImageData {
+    constructor(name, imageBitmap) {
+        this.name = name;
+        this.imageBitmap = imageBitmap;
     }
 }
 
