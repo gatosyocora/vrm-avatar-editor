@@ -79,7 +79,7 @@
            (vrm: ArrayBuffer) => {
 
                 const fileName = "test.vrm";
-                const blob = new Blob([vrm], {type:'octet/stream'}, fileName);
+                const blob = new Blob([vrm], {type:'octet/stream'});
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
                 link.download = fileName;
