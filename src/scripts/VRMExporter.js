@@ -92,22 +92,9 @@ export default class VRMExporter {
         const outputNodes = nodes.map(node => ({
             children: node.children.filter(childNode => childNode.name !== "vrmColliderSphere").map(childNode => nodeNames.indexOf(childNode.name)),
             name: node.name,
-            rotation: [
-                node.quaternion.x,
-                node.quaternion.y,
-                node.quaternion.z,
-                node.quaternion.w
-            ],
-            scale: [
-                node.scale.x,
-                node.scale.y,
-                node.scale.z
-            ],
-            translation: [
-                node.position.x,
-                node.position.y,
-                node.position.z
-            ]
+            rotation: Object.values(node.quaternion),
+            scale: Object.values(node.scale),
+            translation: Object.values(node.position)
         }));
 
         const accessors = [];
@@ -194,45 +181,19 @@ export default class VRMExporter {
         outputNodes.push(...meshes.map((group, index) => ({
             mesh: index,
             name: group.name,
-            rotation: [
-                group.quaternion.x,
-                group.quaternion.y,
-                group.quaternion.z,
-                group.quaternion.w
-            ],
-            scale: [
-                group.scale.x,
-                group.scale.y,
-                group.scale.z
-            ],
+            rotation: Object.values(group.quaternion),
+            scale: Object.values(group.scale),
             skin: index,
-            translation: [
-                group.position.x,
-                group.position.y,
-                group.position.z
-            ]
+            translation: Object.values(group.position)
         })));
 
         // secondary
         const secondaryRootNode = scene.children.filter(child => child.name === "secondary")[0];
         outputNodes.push({
             name: secondaryRootNode.name,
-            rotation: [
-                secondaryRootNode.quaternion.x,
-                secondaryRootNode.quaternion.y,
-                secondaryRootNode.quaternion.z,
-                secondaryRootNode.quaternion.w
-            ],
-            scale: [
-                secondaryRootNode.scale.x,
-                secondaryRootNode.scale.y,
-                secondaryRootNode.scale.z
-            ],
-            translation: [
-                secondaryRootNode.position.x,
-                secondaryRootNode.position.y,
-                secondaryRootNode.position.z
-            ]
+            rotation: Object.values(secondaryRootNode.quaternion),
+            scale: Object.values(secondaryRootNode.scale),
+            translation: Object.values(secondaryRootNode.position)
         });
 
         const outputSkins = meshes.map(object => {
