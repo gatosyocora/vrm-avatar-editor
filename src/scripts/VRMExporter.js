@@ -220,7 +220,7 @@ export default class VRMExporter {
                                     isBinary: blendShape.isBinary,
                                     materialValues: blendShape._materialValues,
                                     name: blendShape.name.replace("BlendShapeController_", ''),
-                                    presetName: Object.entries(blendShapeProxy._blendShapePresetMap).filter(x => x[1] === blendShape.name.replace("BlendShapeController_", '')).filter((_, index) => index === 0)[0]
+                                    presetName: Object.entries(blendShapeProxy._blendShapePresetMap).filter(x => x[1] === blendShape.name.replace("BlendShapeController_", ''))[0][0]
                                 }))
         };
 
