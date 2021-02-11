@@ -1,26 +1,30 @@
 <template>
   <div class="home">
-    <center>  
-      <v-app-bar
-        danse
-        dark
-      >
-        <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
-      </v-app-bar>
-      <p class="margin-area">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-      <div class="top layer-size margin-area">
-        <div
-          class="layer2 layer-size layer"
-          :class="{outline:isDragOver}"
-          @dragover.prevent="onDrag('over')"
-          @dragleave.prevent="onDrag('leave')"
-          @drop.prevent="onDrop">
-          <div class="white-color">VRMをドラッグ&ドロップ</div>
-          <p><input type="file" class="white-color" @change="onFileChange" accept=".vrm"></p>
+    <v-app-bar
+      danse
+      dark
+    >
+      <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
+    </v-app-bar>
+    <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
+    <div id="main">
+      <center>
+        <div class="top">
+          <div
+            v-if="vrmObject === null"
+            class="layer2 layer-size layer"
+            :class="{outline:isDragOver}"
+            @dragover.prevent="onDrag('over')"
+            @dragleave.prevent="onDrag('leave')"
+            @drop.prevent="onDrop">
+            <div class="white-color">VRMをドラッグ&ドロップ</div>
+            <p><input type="file" class="white-color" @change="onFileChange" accept=".vrm"></p>
+          </div>
+          <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
         </div>
-        <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
-      </div>
-      <ExportButton :vrm="vrm"/>
+      </center>
+    </div>
+    <div id="menu">
       <v-card>
         <v-tabs
           fixed-tabs
@@ -30,19 +34,20 @@
           <v-tab @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</v-tab>
           <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
         </v-tabs>
+        <div class="margin-area contents">
+          <div v-show="currentTab === 0">
+            <MetaView :meta="meta"/>
+          </div>
+          <div v-show="currentTab === 1">
+            <MaterialView :materials="materials"/>
+          </div>
+          <div v-show="currentTab === 2">
+            <ModelInfoView :vrmObject="vrmObject" :materials="materials"/>
+          </div>
+          <ExportButton :vrm="vrm"/>
+        </div>
       </v-card>
-      <div class="margin-area contents">
-        <div v-show="currentTab === 0">
-          <MetaView :meta="meta"/>
-        </div>
-        <div v-show="currentTab === 1">
-          <MaterialView :materials="materials"/>
-        </div>
-        <div v-show="currentTab === 2">
-          <ModelInfoView :vrmObject="vrmObject" :materials="materials"/>
-        </div>
-      </div>
-    </center>
+    </div>
   </div>
 </template>
 
@@ -72,7 +77,7 @@ interface HTMLInputEvent extends Event {
   },
 })
 
-export default class Home extends Vue 
+export default class Home extends Vue
 {
     @Prop()
     public vrm: VRM | null = null;
@@ -96,7 +101,7 @@ export default class Home extends Vue
     }
     public onDrop(e: DragEvent) {
 
-      if (e.dataTransfer === null || 
+      if (e.dataTransfer === null ||
           e.dataTransfer.files === null) return;
 
       this.isDragOver = false;
@@ -182,8 +187,8 @@ export default class Home extends Vue
     right: 0;
   }
   .layer-size {
-    width: 600px;
-    height: 400px;
+    width: 100%;
+    height: 100%;
     margin: auto;
   }
   .layer1 {
@@ -202,10 +207,32 @@ export default class Home extends Vue
     margin: 20px;
   }
   .contents {
-    max-width: 70%;
+    padding: 10px;
   }
-  
+
   .v-data-table__wrapper tr:hover {
     background: white !important;
+  }
+
+  #main {
+    float: none;
+    z-index: 0;
+    position: relative;
+  }
+
+  #menu {
+    float: right;
+    width: 30%;
+    z-index: 9;
+    position: relative;
+  }
+
+  #message {
+    float: left;
+    z-index: 8;
+    position: relative;
+    color: white;
+    font-size: 20px;
+    margin: 10px;
   }
 </style>
