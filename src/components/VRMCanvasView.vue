@@ -15,6 +15,7 @@
     private camera = new THREE.PerspectiveCamera(75, 600/400, 0.1, 1000);
     private light = new THREE.DirectionalLight(0xffffff);
     private gridHelper = new THREE.GridHelper(10, 10);
+    private axesHelper = new THREE.AxesHelper(5);
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
@@ -62,6 +63,7 @@
         this.scene = new THREE.Scene();
         this.scene.add(this.light);
         this.scene.add(this.gridHelper);
+        this.scene.add(this.axesHelper);
         this.animate();
     }
   };
