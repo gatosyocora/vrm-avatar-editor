@@ -87,7 +87,7 @@
 <style>
   .card {
     margin: 10px;
-    width: 50%;
+    width: 100%;
   }
   .tex-info {
     font-size: 10px;
