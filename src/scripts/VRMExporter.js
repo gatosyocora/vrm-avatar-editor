@@ -71,15 +71,17 @@ export default class VRMExporter {
                 alphaMode:  material.userData.vrmMaterialProperties.renderQueue < 2450 ?"OPAQUE" : 
                             material.userData.vrmMaterialProperties.renderQueue < 3000 ? "MASK" : "BLEND", // TODO:
                 doubleSided: material.side === 2, // 両面描画であれば2になっている
-                extensions: {
+                extensions: material.type === "MeshBasicMaterial" ? {
                     KHR_materials_unlit: {} // TODO:
-                },
+                } : undefined,
                 name: material.name,
                 pbrMetallicRoughness: {
                     baseColorFactor: baseColor,
                     baseColorTexture: baseTexture,
-                    metallicFactor: 0, // TODO:
-                    roughnessFactor: 0.9 // TODO:
+                    metallicFactor:     material.type === "MeshStandardMaterial" ? material.metalness : 
+                                        material.type === "MeshBasicMaterial" ? 0 : 0.5,
+                    roughnessFactor:    material.type === "MeshStandardMaterial" ? material.roughness : 
+                                        material.type === "MeshBasicMaterial" ? 0.9 : 0.5,
                 }
             };
         });
