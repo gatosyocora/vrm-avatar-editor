@@ -215,7 +215,6 @@ export default class VRMExporter {
 
         // secondary
         const secondaryRootNode = scene.children.filter(child => child.name === "secondary")[0];
-        console.log(secondaryRootNode);
         outputNodes.push({
             name: secondaryRootNode.name,
             rotation: [
