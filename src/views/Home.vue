@@ -75,7 +75,7 @@ interface HTMLInputEvent extends Event {
 export default class Home extends Vue 
 {
     @Prop()
-    public vrm: THREE.Scene | null = null;
+    public vrm: VRM | null = null;
 
     @Prop()
     public meta: VRMMeta | undefined | null = null;
