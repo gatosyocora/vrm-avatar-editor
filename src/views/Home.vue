@@ -201,6 +201,7 @@ export default class Home extends Vue
     margin: 20px;
   }
   .contents {
+    padding: 10px;
   }
   
   .v-data-table__wrapper tr:hover {
