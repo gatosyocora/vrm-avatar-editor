@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home full">
     <v-app-bar
       danse
       dark
@@ -11,22 +11,24 @@
       <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md" target="_blank">License</v-btn>
     </v-app-bar>    
     <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-    <div id="main">
-      <center>
-        <div class="top">
-          <div
-            v-if="vrmObject === null"
-            class="layer2 layer-size layer"
-            :class="{outline:isDragOver}"
-            @dragover.prevent="onDrag('over')"
-            @dragleave.prevent="onDrag('leave')"
-            @drop.prevent="onDrop">
-            <div class="white-color">VRMをドラッグ&ドロップ</div>
-            <p><input type="file" class="white-color" @change="onFileChange" accept=".vrm"></p>
+    <div id="main" class="full">
+      <div class="top full">
+        <div
+          v-if="vrmObject === null"
+          class="layer2 layer full"
+          :class="{outline:isDragOver}"
+          @dragover.prevent="onDrag('over')"
+          @dragleave.prevent="onDrag('leave')"
+          @drop.prevent="onDrop">
+          <div class="white-color">
+            <center>
+              VRMをドラッグ&ドロップ<br>
+              <p><input type="file" @change="onFileChange" accept=".vrm"></p>
+            </center>
           </div>
-          <VRMCanvas :vrmObject="vrmObject" class="layer1 layer-size layer" />
         </div>
-      </center>
+        <VRMCanvas :vrmObject="vrmObject" class="layer1 layer full" />
+      </div>
     </div>
     <div id="menu">
       <v-card>
@@ -184,16 +186,18 @@ export default class Home extends Vue
     left: 0;
     right: 0;
   }
-  .layer-size {
+  .full {
     width: 100%;
     height: 100%;
-    margin: auto;
   }
   .layer1 {
     z-index: 1;
   }
   .layer2 {
     z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .white-color {
     color: #ffffff;
@@ -210,6 +214,11 @@ export default class Home extends Vue
   
   .v-data-table__wrapper tr:hover {
     background: white !important;
+  }
+
+  body {
+    width: 100%;
+    height: 100%;
   }
 
   #main {
