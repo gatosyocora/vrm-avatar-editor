@@ -11,8 +11,8 @@
       <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md" target="_blank">License</v-btn>
     </v-app-bar>    
     <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
-    <div id="menu">
-      <v-card>
+    <div id="menu" class="full-height">
+      <v-card class="full-height">
         <v-tabs
           fixed-tabs
           dark
@@ -21,7 +21,7 @@
           <v-tab @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</v-tab>
           <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
         </v-tabs>
-        <div class="margin-area contents">
+        <div class="margin-area contents full-height">
           <div v-show="currentTab === 0">
             <MetaView :meta="meta"/>
           </div>
@@ -189,6 +189,9 @@ export default class Home extends Vue
   }
   .full {
     width: 100%;
+    height: 100%;
+  }
+  .full-height {
     height: 100%;
   }
   .layer1 {
