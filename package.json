@@ -56,6 +56,10 @@
     "transform": {
       ".*\\.(vue)$": "vue-jest",
       "^.+\\.tsx?$": "ts-jest"
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
     },
     "testURL": "http://localhost",
     "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
