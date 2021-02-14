@@ -62,6 +62,8 @@
       }
     },
     "testURL": "http://localhost",
-    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ]
   }
 }
