@@ -1,26 +1,26 @@
 module.exports = {
-    "verbose": true,
-    "moduleFileExtensions": [
+    verbose: true,
+    moduleFileExtensions: [
       "js",
       "ts",
       "json",
       "vue"
     ],
-    "moduleNameMapper": {
+    moduleNameMapper: {
       "^@/(.+)": "<rootDir>/src/$1"
     },
-    "transform": {
+    transform: {
       ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest",
       "^.+\\.ts$": "<rootDir>/node_modules/ts-jest",
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
     },
-    "globals": {
+    globals: {
       "ts-jest": {
         "tsConfig": "tsconfig.json"
       }
     },
-    "testURL": "http://localhost",
-    "testMatch": [
+    testURL: "http://localhost",
+    testMatch: [
       "**/tests/**/*.test.ts"
     ]
 }
