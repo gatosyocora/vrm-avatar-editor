@@ -10,9 +10,9 @@ module.exports = {
       "^@/(.+)": "<rootDir>/src/$1"
     },
     transform: {
-      ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest",
-      "^.+\\.ts$": "<rootDir>/node_modules/ts-jest",
-      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+      ".*\\.(vue)$": "vue-jest",
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.js$": "babel-jest"
     },
     globals: {
       "ts-jest": {
