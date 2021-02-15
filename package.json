@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "deploy": "gh-pages -d docs",
-    "test:unit": "jest"
+    "test": "jest"
   },
   "dependencies": {
     "@pixiv/three-vrm": "^0.5.6",
