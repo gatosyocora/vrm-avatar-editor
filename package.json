@@ -46,30 +46,5 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ],
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "json",
-      "vue"
-    ],
-    "moduleNameMapper": {
-      "^@/(.+)": "<rootDir>/src/$1"
-    },
-    "transform": {
-      ".*\\.(vue)$": "vue-jest",
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "tsconfig.json"
-      }
-    },
-    "testURL": "http://localhost",
-    "testMatch": [
-      "**/tests/**/*.test.ts"
-    ]
-  }
+  ]
 }
