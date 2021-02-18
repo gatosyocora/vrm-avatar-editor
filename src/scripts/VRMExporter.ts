@@ -609,7 +609,7 @@ function parseBinary(attr: BufferAttribute, componentType: number) {
     const buf = new ArrayBuffer(attr.count * attr.itemSize * componentTypeSize);
     const view = new DataView(buf);
     for (let i = 0; i < attr.count; i++) {
-        for (var a = 0; a < attr.itemSize; a++) {
+        for (let a = 0; a < attr.itemSize; a++) {
 
             let value: number;
             if (attr.itemSize > 4) {
