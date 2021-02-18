@@ -1,6 +1,7 @@
 import { VRM, MToonMaterial } from "@pixiv/three-vrm";
 import { BufferAttribute, MeshStandardMaterial, MeshBasicMaterial, Bone, Object3D } from "three";
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
+import { ToOutputVRMMeta } from "./VRMMetaUtils";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -388,8 +389,8 @@ export default class VRMExporter {
 
         const materialProperties = materials.map((material) => material.userData.vrmMaterialProperties);
         
-        vrmMeta.texture = icon ? outputImage.length - 1 : undefined;
     
+        const outputVrmMeta = ToOutputVRMMeta(vrmMeta, icon, outputImage);
         const secondaryAnimation = {
             boneGroups: springBone.springBoneGroupList[0] && springBone.springBoneGroupList[0].length > 0 ? springBone.springBoneGroupList.map(group => 
                 ({
@@ -495,7 +496,7 @@ export default class VRMExporter {
                     firstPerson: vrmFirstPerson,
                     humanoid: vrmHumanoid,
                     materialProperties: materialProperties,
-                    meta: vrmMeta,
+                    meta: outputVrmMeta,
                     secondaryAnimation: secondaryAnimation,
                     specVersion: "0.0" // TODO:
                 }
@@ -698,7 +699,7 @@ enum MeshDataType {
     BIND_MATRIX = "BIND_MATRIX"
 }
 
-interface ImageData {
+export interface ImageData {
     name: string;
     imageBitmap: ImageBitmap;
 }
