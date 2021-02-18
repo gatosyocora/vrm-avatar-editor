@@ -27,13 +27,7 @@
 
        const exporter = new VRMExporter();
        exporter.parse(
-           this.vrm.scene, 
-           this.vrm.humanoid,
-           this.vrm.meta,
-           this.vrm.materials,
-           this.vrm.blendShapeProxy,
-           this.vrm.lookAt,
-           this.vrm.springBoneManager,
+           this.vrm,
            (vrm: ArrayBuffer) => {
 
                 const fileName = "test.vrm";

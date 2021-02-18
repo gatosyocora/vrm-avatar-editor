@@ -1,24 +1,26 @@
-import { BufferAttribute } from "three";
+import { VRM, MToonMaterial } from "@pixiv/three-vrm";
+import { BufferAttribute, MeshStandardMaterial, MeshBasicMaterial, Bone, Object3D } from "three";
+import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 
 // WebGL(OpenGL)マクロ定数
-const WEBGL_CONST = {
-    ARRAY_BUFFER: 34962,
-    ELEMENT_ARRAY_BUFFER: 34963,
-    BYTE: 5120,
-    UNSIGNED_BYTE: 5121,
-    SHORT: 5122,
-    UNSIGNED_SHORT: 5123,
-    UNSIGNED_INT: 5125,
-    FLOAT: 5126,
-    LINEAR: 9729,
-    REPEAT: 10497
+enum WEBGL_CONST {
+    ARRAY_BUFFER = 34962,
+    ELEMENT_ARRAY_BUFFER = 34963,
+    BYTE = 5120,
+    UNSIGNED_BYTE = 5121,
+    SHORT = 5122,
+    UNSIGNED_SHORT = 5123,
+    UNSIGNED_INT = 5125,
+    FLOAT = 5126,
+    LINEAR = 9729,
+    REPEAT = 10497
 };
 
 const BLENDSHAPE_PREFIX = "blend_";
 
 export default class VRMExporter {
     constructor() {}
-    parse(vrm, onDone) {
+    parse(vrm: VRM, onDone:(buffer:ArrayBuffer) => void) {
 
         const scene = vrm.scene;
         const humanoid = vrm.humanoid;
@@ -33,14 +35,24 @@ export default class VRMExporter {
             version: "2.0"
         };
 
+        // TODO: とりあえず全部ある想定で進める
+        if (!scene || !humanoid || !vrmMeta || !materials || !blendShapeProxy || !lookAt || !springBone) {
+            throw new Error;
+        }
+
         // TODO: name基準で重複除外 これでいいのか？
         const uniqueMaterials = materials.filter((material, index, self) => 
-                                            self.findIndex(e => e.name === material.name) === index);
+                                            self.findIndex(e => e.name === material.name) === index)
+                                                .map(material => material as (MeshBasicMaterial|MeshStandardMaterial|MToonMaterial));
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
-
-        const icon = vrmMeta.texture ? new ImageData("icon", vrmMeta.texture.image) : null; // TODO: ない場合もある
-        const images = uniqueMaterials.filter(material => material.map).map(material => new ImageData(material.name, material.map.image));
-        const outputImage = images.concat(icon).filter(image => image && image.imageBitmap).map(image => ({
+        const icon:ImageData | null = vrmMeta.texture ? {name:"icon", imageBitmap: vrmMeta.texture.image} : null; // TODO: ない場合もある
+        const images: Array<ImageData> = uniqueMaterials
+                                            .filter(material => material.map)
+                                            .map(material => {
+                                                if (!material.map) throw new Error;
+                                                return ({name: material.name, imageBitmap: material.map.image});
+                                            }); // TODO: 画像がないMaterialもある
+        const outputImage = (icon? images.concat(icon) : images).filter(image => image && image.imageBitmap).map(image => ({
             bufferView: -1,
             mimeType: "image\/png", // TODO: とりあえずpngをいれた
             name: image.name // TODO: 取得できないので仮のテクスチャ名としてマテリアル名を入れた
@@ -57,12 +69,25 @@ export default class VRMExporter {
         }));
 
         const outputMaterials = uniqueMaterials.map((material) => {
-            const baseColor = material.color ? [
-                                                    material.color.r,
-                                                    material.color.g,
-                                                    material.color.b,
-                                                    1 // TODO:
-                                                ] : undefined;
+            let baseColor: [number, number, number, number] | undefined;
+            if (material.type === MaterialType.MToonMaterial) {
+                const mtoonMaterial = material as MToonMaterial;
+                baseColor = mtoonMaterial.color ? [
+                                mtoonMaterial.color.x,
+                                mtoonMaterial.color.y,
+                                mtoonMaterial.color.z,
+                                mtoonMaterial.color.w
+                            ] : undefined;
+            }
+            else {
+                const otherMaterial = material as (MeshBasicMaterial|MeshStandardMaterial);
+                baseColor = otherMaterial.color ? [
+                                otherMaterial.color.r,
+                                otherMaterial.color.g,
+                                otherMaterial.color.b,
+                                1 // TODO:
+                            ] : undefined;
+            }
             const baseTexture = material.map ? {
                                                     extensions: {
                                                         KHR_texture_transform: {
@@ -73,22 +98,42 @@ export default class VRMExporter {
                                                     index: images.map(image => image.name).indexOf(material.name), // TODO: ImageDataにいれたMaterial名で対応付け
                                                     texCoord: 0 // TODO:
                                                 } : undefined;
+            const metallicFactor = (_ => {
+                switch (material.type) {
+                    case MaterialType.MeshStandardMaterial:
+                        return (material as MeshStandardMaterial).metalness;
+                    case MaterialType.MeshBasicMaterial:
+                        return 0;
+                    default:
+                        return 0.5;
+                }
+            })();
+
+            const roughnessFactor = (_ => {
+                switch (material.type) {
+                    case MaterialType.MeshStandardMaterial:
+                        return (material as MeshStandardMaterial).roughness;
+                    case MaterialType.MeshBasicMaterial:
+                        return 0.9;
+                    default:
+                        return 0.5;
+                }
+            })();
+            
             return {
                 alphaCutoff: material.alphaTest > 0 ? material.alphaTest : undefined,
                 alphaMode:  material.transparent ? "BLEND" :
                             material.alphaTest > 0 ? "MASK" : "OPAQUE",
                 doubleSided: material.side === 2, // 両面描画であれば2になっている
-                extensions: material.type === "MeshBasicMaterial" ? {
+                extensions: material.type === MaterialType.MeshBasicMaterial ? {
                     KHR_materials_unlit: {} // TODO:
                 } : undefined,
                 name: material.name,
                 pbrMetallicRoughness: {
                     baseColorFactor: baseColor,
                     baseColorTexture: baseTexture,
-                    metallicFactor:     material.type === "MeshStandardMaterial" ? material.metalness : 
-                                        material.type === "MeshBasicMaterial" ? 0 : 0.5,
-                    roughnessFactor:    material.type === "MeshStandardMaterial" ? material.roughness : 
-                                        material.type === "MeshBasicMaterial" ? 0.9 : 0.5,
+                    metallicFactor: metallicFactor,
+                    roughnessFactor: roughnessFactor,
                 }
             };
         });
@@ -97,31 +142,48 @@ export default class VRMExporter {
         const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[0];
         const nodes = getNodes(rootNode).filter(node => node.name !== "vrmColliderSphere");
         const nodeNames = nodes.map(node => node.name);
-        const outputNodes = nodes.map(node => ({
-            children: node.children.filter(childNode => childNode.name !== "vrmColliderSphere").map(childNode => nodeNames.indexOf(childNode.name)),
+        const outputNodes: Array<Node> = nodes.map(node => ({
+            children: node.children
+                        .filter(childNode => childNode.name !== "vrmColliderSphere")
+                        .map(childNode => nodeNames.indexOf(childNode.name)),
+            skin: undefined,
             name: node.name,
-            rotation: Object.values(node.quaternion),
-            scale: Object.values(node.scale),
-            translation: Object.values(node.position)
+            rotation: {
+                x: node.quaternion.x,
+                y: node.quaternion.y,
+                z: node.quaternion.z,
+                w: node.quaternion.w
+            },
+            scale: {
+                x: node.scale.x,
+                y: node.scale.y,
+                z: node.scale.z
+            },
+            translation: {
+                x: node.position.x,
+                y: node.position.y,
+                z: node.position.z
+            }
         }));
 
-        const accessors = [];
+        const accessors: Array<Accessor> = [];
 
         const meshes = scene.children.filter(child => child.type === "Group" || child.type === "SkinnedMesh");
 
-        const meshDatas = [];
+        const meshDatas: Array<MeshData> = [];
         meshes.forEach(object => {
-            const mesh = object.type === "Group" ? object.children[0] : object;
+            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
             const attributes = mesh.geometry.attributes;
-            meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, "POSITION", "VEC3", mesh.name));
-            meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, "NORMAL", "VEC3", mesh.name));
-            meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, "UV", "VEC2", mesh.name));
-            meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, "SKIN_WEIGHT", "VEC4", mesh.name));
-            meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, "SKIN_INDEX", "VEC4", mesh.name));
+            meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, MeshDataType.POSITION, AccessorsType.VEC3, mesh.name, undefined));
+            meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, MeshDataType.NORMAL, AccessorsType.VEC3, mesh.name, undefined));
+            meshDatas.push(new MeshData(attributes.uv, WEBGL_CONST.FLOAT, MeshDataType.UV, AccessorsType.VEC2, mesh.name, undefined));
+            meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, MeshDataType.SKIN_WEIGHT, AccessorsType.VEC4, mesh.name, undefined));
+            meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, MeshDataType.SKIN_INDEX, AccessorsType.VEC4, mesh.name, undefined));
 
-            const subMeshes = object.type === "Group" ? object.children : [object];
+            const subMeshes = object.type === "Group" ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
             subMeshes.forEach(subMesh => {
-                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, "INDEX", "SCALAR", mesh.name, subMesh.name));
+                if (!subMesh.geometry.index) throw new Error;
+                meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, MeshDataType.INDEX, AccessorsType.SCALAR, mesh.name, subMesh.name));
             });
 
             const morphIndexPair = Object.entries(mesh.morphTargetDictionary);
@@ -129,8 +191,8 @@ export default class VRMExporter {
                 mesh.geometry.userData.targetNames.forEach(targetName => {
                     const morphIndex = morphIndexPair.filter(pair => pair[0] === targetName)[0][1];
                     const morphAttribute = mesh.geometry.morphAttributes;
-                    meshDatas.push(new MeshData(morphAttribute.position[morphIndex], WEBGL_CONST.FLOAT, "BLEND_POSITION", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
-                    meshDatas.push(new MeshData(morphAttribute.normal[morphIndex], WEBGL_CONST.FLOAT, "BLEND_NORMAL", "VEC3", mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    meshDatas.push(new MeshData(morphAttribute.position[morphIndex], WEBGL_CONST.FLOAT, MeshDataType.BLEND_POSITION, AccessorsType.VEC3, mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+                    meshDatas.push(new MeshData(morphAttribute.normal[morphIndex], WEBGL_CONST.FLOAT, MeshDataType.BLEND_NORMAL, AccessorsType.VEC3, mesh.name, BLENDSHAPE_PREFIX + targetName)); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
                 });
             }
         });
@@ -138,9 +200,9 @@ export default class VRMExporter {
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         meshes.forEach(object => {
-            const mesh = object.type === "Group" ? object.children[0] : object;
+            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
             const inverseBindMatrices = new Float32Array(mesh.skeleton.boneInverses.map(boneInv => boneInv.elements).flat());
-            meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, "BIND_MATRIX", "MAT4", mesh.name, mesh.name));
+            meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, MeshDataType.BIND_MATRIX, AccessorsType.MAT4, mesh.name, mesh.name));
         })
 
         accessors.push(...meshDatas.map(meshData => ({
@@ -155,8 +217,8 @@ export default class VRMExporter {
         })));
 
         const outputMeshes = meshes.map(object => {
-            const mesh = object.type === "Group" ? object.children[0] : object;
-            const subMeshes = object.type === "Group" ? object.children : [object];
+            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
+            const subMeshes = object.type === "Group" ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
             return {
                 extras: {
                     targetNames: mesh.geometry.userData.targetNames,
@@ -166,22 +228,22 @@ export default class VRMExporter {
                     const meshTypes = meshDatas.map(data => data.meshName === mesh.name ? data.type : null);
                     return {
                         attributes: {
-                            JOINTS_0: meshTypes.indexOf("SKIN_INDEX"),
-                            NORMAL: meshTypes.indexOf("NORMAL"),
-                            POSITION: meshTypes.indexOf("POSITION"),
-                            TEXCOORD_0: meshTypes.indexOf("UV"),
-                            WEIGHTS_0: meshTypes.indexOf("SKIN_WEIGHT")
+                            JOINTS_0: meshTypes.indexOf(MeshDataType.SKIN_INDEX),
+                            NORMAL: meshTypes.indexOf(MeshDataType.NORMAL),
+                            POSITION: meshTypes.indexOf(MeshDataType.POSITION),
+                            TEXCOORD_0: meshTypes.indexOf(MeshDataType.UV),
+                            WEIGHTS_0: meshTypes.indexOf(MeshDataType.SKIN_WEIGHT)
                         },
                         extras: {
                             targetNames: subMesh.geometry.userData.targetNames
                         },
-                        indices: meshDatas.map(data => data.type === "INDEX" && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
+                        indices: meshDatas.map(data => data.type === MeshDataType.INDEX && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
                         material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
                         mode: 4, // TRIANGLES
                         targets: mesh.geometry.userData.targetNames ? mesh.geometry.userData.targetNames.map(targetName => 
                         ({
-                            NORMAL: meshDatas.map(data => data.type === "BLEND_NORMAL" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
-                            POSITION: meshDatas.map(data => data.type === "BLEND_POSITION" && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
+                            NORMAL: meshDatas.map(data => data.type === MeshDataType.BLEND_NORMAL && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName),
+                            POSITION: meshDatas.map(data => data.type === MeshDataType.BLEND_POSITION && data.meshName === mesh.name ? data.name : null).indexOf(BLENDSHAPE_PREFIX + targetName)
                         })) : undefined
                     };
                 })
@@ -192,23 +254,52 @@ export default class VRMExporter {
         outputNodes.push(...meshes.map((group, index) => ({
             mesh: index,
             name: group.name,
-            rotation: Object.values(group.quaternion),
-            scale: Object.values(group.scale),
+            children: undefined,
+            rotation: {
+                x: group.quaternion.x,
+                y: group.quaternion.y,
+                z: group.quaternion.z,
+                w: group.quaternion.w
+            },
+            scale: {
+                x: group.scale.x,
+                y: group.scale.y,
+                z: group.scale.z
+            },
             skin: index,
-            translation: Object.values(group.position)
+            translation: {
+                x: group.position.x,
+                y: group.position.y,
+                z: group.position.z
+            }
         })));
 
         // secondary
         const secondaryRootNode = scene.children.filter(child => child.name === "secondary")[0];
         outputNodes.push({
             name: secondaryRootNode.name,
-            rotation: Object.values(secondaryRootNode.quaternion),
-            scale: Object.values(secondaryRootNode.scale),
-            translation: Object.values(secondaryRootNode.position)
+            children: undefined,
+            skin: undefined,
+            rotation: {
+                x: secondaryRootNode.quaternion.x,
+                y: secondaryRootNode.quaternion.y,
+                z: secondaryRootNode.quaternion.z,
+                w: secondaryRootNode.quaternion.w
+            },
+            scale: {
+                x: secondaryRootNode.scale.x,
+                y: secondaryRootNode.scale.y,
+                z: secondaryRootNode.scale.z
+            },
+            translation: {
+                x: secondaryRootNode.position.x,
+                y: secondaryRootNode.position.y,
+                z: secondaryRootNode.position.z
+            }
         });
 
         const outputSkins = meshes.map(object => {
-            const mesh = object.type === "Group" ? object.children[0] : object;
+            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
             return {
                 inverseBindMatrices: meshDatas.map(data => data.type === "BIND_MATRIX" ? data.meshName : null).indexOf(mesh.name),
                 joints: mesh.skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
@@ -228,7 +319,8 @@ export default class VRMExporter {
                                     isBinary: blendShape.isBinary,
                                     materialValues: blendShape._materialValues,
                                     name: blendShape.name.replace("BlendShapeController_", ''),
-                                    presetName: Object.entries(blendShapeProxy._blendShapePresetMap).filter(x => x[1] === blendShape.name.replace("BlendShapeController_", ''))[0][0]
+                                    presetName: Object.entries(blendShapeProxy.blendShapePresetMap)
+                                                    .filter(x => x[1] === blendShape.name.replace("BlendShapeController_", ''))[0][0]
                                 }))
         };
 
@@ -259,9 +351,13 @@ export default class VRMExporter {
                 xRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveXRangeDegree),
                 yRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveYRangeDegree)
             },
-            meshAnnotations: lookAt.firstPerson._meshAnnotations.map(annotation => ({
+            meshAnnotations: lookAt.firstPerson.meshAnnotations.map(annotation => ({
                 firstPersonFlag: annotation.firstPersonFlag === 0 ? "Auto" : "", // TODO: 別の数字のとき何になるか
-                mesh : outputMeshes.map(mesh => mesh.name).indexOf(annotation.mesh.children.length > 0 ? annotation.mesh.children[0].name : annotation.mesh.name) // TODO: とりあえず対応
+                mesh : outputMeshes
+                        .map(mesh => mesh.name)
+                        .indexOf(annotation.mesh.children.length > 0 ? 
+                            annotation.mesh.children[0].name : 
+                            annotation.mesh.name) // TODO: とりあえず対応
             }))
         };
 
@@ -325,7 +421,7 @@ export default class VRMExporter {
                             y: group.colliders[0].position.y,
                             z: group.colliders[0].position.z
                         },
-                        radius: group.colliders[0].geometry.boundingSphere.radius
+                        radius: group.colliders[0].geometry.boundingSphere?.radius
                     }],
                     node: group.node
                 }))
@@ -428,20 +524,20 @@ export default class VRMExporter {
     }
 }
 
-function radian2Degree(radian) {
+function radian2Degree(radian: number) {
     return radian * (180 / Math.PI);
 }
 
-function getNodes(parentNode) {
-    if (parentNode.children.length <= 0) return parentNode;
+function getNodes(parentNode: Object3D|Bone): Array<Object3D|Bone> {
+    if (parentNode.children.length <= 0) return [parentNode];
     return [parentNode].concat(parentNode.children.map(child => getNodes(child)).flat());
 }
 
-function imageBitmap2png(image) {
+function imageBitmap2png(image: ImageBitmap) {
     const canvas = document.createElement("canvas");
     canvas.width = image.width;
     canvas.height = image.height;
-    canvas.getContext('2d').drawImage(image, 0, 0);
+    canvas.getContext('2d')!.drawImage(image, 0, 0);
     const pngUrl = canvas.toDataURL("image/png");
     const data = atob(pngUrl.split(',')[1]);
     const array = new ArrayBuffer(data.length);
@@ -452,18 +548,18 @@ function imageBitmap2png(image) {
     return array;
 }
 
-function parseNumber2Binary(number, size) {
+function parseNumber2Binary(number: number, size: number) {
     const buf = new ArrayBuffer(size);
     const view = new DataView(buf);
     view.setUint32(0, number, true);
     return buf;
 }
 
-function parseString2Binary(str) {
+function parseString2Binary(str: string): ArrayBuffer {
     return new TextEncoder().encode(str).buffer;
 }
 
-function concatBinary(arrays) {
+function concatBinary(arrays: Array<ArrayBuffer>) {
     let sumLength = 0;
     for (let i = 0; i < arrays.length; i++) {
         sumLength += arrays[i].byteLength;
@@ -477,7 +573,7 @@ function concatBinary(arrays) {
     return output.buffer;
 }
 
-function parseBinary(attr, componentType) {
+function parseBinary(attr: BufferAttribute, componentType: number) {
 
     const componentTypeSize = componentType === WEBGL_CONST.UNSIGNED_SHORT ? 2 : 4;
     const array = attr.array;
@@ -487,7 +583,7 @@ function parseBinary(attr, componentType) {
     for (let i = 0; i < attr.count; i++) {
         for (var a = 0; a < attr.itemSize; a++) {
 
-            let value;
+            let value: number;
             if (attr.itemSize > 4) {
                 value = array[i * attr.itemSize + a];
             }
@@ -495,7 +591,7 @@ function parseBinary(attr, componentType) {
                 if (a === 0) value = attr.getX(i);
                 else if (a === 1) value = attr.getY(i);
                 else if (a === 2) value = attr.getZ(i);
-                else if (a === 3) value = attr.getW(i);
+                else value = attr.getW(i);
             }
 
             if (componentType === WEBGL_CONST.UNSIGNED_SHORT) {
@@ -515,7 +611,10 @@ function parseBinary(attr, componentType) {
 }
 
 class GlbChunk {
-    constructor(data, type) {
+    data: ArrayBuffer;
+    type: string;
+    buffer: ArrayBuffer;
+    constructor(data: ArrayBuffer, type: string) {
         this.data = data;
         this.type = type;
         const buf = this.data;//, this.type === "JSON" ? 0x20 : 0x00);
@@ -523,7 +622,7 @@ class GlbChunk {
     }
 
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#structured-json-content
-    paddingBinary(array, value) {
+    paddingBinary(array: ArrayBuffer, value: number) {
         const paddedLength = Math.ceil(array.byteLength / 4) * 4;
         if (array.byteLength === paddedLength) return array;
         const paddedArray = new Uint8Array(paddedLength);
@@ -536,7 +635,16 @@ class GlbChunk {
 }
 
 class MeshData {
-    constructor(attribute, valueType, type, accessorsType, meshName, name) {
+    attribute: BufferAttribute;
+    valueType: number;
+    type: MeshDataType;
+    accessorsType: AccessorsType;
+    meshName: string;
+    name: string | undefined;
+    buffer: ArrayBuffer;
+    max: [number, number, number] | undefined;
+    min: [number, number, number] | undefined;
+    constructor(attribute: BufferAttribute, valueType: number, type: MeshDataType, accessorsType: AccessorsType, meshName: string, name: string|undefined) {
         this.attribute = attribute;
         this.type = type;
         this.valueType = valueType;
@@ -544,29 +652,75 @@ class MeshData {
         this.meshName = meshName;
         this.name = name;
         this.buffer = parseBinary(this.attribute, this.valueType);
-        this.max = type === "POSITION" || type === "BLEND_POSITION" ? [
-            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
-            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
-            Math.max.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
+        this.max = type === MeshDataType.POSITION || type === MeshDataType.BLEND_POSITION ? [
+            Math.max.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 0)),
+            Math.max.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 1)),
+            Math.max.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 2))
         ] : undefined;
-        this.min = type === "POSITION" || type === "BLEND_POSITION" ? [
-            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 0)),
-            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 1)),
-            Math.min.apply(null, this.attribute.array.filter((_, i) => i % 3 === 2))
+        this.min = type === MeshDataType.POSITION || type === MeshDataType.BLEND_POSITION ? [
+            Math.min.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 0)),
+            Math.min.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 1)),
+            Math.min.apply(null, Array.from(this.attribute.array).filter((_, i) => i % 3 === 2))
         ] : undefined;
     }
 }
 
-class ImageData {
-    constructor(name, imageBitmap) {
-        this.name = name;
-        this.imageBitmap = imageBitmap;
-    }
+enum MaterialType {
+    MeshBasicMaterial = "MeshBasicMaterial",
+    MeshStandardMaterial = "MeshStandardMaterial",
+    MToonMaterial = "MToonMaterial"
+}
+
+enum AccessorsType {
+    SCALAR = "SCALAR", // 1
+    VEC2 = "VEC2", // 2
+    VEC3 = "VEC3", // 3
+    VEC4 = "VEC4", // 4
+    MAT4 = "MAT4" // 16
+}
+
+enum MeshDataType {
+    POSITION = "POSITION",
+    NORMAL = "NORMAL",
+    UV = "UV",
+    INDEX = "INDEX",
+    SKIN_WEIGHT = "SKIN_WEIGHT",
+    SKIN_INDEX = "SKIN_INDEX",
+    BLEND_POSITION = "BLEND_POSITION",
+    BLEND_NORMAL = "BLEND_NORMAL",
+    BIND_MATRIX = "BIND_MATRIX"
+}
+
+interface ImageData {
+    name: string;
+    imageBitmap: ImageBitmap;
 }
 
 class BufferView {
-    constructor(buffer, type) {
+    buffer: ArrayBuffer;
+    type: string;
+    constructor(buffer: ArrayBuffer, type: string) {
         this.buffer = buffer;
         this.type = type;
     }
+}
+
+interface Accessor {
+    bufferView: number,
+    byteOffset: number,
+    componentType: number,
+    count: number,
+    max: [number, number, number] | undefined,
+    min: [number, number, number] | undefined,
+    normalized: boolean,
+    type: string
+}
+
+interface Node {
+    children: Array<number> | undefined,
+    skin: number | undefined,
+    name: string,
+    rotation: { x: number, y: number, z:number, w:number },
+    scale: { x:number, y:number, z:number },
+    translation: { x:number, y:number, z:number }
 }
