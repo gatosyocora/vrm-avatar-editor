@@ -18,7 +18,15 @@ const BLENDSHAPE_PREFIX = "blend_";
 
 export default class VRMExporter {
     constructor() {}
-    parse(scene, humanoid, vrmMeta, materials, blendShapeProxy, lookAt, springBone, onDone) {
+    parse(vrm, onDone) {
+
+        const scene = vrm.scene;
+        const humanoid = vrm.humanoid;
+        const vrmMeta = vrm.meta;
+        const materials = vrm.materials;
+        const blendShapeProxy = vrm.blendShapeProxy;
+        const lookAt = vrm.lookAt;
+        const springBone = vrm.springBoneManager;
 
         const exporterInfo = { // TODO: データがなくて取得できない
             generator: "UniGLTF-2.0.0",
