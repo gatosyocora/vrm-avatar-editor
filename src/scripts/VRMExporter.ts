@@ -46,8 +46,8 @@ export default class VRMExporter {
                                             self.findIndex(e => e.name === material.name) === index)
                                                 .map(material => material as (MeshBasicMaterial|MeshStandardMaterial|MToonMaterial));
         const uniqueMaterialNames = uniqueMaterials.map(material => material.name);
-        const icon:ImageData | null = vrmMeta.texture ? {name:"icon", imageBitmap: vrmMeta.texture.image} : null; // TODO: ない場合もある
-        const images: Array<ImageData> = uniqueMaterials
+        const icon:VRMImageData | null = vrmMeta.texture ? {name:"icon", imageBitmap: vrmMeta.texture.image} : null; // TODO: ない場合もある
+        const images: Array<VRMImageData> = uniqueMaterials
                                             .filter(material => material.map)
                                             .map(material => {
                                                 if (!material.map) throw new Error;
@@ -699,7 +699,7 @@ enum MeshDataType {
     BIND_MATRIX = "BIND_MATRIX"
 }
 
-export interface ImageData {
+export interface VRMImageData {
     name: string;
     imageBitmap: ImageBitmap;
 }

@@ -1,5 +1,6 @@
 import { VRMMeta } from "@pixiv/three-vrm";
 import { OutputVRMMeta } from "./OutputVRMMeta";
+import { VRMImageData } from "./VRMExporter";
 
 type OutputImage = {
     bufferView: number;
@@ -7,7 +8,7 @@ type OutputImage = {
     name: string;
 };
 
-export function ToOutputVRMMeta(vrmMeta: VRMMeta, icon: ImageData | null, outputImage: Array<OutputImage>): OutputVRMMeta {
+export function ToOutputVRMMeta(vrmMeta: VRMMeta, icon: VRMImageData | null, outputImage: Array<OutputImage>): OutputVRMMeta {
     return {
         allowedUserName: vrmMeta.allowedUserName,
         author: vrmMeta.author,
