@@ -140,7 +140,7 @@ export default class VRMExporter {
         });
         
 
-        const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === "Bone")[0];
+        const rootNode = scene.children.filter(child => child.children.length > 0 && child.children[0].type === VRMObjectType.Bone)[0];
         const nodes = getNodes(rootNode).filter(node => node.name !== "vrmColliderSphere");
         const nodeNames = nodes.map(node => node.name);
         const outputNodes: Array<Node> = nodes.map(node => ({
@@ -168,11 +168,11 @@ export default class VRMExporter {
 
         const accessors: Array<Accessor> = [];
 
-        const meshes = scene.children.filter(child => child.type === "Group" || child.type === "SkinnedMesh");
+        const meshes = scene.children.filter(child => child.type === VRMObjectType.Group || child.type === VRMObjectType.SkinnedMesh);
 
         const meshDatas: Array<MeshData> = [];
         meshes.forEach(object => {
-            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
+            const mesh = (object.type === VRMObjectType.Group ? object.children[0] : object) as VRMSkinnedMesh;
             const attributes = mesh.geometry.attributes;
             meshDatas.push(new MeshData(attributes.position, WEBGL_CONST.FLOAT, MeshDataType.POSITION, AccessorsType.VEC3, mesh.name, undefined));
             meshDatas.push(new MeshData(attributes.normal, WEBGL_CONST.FLOAT, MeshDataType.NORMAL, AccessorsType.VEC3, mesh.name, undefined));
@@ -180,7 +180,7 @@ export default class VRMExporter {
             meshDatas.push(new MeshData(attributes.skinWeight, WEBGL_CONST.FLOAT, MeshDataType.SKIN_WEIGHT, AccessorsType.VEC4, mesh.name, undefined));
             meshDatas.push(new MeshData(attributes.skinIndex, WEBGL_CONST.UNSIGNED_SHORT, MeshDataType.SKIN_INDEX, AccessorsType.VEC4, mesh.name, undefined));
 
-            const subMeshes = object.type === "Group" ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
+            const subMeshes = object.type === VRMObjectType.Group ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
             subMeshes.forEach(subMesh => {
                 if (!subMesh.geometry.index) throw new Error;
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, MeshDataType.INDEX, AccessorsType.SCALAR, mesh.name, subMesh.name));
@@ -206,7 +206,7 @@ export default class VRMExporter {
         // inverseBindMatrices length = 16(matrixの要素数) * 4バイト * ボーン数
         // TODO: とりあえず数合わせでrootNode以外のBoneのmatrixをいれた
         meshes.forEach(object => {
-            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
+            const mesh = (object.type === VRMObjectType.Group ? object.children[0] : object) as VRMSkinnedMesh;
             const inverseBindMatrices = new Float32Array(mesh.skeleton.boneInverses.map(boneInv => boneInv.elements).flat());
             meshDatas.push(new MeshData(new BufferAttribute(inverseBindMatrices, 16), WEBGL_CONST.FLOAT, MeshDataType.BIND_MATRIX, AccessorsType.MAT4, mesh.name, mesh.name));
         })
@@ -223,8 +223,8 @@ export default class VRMExporter {
         })));
 
         const outputMeshes = meshes.map(object => {
-            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
-            const subMeshes = object.type === "Group" ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
+            const mesh = (object.type === VRMObjectType.Group ? object.children[0] : object) as VRMSkinnedMesh;
+            const subMeshes = object.type === VRMObjectType.Group ? object.children.map(child => child as VRMSkinnedMesh) : [object as VRMSkinnedMesh];
             return {
                 extras: {
                     targetNames: mesh.geometry.userData.targetNames,
@@ -303,7 +303,7 @@ export default class VRMExporter {
         });
 
         const outputSkins = meshes.map(object => {
-            const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
+            const mesh = (object.type === VRMObjectType.Group ? object.children[0] : object) as VRMSkinnedMesh;
             return {
                 inverseBindMatrices: meshDatas.map(data => data.type === MeshDataType.BIND_MATRIX ? data.meshName : null).indexOf(mesh.name),
                 joints: mesh.skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
@@ -535,9 +535,9 @@ export default class VRMExporter {
             scenes:[
                 {
                     nodes: scene.children
-                            .filter(child =>    child.type === "Object3D" || 
-                                                child.type === "SkinnedMesh" || 
-                                                child.type === "Group")
+                            .filter(child =>    child.type === VRMObjectType.Object3D || 
+                                                child.type === VRMObjectType.SkinnedMesh || 
+                                                child.type === VRMObjectType.Group)
                             .map(x => outputNodeNames.indexOf(x.name))
                 }],
             skins: outputSkins,
@@ -718,6 +718,13 @@ enum MeshDataType {
     BLEND_NORMAL = "BLEND_NORMAL",
     BIND_MATRIX = "BIND_MATRIX",
     IMAGE = "IMAGE"
+}
+
+enum VRMObjectType {
+    Group = "Group",
+    SkinnedMesh = "SkinnedMesh",
+    Object3D = "Object3D",
+    Bone = "Bone"
 }
 
 export interface VRMImageData {
