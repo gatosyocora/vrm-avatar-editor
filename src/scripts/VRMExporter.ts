@@ -459,10 +459,10 @@ export default class VRMExporter {
                 }))
         };
 
-        const bufferViews = [];
-        bufferViews.push(...images.map(image => new BufferView(imageBitmap2png(image.imageBitmap), "IMAGE")));
-        bufferViews.push(...meshDatas.map(data => new BufferView(data.buffer, data.type)));
-        if (icon) bufferViews.push(new BufferView(imageBitmap2png(icon.imageBitmap), "IMAGE"));
+        const bufferViews: Array<BufferView> = [];
+        bufferViews.push(...images.map(image => ({ buffer: imageBitmap2png(image.imageBitmap), type: MeshDataType.IMAGE})));
+        bufferViews.push(...meshDatas.map(data => ({ buffer: data.buffer, type: data.type})));
+        if (icon) bufferViews.push({ buffer: imageBitmap2png(icon.imageBitmap), type: MeshDataType.IMAGE});
 
         /* png画像として書き出しのテスト
         images.forEach((image, index) => {
@@ -729,13 +729,9 @@ export interface VRMImageData {
     imageBitmap: ImageBitmap;
 }
 
-class BufferView {
+interface BufferView {
     buffer: ArrayBuffer;
-    type: string;
-    constructor(buffer: ArrayBuffer, type: string) {
-        this.buffer = buffer;
-        this.type = type;
-    }
+    type: MeshDataType;
 }
 
 interface Accessor {
