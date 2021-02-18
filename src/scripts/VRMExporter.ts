@@ -309,7 +309,7 @@ export default class VRMExporter {
         const outputSkins = meshes.map(object => {
             const mesh = (object.type === "Group" ? object.children[0] : object) as VRMSkinnedMesh;
             return {
-                inverseBindMatrices: meshDatas.map(data => data.type === "BIND_MATRIX" ? data.meshName : null).indexOf(mesh.name),
+                inverseBindMatrices: meshDatas.map(data => data.type === MeshDataType.BIND_MATRIX ? data.meshName : null).indexOf(mesh.name),
                 joints: mesh.skeleton.bones.map(bone => nodeNames.indexOf(bone.name)),
                 skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name)
             }
@@ -489,11 +489,11 @@ export default class VRMExporter {
                 buffer: 0,
                 byteLength: bufferView.buffer.byteLength,
                 byteOffset: bufferOffset,
-                target: bufferView.type === "IMAGE" || bufferView.type === "BIND_MATRIX" ? undefined :
-                        bufferView.type === "INDEX" ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...           
+                target: bufferView.type === MeshDataType.IMAGE || bufferView.type === MeshDataType.BIND_MATRIX ? undefined :
+                        bufferView.type === MeshDataType.INDEX ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER : WEBGL_CONST.ARRAY_BUFFER // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...           
             };
             bufferOffset += bufferView.buffer.byteLength;
-            if (bufferView.type === "IMAGE") {
+            if (bufferView.type === MeshDataType.IMAGE) {
                 outputImage[imageIndex++].bufferView = index;
             }
             else {
@@ -720,7 +720,8 @@ enum MeshDataType {
     SKIN_INDEX = "SKIN_INDEX",
     BLEND_POSITION = "BLEND_POSITION",
     BLEND_NORMAL = "BLEND_NORMAL",
-    BIND_MATRIX = "BIND_MATRIX"
+    BIND_MATRIX = "BIND_MATRIX",
+    IMAGE = "IMAGE"
 }
 
 export interface VRMImageData {
