@@ -1,37 +1,51 @@
 <template>
   <div class="home full">
-    <v-app-bar
-      danse
-      dark
-    >
+    <v-app-bar danse dark>
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/issues/new" target="_blank">Issue</v-btn>
-      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor" target="_blank">GitHub</v-btn>
-      <v-btn href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md" target="_blank">License</v-btn>
+      <v-btn
+        href="https://github.com/gatosyocora/vrm-avatar-editor/issues/new"
+        target="_blank"
+        >Issue</v-btn
+      >
+      <v-btn
+        href="https://github.com/gatosyocora/vrm-avatar-editor"
+        target="_blank"
+        >GitHub</v-btn
+      >
+      <v-btn
+        href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md"
+        target="_blank"
+        >License</v-btn
+      >
     </v-app-bar>
-    <p id="message">ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。</p>
+    <p id="message">
+      ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
+    </p>
     <div id="menu" class="full-height">
       <v-card class="full-height">
-        <v-tabs
-          fixed-tabs
-          dark
-        >
-          <v-tab @click="changeTab(0)" :class="{'active': currentTab === 0}">Meta</v-tab>
-          <v-tab @click="changeTab(1)" :class="{'active': currentTab === 1}">Materials</v-tab>
-          <v-tab @click="changeTab(2)" :class="{'active': currentTab === 2}">Model</v-tab>
+        <v-tabs fixed-tabs dark>
+          <v-tab @click="changeTab(0)" :class="{ active: currentTab === 0 }"
+            >Meta</v-tab
+          >
+          <v-tab @click="changeTab(1)" :class="{ active: currentTab === 1 }"
+            >Materials</v-tab
+          >
+          <v-tab @click="changeTab(2)" :class="{ active: currentTab === 2 }"
+            >Model</v-tab
+          >
         </v-tabs>
         <div class="margin-area contents full-height">
           <div v-show="currentTab === 0">
-            <MetaView :meta="meta"/>
+            <MetaView :meta="meta" />
           </div>
           <div v-show="currentTab === 1">
-            <MaterialView :materials="materials"/>
+            <MaterialView :materials="materials" />
           </div>
           <div v-show="currentTab === 2">
-            <ModelInfoView :vrmObject="vrmObject" :materials="materials"/>
+            <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
           </div>
-          <ExportButton :vrm="vrm"/>
+          <ExportButton :vrm="vrm" />
         </div>
       </v-card>
     </div>
@@ -41,14 +55,15 @@
         <div
           v-if="vrmObject === null"
           class="layer2 layer full"
-          :class="{outline:isDragOver}"
+          :class="{ outline: isDragOver }"
           @dragover.prevent="onDrag('over')"
           @dragleave.prevent="onDrag('leave')"
-          @drop.prevent="onDrop">
+          @drop.prevent="onDrop"
+        >
           <div class="white-color">
             <center>
-              VRMをドラッグ&ドロップ<br>
-              <p><input type="file" @change="onFileChange" accept=".vrm"></p>
+              VRMをドラッグ&ドロップ<br />
+              <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
             </center>
           </div>
         </div>
@@ -60,15 +75,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { VRM, VRMMeta } from '@pixiv/three-vrm';
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { VRM, VRMMeta } from "@pixiv/three-vrm";
 
-import VRMCanvas from '@/components/VRMCanvasView.vue'; // @ is an alias to /src
-import MetaView from '@/components/MetaView.vue';
-import MaterialView from '@/components/MaterialView.vue';
-import ModelInfoView from '@/components/ModelInfoView.vue';
-import ExportButton from '@/components/ExportButton.vue';
+import VRMCanvas from "@/components/VRMCanvasView.vue"; // @ is an alias to /src
+import MetaView from "@/components/MetaView.vue";
+import MaterialView from "@/components/MaterialView.vue";
+import ModelInfoView from "@/components/ModelInfoView.vue";
+import ExportButton from "@/components/ExportButton.vue";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -83,173 +98,171 @@ interface HTMLInputEvent extends Event {
     ExportButton,
   },
 })
+export default class Home extends Vue {
+  @Prop()
+  public vrm: VRM | null = null;
 
-export default class Home extends Vue
-{
-    @Prop()
-    public vrm: VRM | null = null;
+  @Prop()
+  public meta: VRMMeta | undefined | null = null;
 
-    @Prop()
-    public meta: VRMMeta | undefined | null = null;
+  @Prop()
+  public materials: THREE.Material[] | undefined | null = null;
 
-    @Prop()
-    public materials: THREE.Material[] | undefined | null = null;
+  @Prop()
+  public vrmObject: THREE.Scene | THREE.Group | null = null;
 
-    @Prop()
-    public vrmObject: THREE.Scene | THREE.Group | null = null;
+  @Prop()
+  public currentTab: Number = 0;
 
-    @Prop()
-    public currentTab: Number = 0;
+  public isDragOver: boolean = false;
 
-    public isDragOver: boolean = false;
+  public onDrag(type: string) {
+    this.isDragOver = type === "over";
+  }
+  public onDrop(e: DragEvent) {
+    if (e.dataTransfer === null || e.dataTransfer.files === null) return;
 
-    public onDrag(type: string) {
-      this.isDragOver = type === "over";
-    }
-    public onDrop(e: DragEvent) {
+    this.isDragOver = false;
+    const file = e.dataTransfer.files[0];
+    const url: string = window.URL.createObjectURL(file);
 
-      if (e.dataTransfer === null ||
-          e.dataTransfer.files === null) return;
+    this.loadVrm(url);
+  }
 
-      this.isDragOver = false;
-      const file = e.dataTransfer.files[0];
-      const url:string = window.URL.createObjectURL(file);
+  public onFileChange(e: HTMLInputEvent) {
+    if (e.target.files === null) return;
 
-      this.loadVrm(url);
-    }
+    const file = e.target.files[0];
+    const url: string = window.URL.createObjectURL(file);
 
-    public onFileChange (e: HTMLInputEvent) {
+    this.loadVrm(url);
+  }
 
-      if (e.target.files === null) return;
+  public loadVrm(url: string) {
+    const loader = new GLTFLoader();
+    loader.load(
+      // URL of the VRM you want to load
+      url,
 
-      const file = e.target.files[0];
-      const url:string = window.URL.createObjectURL(file);
+      // called when the resource is loaded
+      (gltf) => {
+        console.log(gltf);
+        // generate a VRM instance from gltf
+        VRM.from(gltf).then((vrm) => {
+          // deal with vrm features
+          this.vrm = vrm;
+          this.meta = vrm.meta;
+          this.materials = vrm.materials;
+          this.vrmObject = vrm.scene;
+          console.log(vrm);
+        });
+      },
 
-      this.loadVrm(url);
-    }
+      // called while loading is progressing
+      (progress) =>
+        console.log(
+          "Loading model...",
+          100.0 * (progress.loaded / progress.total),
+          "%"
+        ),
 
-    public loadVrm(url: string) {
-      const loader = new GLTFLoader();
-      loader.load(
+      // called when loading has errors
+      (error) => console.error(error)
+    );
+  }
 
-	      // URL of the VRM you want to load
-	      url,
-
-	      // called when the resource is loaded
-	      ( gltf ) => {
-          console.log(gltf);
-		      // generate a VRM instance from gltf
-		      VRM.from( gltf ).then( ( vrm ) => {
-              // deal with vrm features
-              this.vrm = vrm;
-              this.meta = vrm.meta;
-              this.materials = vrm.materials;
-              this.vrmObject = vrm.scene;
-              console.log( vrm );
-	      	} );
-	      },
-
-      	// called while loading is progressing
-      	( progress ) => console.log( 'Loading model...', 100.0 * ( progress.loaded / progress.total ), '%' ),
-
-      	// called when loading has errors
-      	( error ) => console.error( error )
-
-      );
-    }
-
-    public changeTab(tabNumber: Number) {
-      this.currentTab = tabNumber;
-    }
+  public changeTab(tabNumber: Number) {
+    this.currentTab = tabNumber;
+  }
 }
 </script>
 <style>
-  .tabs {
-    overflow: hidden;
-  }
-  .tabs li {
-    width: 100px;
-    font-size: 20px;
-    text-align: center;
-    margin: 15px;
-    padding: 5px;
-    color: black;
-    background: white;
-    border: 1px solid black;
-    list-style: none;
-    display: inline;
-  }
-  .tabs li.active{
-    color: white;
-    background: black;
-  }
+.tabs {
+  overflow: hidden;
+}
+.tabs li {
+  width: 100px;
+  font-size: 20px;
+  text-align: center;
+  margin: 15px;
+  padding: 5px;
+  color: black;
+  background: white;
+  border: 1px solid black;
+  list-style: none;
+  display: inline;
+}
+.tabs li.active {
+  color: white;
+  background: black;
+}
 
-  .top {
-    position: relative;
-  }
-  .layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-  .full {
-    width: 100%;
-    height: 100%;
-  }
-  .full-height {
-    height: 100%;
-  }
-  .layer1 {
-    z-index: 1;
-  }
-  .layer2 {
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .white-color {
-    color: #ffffff;
-  }
-  .outline {
-    outline: 5px dashed red;
-  }
-  .margin-area {
-    margin: 20px;
-  }
-  .contents {
-    padding: 10px;
-  }
+.top {
+  position: relative;
+}
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.full {
+  width: 100%;
+  height: 100%;
+}
+.full-height {
+  height: 100%;
+}
+.layer1 {
+  z-index: 1;
+}
+.layer2 {
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.white-color {
+  color: #ffffff;
+}
+.outline {
+  outline: 5px dashed red;
+}
+.margin-area {
+  margin: 20px;
+}
+.contents {
+  padding: 10px;
+}
 
-  .v-data-table__wrapper tr:hover {
-    background: white !important;
-  }
+.v-data-table__wrapper tr:hover {
+  background: white !important;
+}
 
-  body {
-    width: 100%;
-    height: 100%;
-  }
+body {
+  width: 100%;
+  height: 100%;
+}
 
-  #main {
-    float: none;
-    z-index: 0;
-    position: relative;
-  }
+#main {
+  float: none;
+  z-index: 0;
+  position: relative;
+}
 
-  #menu {
-    float: right;
-    width: 30%;
-    z-index: 9;
-    position: relative;
-  }
+#menu {
+  float: right;
+  width: 30%;
+  z-index: 9;
+  position: relative;
+}
 
-  #message {
-    float: left;
-    z-index: 8;
-    position: relative;
-    color: white;
-    font-size: 20px;
-    margin: 10px;
-  }
+#message {
+  float: left;
+  z-index: 8;
+  position: relative;
+  color: white;
+  font-size: 20px;
+  margin: 10px;
+}
 </style>
