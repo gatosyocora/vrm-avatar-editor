@@ -1,9 +1,8 @@
 import * as THREE from "three";
 
-export interface Arrays
-  extends Array<
+export type Arrays = Array<
     THREE.Object3D | THREE.Group | THREE.SkinnedMesh | THREE.Bone
-  > {}
+  >
 
 export interface VRMSkinnedMesh extends THREE.SkinnedMesh {
   geometry: VRMBufferGeometry;

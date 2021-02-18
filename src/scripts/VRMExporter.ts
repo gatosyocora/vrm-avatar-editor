@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { VRM, MToonMaterial } from "@pixiv/three-vrm";
 import {
   BufferAttribute,
@@ -26,8 +27,7 @@ enum WEBGL_CONST {
 const BLENDSHAPE_PREFIX = "blend_";
 
 export default class VRMExporter {
-  constructor() {}
-  parse(vrm: VRM, onDone: (buffer: ArrayBuffer) => void) {
+  parse(vrm: VRM, onDone: (buffer: ArrayBuffer) => void): void {
     const scene = vrm.scene;
     const humanoid = vrm.humanoid;
     const vrmMeta = vrm.meta;
@@ -84,7 +84,7 @@ export default class VRMExporter {
         mimeType: "image/png", // TODO: とりあえずpngをいれた
         name: image.name, // TODO: 取得できないので仮のテクスチャ名としてマテリアル名を入れた
       }));
-    const outputSamplers = outputImage.map((_) => ({
+    const outputSamplers = outputImage.map(() => ({
       magFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
       minFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
       wrapS: WEBGL_CONST.REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
@@ -132,7 +132,7 @@ export default class VRMExporter {
             texCoord: 0, // TODO:
           }
         : undefined;
-      const metallicFactor = ((_) => {
+      const metallicFactor = (() => {
         switch (material.type) {
           case MaterialType.MeshStandardMaterial:
             return (material as MeshStandardMaterial).metalness;
@@ -143,7 +143,7 @@ export default class VRMExporter {
         }
       })();
 
-      const roughnessFactor = ((_) => {
+      const roughnessFactor = (() => {
         switch (material.type) {
           case MaterialType.MeshStandardMaterial:
             return (material as MeshStandardMaterial).roughness;
@@ -811,6 +811,7 @@ function imageBitmap2png(image: ImageBitmap) {
   const canvas = document.createElement("canvas");
   canvas.width = image.width;
   canvas.height = image.height;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   canvas.getContext("2d")!.drawImage(image, 0, 0);
   const pngUrl = canvas.toDataURL("image/png");
   const data = atob(pngUrl.split(",")[1]);
