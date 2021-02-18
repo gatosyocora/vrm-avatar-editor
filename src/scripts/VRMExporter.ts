@@ -315,48 +315,72 @@ export default class VRMExporter {
             }
         });
 
+        // TODO: javascript版の弊害によるエラーなので将来的に実装を変える
         const blendShapeMaster = {
+            // @ts-ignore: Unreachable code error
             blendShapeGroups: Object.values(blendShapeProxy._blendShapeGroups).map(blendShape => 
                                 ({
+                                    // @ts-ignore: Unreachable code error
                                     binds: blendShape._binds.map(bind => 
                                     ({
                                         index: bind.morphTargetIndex,
                                         mesh: outputMeshes.map(mesh => mesh.name).indexOf(bind.meshes[0].name),
                                         weight: bind.weight * 100
                                     })),
+                                    // @ts-ignore: Unreachable code error
                                     isBinary: blendShape.isBinary,
+                                    // @ts-ignore: Unreachable code error
                                     materialValues: blendShape._materialValues,
+                                    // @ts-ignore: Unreachable code error
                                     name: blendShape.name.replace("BlendShapeController_", ''),
                                     presetName: Object.entries(blendShapeProxy.blendShapePresetMap)
+                                    // @ts-ignore: Unreachable code error
                                                     .filter(x => x[1] === blendShape.name.replace("BlendShapeController_", ''))[0][0]
                                 }))
         };
 
         const exporterVersion = "UniVRM-0.64.0"; // TODO:
 
+        // TODO: javascript版の弊害によるエラーなので将来的に実装を変える
+        // @ts-ignore: Unreachable code error
         lookAt.firstPerson._firstPersonBoneOffset.z *= -1; // TODO:
         const vrmFirstPerson = {
+            // @ts-ignore: Unreachable code error
             firstPersonBone: nodeNames.indexOf(lookAt.firstPerson._firstPersonBone.name),
+            // @ts-ignore: Unreachable code error
             firstPersonBoneOffset: lookAt.firstPerson._firstPersonBoneOffset,
             lookAtHorizontalInner: {
+                // @ts-ignore: Unreachable code error
                 curve:lookAt.applyer._curveHorizontalInner.curve,
+                // @ts-ignore: Unreachable code error
                 xRange: radian2Degree(lookAt.applyer._curveHorizontalInner.curveXRangeDegree),
+                // @ts-ignore: Unreachable code error
                 yRange: radian2Degree(lookAt.applyer._curveHorizontalInner.curveYRangeDegree)
             },
             lookAtHorizontalOuter: {
+                // @ts-ignore: Unreachable code error
                 curve:lookAt.applyer._curveHorizontalOuter.curve,
+                // @ts-ignore: Unreachable code error
                 xRange: radian2Degree(lookAt.applyer._curveHorizontalOuter.curveXRangeDegree),
+                // @ts-ignore: Unreachable code error
                 yRange: radian2Degree(lookAt.applyer._curveHorizontalOuter.curveYRangeDegree)
             },
+            // @ts-ignore: Unreachable code error
             lookAtTypeName: lookAt.applyer.type,
             lookAtVerticalDown: {
+                // @ts-ignore: Unreachable code error
                 curve:lookAt.applyer._curveVerticalDown.curve,
+                // @ts-ignore: Unreachable code error
                 xRange: radian2Degree(lookAt.applyer._curveVerticalDown.curveXRangeDegree),
+                // @ts-ignore: Unreachable code error
                 yRange: radian2Degree(lookAt.applyer._curveVerticalDown.curveYRangeDegree)
             },
             lookAtVerticalUp: {
+                // @ts-ignore: Unreachable code error
                 curve:lookAt.applyer._curveVerticalUp.curve,
+                // @ts-ignore: Unreachable code error
                 xRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveXRangeDegree),
+                // @ts-ignore: Unreachable code error
                 yRange: radian2Degree(lookAt.applyer._curveVerticalUp.curveYRangeDegree)
             },
             meshAnnotations: lookAt.firstPerson.meshAnnotations.map(annotation => ({
