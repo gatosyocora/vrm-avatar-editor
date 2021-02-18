@@ -186,6 +186,12 @@ export default class VRMExporter {
                 meshDatas.push(new MeshData(subMesh.geometry.index, WEBGL_CONST.UNSIGNED_INT, MeshDataType.INDEX, AccessorsType.SCALAR, mesh.name, subMesh.name));
             });
 
+            // TODO: とりあえずundefiendは例外スロー
+            if (!mesh.morphTargetDictionary)
+            {
+                throw new Error;
+            }
+
             const morphIndexPair = Object.entries(mesh.morphTargetDictionary);
             if (mesh.geometry.userData.targetNames) {
                 mesh.geometry.userData.targetNames.forEach(targetName => {
@@ -226,6 +232,7 @@ export default class VRMExporter {
                 name: mesh.name, // TODO: なんか違う名前になっている
                 primitives: subMeshes.map(subMesh => {
                     const meshTypes = meshDatas.map(data => data.meshName === mesh.name ? data.type : null);
+                    const materialName = Array.isArray(subMesh.material) ? subMesh.material[0].name : subMesh.material.name;
                     return {
                         attributes: {
                             JOINTS_0: meshTypes.indexOf(MeshDataType.SKIN_INDEX),
@@ -238,7 +245,7 @@ export default class VRMExporter {
                             targetNames: subMesh.geometry.userData.targetNames
                         },
                         indices: meshDatas.map(data => data.type === MeshDataType.INDEX && data.meshName === mesh.name ? data.name : null).indexOf(subMesh.name),
-                        material: uniqueMaterialNames.indexOf(subMesh.material[0].name),
+                        material: uniqueMaterialNames.indexOf(materialName),
                         mode: 4, // TRIANGLES
                         targets: mesh.geometry.userData.targetNames ? mesh.geometry.userData.targetNames.map(targetName => 
                         ({
