@@ -147,7 +147,6 @@ export default class VRMExporter {
             children: node.children
                         .filter(childNode => childNode.name !== "vrmColliderSphere")
                         .map(childNode => nodeNames.indexOf(childNode.name)),
-            skin: undefined,
             name: node.name,
             rotation: {
                 x: node.quaternion.x,
@@ -262,7 +261,6 @@ export default class VRMExporter {
         outputNodes.push(...meshes.map((group, index) => ({
             mesh: index,
             name: group.name,
-            children: undefined,
             rotation: {
                 x: group.quaternion.x,
                 y: group.quaternion.y,
@@ -286,8 +284,6 @@ export default class VRMExporter {
         const secondaryRootNode = scene.children.filter(child => child.name === "secondary")[0];
         outputNodes.push({
             name: secondaryRootNode.name,
-            children: undefined,
-            skin: undefined,
             rotation: {
                 x: secondaryRootNode.quaternion.x,
                 y: secondaryRootNode.quaternion.y,
@@ -746,8 +742,8 @@ interface Accessor {
 }
 
 interface Node {
-    children: Array<number> | undefined,
-    skin: number | undefined,
+    children?: Array<number> | undefined,
+    skin?: number | undefined,
     name: string,
     rotation: { x: number, y: number, z:number, w:number },
     scale: { x:number, y:number, z:number },
