@@ -6,6 +6,8 @@ import {
   MeshBasicMaterial,
   Bone,
   Object3D,
+  Scene,
+  Group,
 } from "three";
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
@@ -18,6 +20,7 @@ import { OutputSampler } from "./OutputSampler";
 import { OutputTexture } from "./OutputTexture";
 import { OutputAccessor } from "./OutputAccessor";
 import { OutputBufferView } from "./OutputBufferView";
+import { OutputScene } from "./OutputScene";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -569,7 +572,7 @@ export default class VRMExporter {
       }
     );
 
-    const outputNodeNames = outputNodes.map((node) => node.name);
+    const outputScenes = toOutputScenes(scene, outputNodes);
 
     const outputData = {
       accessors: outputAccessors, // buffer数 - 画像数
@@ -603,18 +606,7 @@ export default class VRMExporter {
       nodes: outputNodes,
       samplers: outputSamplers,
       scene: 0,
-      scenes: [
-        {
-          nodes: scene.children
-            .filter(
-              (child) =>
-                child.type === VRMObjectType.Object3D ||
-                child.type === VRMObjectType.SkinnedMesh ||
-                child.type === VRMObjectType.Group
-            )
-            .map((x) => outputNodeNames.indexOf(x.name)),
-        },
-      ],
+      scenes: outputScenes,
       skins: outputSkins,
       textures: outputTextures,
     };
@@ -1066,4 +1058,23 @@ const toOutputTextures = (
     sampler: index, // TODO: 全パターンでindexなのか不明
     source: index, // TODO: 全パターンでindexなのか不明
   }));
+};
+
+const toOutputScenes = (
+  scene: Scene | Group,
+  outputNodes: Array<OutputNode>
+): Array<OutputScene> => {
+  const nodeNames = outputNodes.map((node) => node.name);
+  return [
+    {
+      nodes: scene.children
+        .filter(
+          (child) =>
+            child.type === VRMObjectType.Object3D ||
+            child.type === VRMObjectType.SkinnedMesh ||
+            child.type === VRMObjectType.Group
+        )
+        .map((x) => nodeNames.indexOf(x.name)),
+    },
+  ];
 };
