@@ -53,9 +53,8 @@ export default class VRMExporter {
     const springBone = vrm.springBoneManager;
 
     const exporterInfo = {
-      // TODO: データがなくて取得できない
-      generator: "UniGLTF-2.0.0",
-      version: "2.0",
+      generator: "VRMExporter",
+      version: "0.1",
     };
 
     // TODO: とりあえず全部ある想定で進める
