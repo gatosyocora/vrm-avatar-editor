@@ -1,8 +1,9 @@
 export interface OutputNode {
   children?: Array<number> | undefined;
   skin?: number | undefined;
+  mesh?: number | undefined;
   name: string;
-  rotation: { x: number; y: number; z: number; w: number };
-  scale: { x: number; y: number; z: number };
-  translation: { x: number; y: number; z: number };
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  translation: [number, number, number];
 }

@@ -112,22 +112,14 @@ export default class VRMExporter {
         .filter((childNode) => childNode.name !== SPRINGBONE_COLLIDER_NAME)
         .map((childNode) => nodeNames.indexOf(childNode.name)),
       name: node.name,
-      rotation: {
-        x: node.quaternion.x,
-        y: node.quaternion.y,
-        z: node.quaternion.z,
-        w: node.quaternion.w,
-      },
-      scale: {
-        x: node.scale.x,
-        y: node.scale.y,
-        z: node.scale.z,
-      },
-      translation: {
-        x: node.position.x,
-        y: node.position.y,
-        z: node.position.z,
-      },
+      rotation: [
+        node.quaternion.x,
+        node.quaternion.y,
+        node.quaternion.z,
+        node.quaternion.w,
+      ],
+      scale: [node.scale.x, node.scale.y, node.scale.z],
+      translation: [node.position.x, node.position.y, node.position.z],
     }));
 
     const outputAccessors: Array<OutputAccessor> = [];
@@ -286,29 +278,21 @@ export default class VRMExporter {
     const outputMeshes = toOutputMeshes(meshes, meshDatas, uniqueMaterialNames);
 
     // mesh
-    outputNodes.push(
-      ...meshes.map((group, index) => ({
+    meshes.forEach((group, index) => {
+      outputNodes.push({
         mesh: index,
         name: group.name,
-        rotation: {
-          x: group.quaternion.x,
-          y: group.quaternion.y,
-          z: group.quaternion.z,
-          w: group.quaternion.w,
-        },
-        scale: {
-          x: group.scale.x,
-          y: group.scale.y,
-          z: group.scale.z,
-        },
+        rotation: [
+          group.quaternion.x,
+          group.quaternion.y,
+          group.quaternion.z,
+          group.quaternion.w,
+        ],
+        scale: [group.scale.x, group.scale.y, group.scale.z],
         skin: index,
-        translation: {
-          x: group.position.x,
-          y: group.position.y,
-          z: group.position.z,
-        },
-      }))
-    );
+        translation: [group.position.x, group.position.y, group.position.z],
+      });
+    });
 
     // secondary
     const secondaryRootNode = scene.children.filter(
@@ -316,22 +300,22 @@ export default class VRMExporter {
     )[0];
     outputNodes.push({
       name: secondaryRootNode.name,
-      rotation: {
-        x: secondaryRootNode.quaternion.x,
-        y: secondaryRootNode.quaternion.y,
-        z: secondaryRootNode.quaternion.z,
-        w: secondaryRootNode.quaternion.w,
-      },
-      scale: {
-        x: secondaryRootNode.scale.x,
-        y: secondaryRootNode.scale.y,
-        z: secondaryRootNode.scale.z,
-      },
-      translation: {
-        x: secondaryRootNode.position.x,
-        y: secondaryRootNode.position.y,
-        z: secondaryRootNode.position.z,
-      },
+      rotation: [
+        secondaryRootNode.quaternion.x,
+        secondaryRootNode.quaternion.y,
+        secondaryRootNode.quaternion.z,
+        secondaryRootNode.quaternion.w,
+      ],
+      scale: [
+        secondaryRootNode.scale.x,
+        secondaryRootNode.scale.y,
+        secondaryRootNode.scale.z,
+      ],
+      translation: [
+        secondaryRootNode.position.x,
+        secondaryRootNode.position.y,
+        secondaryRootNode.position.z,
+      ],
     });
 
     const outputSkins = toOutputSkins(meshes, meshDatas, nodeNames);
