@@ -12,6 +12,7 @@ import { ToOutputVRMMeta } from "./VRMMetaUtils";
 import { OutputSkin } from "./OutputSkin";
 import { OutputBaseTexture, OutputMaterial } from "./OutputMaterial";
 import { OutputMesh } from "./OutputMesh";
+import { OutputNode } from "./OutputNode";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -110,7 +111,7 @@ export default class VRMExporter {
       (node) => node.name !== SPRINGBONE_COLLIDER_NAME
     );
     const nodeNames = nodes.map((node) => node.name);
-    const outputNodes: Array<Node> = nodes.map((node) => ({
+    const outputNodes: Array<OutputNode> = nodes.map((node) => ({
       children: node.children
         .filter((childNode) => childNode.name !== SPRINGBONE_COLLIDER_NAME)
         .map((childNode) => nodeNames.indexOf(childNode.name)),
@@ -870,15 +871,6 @@ interface Accessor {
   min: [number, number, number] | undefined;
   normalized: boolean;
   type: string;
-}
-
-interface Node {
-  children?: Array<number> | undefined;
-  skin?: number | undefined;
-  name: string;
-  rotation: { x: number; y: number; z: number; w: number };
-  scale: { x: number; y: number; z: number };
-  translation: { x: number; y: number; z: number };
 }
 
 const toOutputMeshes = (
