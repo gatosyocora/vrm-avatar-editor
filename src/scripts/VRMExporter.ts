@@ -9,6 +9,7 @@ import {
 } from "three";
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
+import { OutputSkin } from "./OutputSkin";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -479,20 +480,7 @@ export default class VRMExporter {
       },
     });
 
-    const outputSkins = meshes.map((object) => {
-      const mesh = (object.type === VRMObjectType.Group
-        ? object.children[0]
-        : object) as VRMSkinnedMesh;
-      return {
-        inverseBindMatrices: meshDatas
-          .map((data) =>
-            data.type === MeshDataType.BIND_MATRIX ? data.meshName : null
-          )
-          .indexOf(mesh.name),
-        joints: mesh.skeleton.bones.map((bone) => nodeNames.indexOf(bone.name)),
-        skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name),
-      };
-    });
+    const outputSkins = toOutputSkins(meshes, meshDatas, nodeNames);
 
     // TODO: javascript版の弊害によるエラーなので将来的に実装を変える
     const blendShapeMaster = {
@@ -910,7 +898,7 @@ class GlbChunk {
   }
 }
 
-class MeshData {
+export class MeshData {
   attribute: BufferAttribute;
   valueType: number;
   type: MeshDataType;
@@ -1035,3 +1023,24 @@ interface Node {
   scale: { x: number; y: number; z: number };
   translation: { x: number; y: number; z: number };
 }
+
+const toOutputSkins = (
+  meshes: Array<Object3D>,
+  meshDatas: Array<MeshData>,
+  nodeNames: Array<string>
+): Array<OutputSkin> => {
+  return meshes.map((object) => {
+    const mesh = (object.type === VRMObjectType.Group
+      ? object.children[0]
+      : object) as VRMSkinnedMesh;
+    return {
+      inverseBindMatrices: meshDatas
+        .map((data) =>
+          data.type === MeshDataType.BIND_MATRIX ? data.meshName : null
+        )
+        .indexOf(mesh.name),
+      joints: mesh.skeleton.bones.map((bone) => nodeNames.indexOf(bone.name)),
+      skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name),
+    };
+  });
+};
