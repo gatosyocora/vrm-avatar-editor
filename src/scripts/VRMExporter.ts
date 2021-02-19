@@ -40,6 +40,8 @@ const BLENDSHAPE_PREFIX = "blend_";
 const MORPH_CONTROLLER_PREFIX = "BlendShapeController_";
 const SPRINGBONE_COLLIDER_NAME = "vrmColliderSphere";
 
+const EXPORTER_VERSION = "UniVRM-0.64.0";
+
 type VRMMaterial = MeshBasicMaterial | MeshStandardMaterial | MToonMaterial;
 
 export default class VRMExporter {
@@ -363,8 +365,6 @@ export default class VRMExporter {
       ),
     };
 
-    const exporterVersion = "UniVRM-0.64.0"; // TODO:
-
     // TODO: javascript版の弊害によるエラーなので将来的に実装を変える
     // @ts-ignore: Unreachable code error
     lookAt.firstPerson._firstPersonBoneOffset.z *= -1; // TODO:
@@ -585,7 +585,7 @@ export default class VRMExporter {
       extensions: {
         VRM: {
           blendShapeMaster: blendShapeMaster,
-          exporterVersion: exporterVersion,
+          exporterVersion: EXPORTER_VERSION,
           firstPerson: vrmFirstPerson,
           humanoid: vrmHumanoid,
           materialProperties: materialProperties,
