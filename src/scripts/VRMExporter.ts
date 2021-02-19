@@ -11,6 +11,7 @@ import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
 import { OutputSkin } from "./OutputSkin";
 import { OutputBaseTexture, OutputMaterial } from "./OutputMaterial";
+import { OutputMesh } from "./OutputMesh";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -285,70 +286,7 @@ export default class VRMExporter {
       }))
     );
 
-    const outputMeshes = meshes.map((object) => {
-      const mesh = (object.type === VRMObjectType.Group
-        ? object.children[0]
-        : object) as VRMSkinnedMesh;
-      const subMeshes =
-        object.type === VRMObjectType.Group
-          ? object.children.map((child) => child as VRMSkinnedMesh)
-          : [object as VRMSkinnedMesh];
-      return {
-        extras: {
-          targetNames: mesh.geometry.userData.targetNames,
-        },
-        name: mesh.name, // TODO: なんか違う名前になっている
-        primitives: subMeshes.map((subMesh) => {
-          const meshTypes = meshDatas.map((data) =>
-            data.meshName === mesh.name ? data.type : null
-          );
-          const materialName = Array.isArray(subMesh.material)
-            ? subMesh.material[0].name
-            : subMesh.material.name;
-          return {
-            attributes: {
-              JOINTS_0: meshTypes.indexOf(MeshDataType.SKIN_INDEX),
-              NORMAL: meshTypes.indexOf(MeshDataType.NORMAL),
-              POSITION: meshTypes.indexOf(MeshDataType.POSITION),
-              TEXCOORD_0: meshTypes.indexOf(MeshDataType.UV),
-              WEIGHTS_0: meshTypes.indexOf(MeshDataType.SKIN_WEIGHT),
-            },
-            extras: {
-              targetNames: subMesh.geometry.userData.targetNames,
-            },
-            indices: meshDatas
-              .map((data) =>
-                data.type === MeshDataType.INDEX && data.meshName === mesh.name
-                  ? data.name
-                  : null
-              )
-              .indexOf(subMesh.name),
-            material: uniqueMaterialNames.indexOf(materialName),
-            mode: 4, // TRIANGLES
-            targets: mesh.geometry.userData.targetNames
-              ? mesh.geometry.userData.targetNames.map((targetName) => ({
-                  NORMAL: meshDatas
-                    .map((data) =>
-                      data.type === MeshDataType.BLEND_NORMAL &&
-                      data.meshName === mesh.name
-                        ? data.name
-                        : null
-                    )
-                    .indexOf(BLENDSHAPE_PREFIX + targetName),
-                  POSITION: meshDatas
-                    .map((data) =>
-                      data.type === MeshDataType.BLEND_POSITION &&
-                      data.meshName === mesh.name
-                        ? data.name
-                        : null
-                    )
-                    .indexOf(BLENDSHAPE_PREFIX + targetName),
-                }))
-              : undefined,
-          };
-        }),
-      };
-    });
+    const outputMeshes = toOutputMeshes(meshes, meshDatas, uniqueMaterialNames);
 
     // mesh
     outputNodes.push(
@@ -942,6 +880,77 @@ interface Node {
   scale: { x: number; y: number; z: number };
   translation: { x: number; y: number; z: number };
 }
+
+const toOutputMeshes = (
+  meshes: Array<Object3D>,
+  meshDatas: Array<MeshData>,
+  uniqueMaterialNames: Array<string>
+): Array<OutputMesh> => {
+  return meshes.map((object) => {
+    const mesh = (object.type === VRMObjectType.Group
+      ? object.children[0]
+      : object) as VRMSkinnedMesh;
+    const subMeshes =
+      object.type === VRMObjectType.Group
+        ? object.children.map((child) => child as VRMSkinnedMesh)
+        : [object as VRMSkinnedMesh];
+    return {
+      extras: {
+        targetNames: mesh.geometry.userData.targetNames,
+      },
+      name: mesh.name, // TODO: なんか違う名前になっている
+      primitives: subMeshes.map((subMesh) => {
+        const meshTypes = meshDatas.map((data) =>
+          data.meshName === mesh.name ? data.type : null
+        );
+        const materialName = Array.isArray(subMesh.material)
+          ? subMesh.material[0].name
+          : subMesh.material.name;
+        return {
+          attributes: {
+            JOINTS_0: meshTypes.indexOf(MeshDataType.SKIN_INDEX),
+            NORMAL: meshTypes.indexOf(MeshDataType.NORMAL),
+            POSITION: meshTypes.indexOf(MeshDataType.POSITION),
+            TEXCOORD_0: meshTypes.indexOf(MeshDataType.UV),
+            WEIGHTS_0: meshTypes.indexOf(MeshDataType.SKIN_WEIGHT),
+          },
+          extras: {
+            targetNames: subMesh.geometry.userData.targetNames,
+          },
+          indices: meshDatas
+            .map((data) =>
+              data.type === MeshDataType.INDEX && data.meshName === mesh.name
+                ? data.name
+                : null
+            )
+            .indexOf(subMesh.name),
+          material: uniqueMaterialNames.indexOf(materialName),
+          mode: 4, // TRIANGLES
+          targets: mesh.geometry.userData.targetNames
+            ? mesh.geometry.userData.targetNames.map((targetName) => ({
+                NORMAL: meshDatas
+                  .map((data) =>
+                    data.type === MeshDataType.BLEND_NORMAL &&
+                    data.meshName === mesh.name
+                      ? data.name
+                      : null
+                  )
+                  .indexOf(BLENDSHAPE_PREFIX + targetName),
+                POSITION: meshDatas
+                  .map((data) =>
+                    data.type === MeshDataType.BLEND_POSITION &&
+                    data.meshName === mesh.name
+                      ? data.name
+                      : null
+                  )
+                  .indexOf(BLENDSHAPE_PREFIX + targetName),
+              }))
+            : undefined,
+        };
+      }),
+    };
+  });
+};
 
 const toOutputSkins = (
   meshes: Array<Object3D>,
