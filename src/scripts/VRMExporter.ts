@@ -10,6 +10,7 @@ import {
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
 import { OutputSkin } from "./OutputSkin";
+import { BaseTexture, OutputMaterial } from "./OutputMaterial";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -28,6 +29,8 @@ enum WEBGL_CONST {
 const BLENDSHAPE_PREFIX = "blend_";
 const MORPH_CONTROLLER_PREFIX = "BlendShapeController_";
 const SPRINGBONE_COLLIDER_NAME = "vrmColliderSphere";
+
+type VRMMaterial = MeshBasicMaterial | MeshStandardMaterial | MToonMaterial;
 
 export default class VRMExporter {
   parse(vrm: VRM, onDone: (buffer: ArrayBuffer) => void): void {
@@ -64,10 +67,7 @@ export default class VRMExporter {
         (material, index, self) =>
           self.findIndex((e) => e.name === material.name) === index
       )
-      .map(
-        (material) =>
-          material as MeshBasicMaterial | MeshStandardMaterial | MToonMaterial
-      );
+      .map((material) => material as VRMMaterial);
     const uniqueMaterialNames = uniqueMaterials.map(
       (material) => material.name
     );
@@ -98,88 +98,7 @@ export default class VRMExporter {
       source: index, // TODO: 全パターンでindexなのか不明
     }));
 
-    const outputMaterials = uniqueMaterials.map((material) => {
-      let baseColor: [number, number, number, number] | undefined;
-      if (material.type === MaterialType.MToonMaterial) {
-        const mtoonMaterial = material as MToonMaterial;
-        baseColor = mtoonMaterial.color
-          ? [
-              mtoonMaterial.color.x,
-              mtoonMaterial.color.y,
-              mtoonMaterial.color.z,
-              mtoonMaterial.color.w,
-            ]
-          : undefined;
-      } else {
-        const otherMaterial = material as
-          | MeshBasicMaterial
-          | MeshStandardMaterial;
-        baseColor = otherMaterial.color
-          ? [
-              otherMaterial.color.r,
-              otherMaterial.color.g,
-              otherMaterial.color.b,
-              1, // TODO:
-            ]
-          : undefined;
-      }
-      const baseTexture = material.map
-        ? {
-            extensions: {
-              KHR_texture_transform: {
-                offset: [0, 0],
-                scale: [1, 1],
-              },
-            },
-            index: images.map((image) => image.name).indexOf(material.name), // TODO: ImageDataにいれたMaterial名で対応付け
-            texCoord: 0, // TODO:
-          }
-        : undefined;
-      const metallicFactor = (() => {
-        switch (material.type) {
-          case MaterialType.MeshStandardMaterial:
-            return (material as MeshStandardMaterial).metalness;
-          case MaterialType.MeshBasicMaterial:
-            return 0;
-          default:
-            return 0.5;
-        }
-      })();
-
-      const roughnessFactor = (() => {
-        switch (material.type) {
-          case MaterialType.MeshStandardMaterial:
-            return (material as MeshStandardMaterial).roughness;
-          case MaterialType.MeshBasicMaterial:
-            return 0.9;
-          default:
-            return 0.5;
-        }
-      })();
-
-      return {
-        alphaCutoff: material.alphaTest > 0 ? material.alphaTest : undefined,
-        alphaMode: material.transparent
-          ? "BLEND"
-          : material.alphaTest > 0
-          ? "MASK"
-          : "OPAQUE",
-        doubleSided: material.side === 2, // 両面描画であれば2になっている
-        extensions:
-          material.type === MaterialType.MeshBasicMaterial
-            ? {
-                KHR_materials_unlit: {}, // TODO:
-              }
-            : undefined,
-        name: material.name,
-        pbrMetallicRoughness: {
-          baseColorFactor: baseColor,
-          baseColorTexture: baseTexture,
-          metallicFactor: metallicFactor,
-          roughnessFactor: roughnessFactor,
-        },
-      };
-    });
+    const outputMaterials = toOutputMaterials(uniqueMaterials, images);
 
     const rootNode = scene.children.filter(
       (child) =>
@@ -1041,6 +960,94 @@ const toOutputSkins = (
         .indexOf(mesh.name),
       joints: mesh.skeleton.bones.map((bone) => nodeNames.indexOf(bone.name)),
       skeleton: nodeNames.indexOf(mesh.skeleton.bones[0].name),
+    };
+  });
+};
+
+const toOutputMaterials = (
+  uniqueMaterials: Array<VRMMaterial>,
+  images: Array<VRMImageData>
+): Array<OutputMaterial> => {
+  return uniqueMaterials.map((material) => {
+    let baseColor: [number, number, number, number] | undefined;
+    if (material.type === MaterialType.MToonMaterial) {
+      const mtoonMaterial = material as MToonMaterial;
+      baseColor = mtoonMaterial.color
+        ? [
+            mtoonMaterial.color.x,
+            mtoonMaterial.color.y,
+            mtoonMaterial.color.z,
+            mtoonMaterial.color.w,
+          ]
+        : undefined;
+    } else {
+      const otherMaterial = material as
+        | MeshBasicMaterial
+        | MeshStandardMaterial;
+      baseColor = otherMaterial.color
+        ? [
+            otherMaterial.color.r,
+            otherMaterial.color.g,
+            otherMaterial.color.b,
+            1, // TODO:
+          ]
+        : undefined;
+    }
+    const baseTexture: BaseTexture | undefined = material.map
+      ? {
+          extensions: {
+            KHR_texture_transform: {
+              offset: [0, 0],
+              scale: [1, 1],
+            },
+          },
+          index: images.map((image) => image.name).indexOf(material.name), // TODO: ImageDataにいれたMaterial名で対応付け
+          texCoord: 0, // TODO:
+        }
+      : undefined;
+    const metallicFactor = (() => {
+      switch (material.type) {
+        case MaterialType.MeshStandardMaterial:
+          return (material as MeshStandardMaterial).metalness;
+        case MaterialType.MeshBasicMaterial:
+          return 0;
+        default:
+          return 0.5;
+      }
+    })();
+
+    const roughnessFactor = (() => {
+      switch (material.type) {
+        case MaterialType.MeshStandardMaterial:
+          return (material as MeshStandardMaterial).roughness;
+        case MaterialType.MeshBasicMaterial:
+          return 0.9;
+        default:
+          return 0.5;
+      }
+    })();
+
+    return {
+      alphaCutoff: material.alphaTest > 0 ? material.alphaTest : undefined,
+      alphaMode: material.transparent
+        ? "BLEND"
+        : material.alphaTest > 0
+        ? "MASK"
+        : "OPAQUE",
+      doubleSided: material.side === 2, // 両面描画であれば2になっている
+      extensions:
+        material.type === MaterialType.MeshBasicMaterial
+          ? {
+              KHR_materials_unlit: {}, // TODO:
+            }
+          : undefined,
+      name: material.name,
+      pbrMetallicRoughness: {
+        baseColorFactor: baseColor,
+        baseColorTexture: baseTexture,
+        metallicFactor: metallicFactor,
+        roughnessFactor: roughnessFactor,
+      },
     };
   });
 };
