@@ -17,6 +17,7 @@ import { OutputImage } from "./OutputImage";
 import { OutputSampler } from "./OutputSampler";
 import { OutputTexture } from "./OutputTexture";
 import { OutputAccessor } from "./OutputAccessor";
+import { OutputBufferView } from "./OutputBufferView";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -544,27 +545,29 @@ export default class VRMExporter {
     let bufferOffset = 0;
     let imageIndex = 0;
     let accessorIndex = 0;
-    const outputBufferViews = bufferViews.map((bufferView, index) => {
-      const value = {
-        buffer: 0,
-        byteLength: bufferView.buffer.byteLength,
-        byteOffset: bufferOffset,
-        target:
-          bufferView.type === MeshDataType.IMAGE ||
-          bufferView.type === MeshDataType.BIND_MATRIX
-            ? undefined
-            : bufferView.type === MeshDataType.INDEX
-            ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER
-            : WEBGL_CONST.ARRAY_BUFFER, // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
-      };
-      bufferOffset += bufferView.buffer.byteLength;
-      if (bufferView.type === MeshDataType.IMAGE) {
-        outputImages[imageIndex++].bufferView = index;
-      } else {
-        outputAccessors[accessorIndex++].bufferView = index;
+    const outputBufferViews: Array<OutputBufferView> = bufferViews.map(
+      (bufferView, index) => {
+        const value = {
+          buffer: 0,
+          byteLength: bufferView.buffer.byteLength,
+          byteOffset: bufferOffset,
+          target:
+            bufferView.type === MeshDataType.IMAGE ||
+            bufferView.type === MeshDataType.BIND_MATRIX
+              ? undefined
+              : bufferView.type === MeshDataType.INDEX
+              ? WEBGL_CONST.ELEMENT_ARRAY_BUFFER
+              : WEBGL_CONST.ARRAY_BUFFER, // TODO: だいたいこれだったの　Mesh/indicesだけELEMENT...
+        };
+        bufferOffset += bufferView.buffer.byteLength;
+        if (bufferView.type === MeshDataType.IMAGE) {
+          outputImages[imageIndex++].bufferView = index;
+        } else {
+          outputAccessors[accessorIndex++].bufferView = index;
+        }
+        return value;
       }
-      return value;
-    });
+    );
 
     const outputNodeNames = outputNodes.map((node) => node.name);
 
