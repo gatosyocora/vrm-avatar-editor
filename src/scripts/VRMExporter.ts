@@ -25,6 +25,8 @@ enum WEBGL_CONST {
 }
 
 const BLENDSHAPE_PREFIX = "blend_";
+const MORPH_CONTROLLER_PREFIX = "BlendShapeController_";
+const SPRINGBONE_COLLIDER_NAME = "vrmColliderSphere";
 
 export default class VRMExporter {
   parse(vrm: VRM, onDone: (buffer: ArrayBuffer) => void): void {
@@ -184,12 +186,12 @@ export default class VRMExporter {
         child.children[0].type === VRMObjectType.Bone
     )[0];
     const nodes = getNodes(rootNode).filter(
-      (node) => node.name !== "vrmColliderSphere"
+      (node) => node.name !== SPRINGBONE_COLLIDER_NAME
     );
     const nodeNames = nodes.map((node) => node.name);
     const outputNodes: Array<Node> = nodes.map((node) => ({
       children: node.children
-        .filter((childNode) => childNode.name !== "vrmColliderSphere")
+        .filter((childNode) => childNode.name !== SPRINGBONE_COLLIDER_NAME)
         .map((childNode) => nodeNames.indexOf(childNode.name)),
       name: node.name,
       rotation: {
@@ -510,13 +512,13 @@ export default class VRMExporter {
           // @ts-ignore: Unreachable code error
           materialValues: blendShape._materialValues,
           // @ts-ignore: Unreachable code error
-          name: blendShape.name.replace("BlendShapeController_", ""),
+          name: blendShape.name.replace(MORPH_CONTROLLER_PREFIX, ""),
           presetName: Object.entries(
             blendShapeProxy.blendShapePresetMap
           ).filter(
             (x) =>
               // @ts-ignore: Unreachable code error
-              x[1] === blendShape.name.replace("BlendShapeController_", "")
+              x[1] === blendShape.name.replace(MORPH_CONTROLLER_PREFIX, "")
           )[0][0],
         })
       ),
