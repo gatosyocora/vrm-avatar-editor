@@ -16,6 +16,7 @@ import { OutputNode } from "./OutputNode";
 import { OutputImage } from "./OutputImage";
 import { OutputSampler } from "./OutputSampler";
 import { OutputTexture } from "./OutputTexture";
+import { OutputAccessor } from "./OutputAccessor";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -123,7 +124,7 @@ export default class VRMExporter {
       },
     }));
 
-    const accessors: Array<Accessor> = [];
+    const outputAccessors: Array<OutputAccessor> = [];
 
     const meshes = scene.children.filter(
       (child) =>
@@ -263,7 +264,7 @@ export default class VRMExporter {
       );
     });
 
-    accessors.push(
+    outputAccessors.push(
       ...meshDatas.map((meshData) => ({
         bufferView: -1,
         byteOffset: 0,
@@ -560,7 +561,7 @@ export default class VRMExporter {
       if (bufferView.type === MeshDataType.IMAGE) {
         outputImages[imageIndex++].bufferView = index;
       } else {
-        accessors[accessorIndex++].bufferView = index;
+        outputAccessors[accessorIndex++].bufferView = index;
       }
       return value;
     });
@@ -568,7 +569,7 @@ export default class VRMExporter {
     const outputNodeNames = outputNodes.map((node) => node.name);
 
     const outputData = {
-      accessors: accessors, // buffer数 - 画像数
+      accessors: outputAccessors, // buffer数 - 画像数
       asset: exporterInfo, // TODO:
       buffers: [
         {
@@ -849,17 +850,6 @@ export interface VRMImageData {
 interface BufferView {
   buffer: ArrayBuffer;
   type: MeshDataType;
-}
-
-interface Accessor {
-  bufferView: number;
-  byteOffset: number;
-  componentType: number;
-  count: number;
-  max: [number, number, number] | undefined;
-  min: [number, number, number] | undefined;
-  normalized: boolean;
-  type: string;
 }
 
 const toOutputMeshes = (
