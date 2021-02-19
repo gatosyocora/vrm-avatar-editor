@@ -7,13 +7,13 @@ export interface OutputMaterial {
   name: string;
   pbrMetallicRoughness: {
     baseColorFactor?: [number, number, number, number] | undefined;
-    baseColorTexture?: BaseTexture | undefined;
+    baseColorTexture?: OutputBaseTexture | undefined;
     metallicFactor: number;
     roughnessFactor: number;
   };
 }
 
-export interface BaseTexture {
+export interface OutputBaseTexture {
   extensions: {
     KHR_texture_transform: {
       offset: [number, number];

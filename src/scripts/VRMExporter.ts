@@ -10,7 +10,7 @@ import {
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
 import { OutputSkin } from "./OutputSkin";
-import { BaseTexture, OutputMaterial } from "./OutputMaterial";
+import { OutputBaseTexture, OutputMaterial } from "./OutputMaterial";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -993,7 +993,7 @@ const toOutputMaterials = (
           ]
         : undefined;
     }
-    const baseTexture: BaseTexture | undefined = material.map
+    const baseTexture: OutputBaseTexture | undefined = material.map
       ? {
           extensions: {
             KHR_texture_transform: {
