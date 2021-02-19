@@ -13,6 +13,9 @@ import { OutputSkin } from "./OutputSkin";
 import { OutputBaseTexture, OutputMaterial } from "./OutputMaterial";
 import { OutputMesh } from "./OutputMesh";
 import { OutputNode } from "./OutputNode";
+import { OutputImage } from "./OutputImage";
+import { OutputSampler } from "./OutputSampler";
+import { OutputTexture } from "./OutputTexture";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {
@@ -82,23 +85,9 @@ export default class VRMExporter {
         if (!material.map) throw new Error();
         return { name: material.name, imageBitmap: material.map.image };
       }); // TODO: 画像がないMaterialもある
-    const outputImage = (icon ? images.concat(icon) : images)
-      .filter((image) => image && image.imageBitmap)
-      .map((image) => ({
-        bufferView: -1,
-        mimeType: "image/png", // TODO: とりあえずpngをいれた
-        name: image.name, // TODO: 取得できないので仮のテクスチャ名としてマテリアル名を入れた
-      }));
-    const outputSamplers = outputImage.map(() => ({
-      magFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
-      minFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
-      wrapS: WEBGL_CONST.REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
-      wrapT: WEBGL_CONST.REPEAT, // TODO: だいたいこれだった
-    }));
-    const outputTextures = outputImage.map((_, index) => ({
-      sampler: index, // TODO: 全パターンでindexなのか不明
-      source: index, // TODO: 全パターンでindexなのか不明
-    }));
+    const outputImages = toOutputImages(images, icon);
+    const outputSamplers = toOutputSamplers(outputImages);
+    const outputTextures = toOutputTextures(outputImages);
 
     const outputMaterials = toOutputMaterials(uniqueMaterials, images);
 
@@ -466,7 +455,7 @@ export default class VRMExporter {
       (material) => material.userData.vrmMaterialProperties
     );
 
-    const outputVrmMeta = ToOutputVRMMeta(vrmMeta, icon, outputImage);
+    const outputVrmMeta = ToOutputVRMMeta(vrmMeta, icon, outputImages);
     const secondaryAnimation = {
       boneGroups:
         springBone.springBoneGroupList[0] &&
@@ -569,7 +558,7 @@ export default class VRMExporter {
       };
       bufferOffset += bufferView.buffer.byteLength;
       if (bufferView.type === MeshDataType.IMAGE) {
-        outputImage[imageIndex++].bufferView = index;
+        outputImages[imageIndex++].bufferView = index;
       } else {
         accessors[accessorIndex++].bufferView = index;
       }
@@ -604,7 +593,7 @@ export default class VRMExporter {
         "KHR_texture_transform", // TODO:
         "VRM",
       ],
-      images: outputImage,
+      images: outputImages,
       materials: outputMaterials,
       meshes: outputMeshes,
       nodes: outputNodes,
@@ -1051,4 +1040,37 @@ const toOutputMaterials = (
       },
     };
   });
+};
+
+const toOutputImages = (
+  images: Array<VRMImageData>,
+  icon: VRMImageData | null
+): Array<OutputImage> => {
+  return (icon ? images.concat(icon) : images)
+    .filter((image) => image && image.imageBitmap)
+    .map((image) => ({
+      bufferView: -1,
+      mimeType: "image/png", // TODO: とりあえずpngをいれた
+      name: image.name, // TODO: 取得できないので仮のテクスチャ名としてマテリアル名を入れた
+    }));
+};
+
+const toOutputSamplers = (
+  outputImages: Array<OutputImage>
+): Array<OutputSampler> => {
+  return outputImages.map(() => ({
+    magFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
+    minFilter: WEBGL_CONST.LINEAR, // TODO: だいたいこれだった
+    wrapS: WEBGL_CONST.REPEAT, // TODO: だいたいこれだったからとりあえず直打ちした
+    wrapT: WEBGL_CONST.REPEAT, // TODO: だいたいこれだった
+  }));
+};
+
+const toOutputTextures = (
+  outputImages: Array<OutputImage>
+): Array<OutputTexture> => {
+  return outputImages.map((_, index) => ({
+    sampler: index, // TODO: 全パターンでindexなのか不明
+    source: index, // TODO: 全パターンでindexなのか不明
+  }));
 };
