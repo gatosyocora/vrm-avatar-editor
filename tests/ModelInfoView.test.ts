@@ -15,6 +15,36 @@ describe("ModelInfoView.vue", () => {
   });
 });
 
+describe("ModelInfoView.vue", () => {
+  test("getPolygonCount shapell", () => {
+    loadVrm("./vrm/shapell3.vrm", (vrm) => {
+      const wrapper = shallowMount(ModelInfoView);
+      wrapper.vm.$emit("getPolygonCount", vrm);
+      expect(wrapper.emitted()).toBe(27873);
+    });
+  });
+});
+
+describe("ModelInfoView.vue", () => {
+  test("getBoneCount shapell", () => {
+    loadVrm("./vrm/shapell3.vrm", (vrm) => {
+      const wrapper = shallowMount(ModelInfoView);
+      wrapper.vm.$emit("getBoneCount", vrm);
+      expect(wrapper.emitted()).toBe(180);
+    });
+  });
+});
+
+describe("ModelInfoView.vue", () => {
+  test("getBlendShapeCount shapell", () => {
+    loadVrm("./vrm/shapell3.vrm", (vrm) => {
+      const wrapper = shallowMount(ModelInfoView);
+      wrapper.vm.$emit("getBlendShapeCount", vrm);
+      expect(wrapper.emitted()).toBe(47);
+    });
+  });
+});
+
 const loadVrm = (
   url: string,
   onDone: (vrm: THREE.Group | THREE.Scene) => void
