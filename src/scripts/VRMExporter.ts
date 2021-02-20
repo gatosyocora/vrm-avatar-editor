@@ -231,7 +231,7 @@ export default class VRMExporter {
               mesh.name,
               BLENDSHAPE_PREFIX + targetName
             )
-          ); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+          );
           meshDatas.push(
             new MeshData(
               morphAttribute.normal[morphIndex],
@@ -241,7 +241,7 @@ export default class VRMExporter {
               mesh.name,
               BLENDSHAPE_PREFIX + targetName
             )
-          ); // TODO: 本当はblendShapeの差分値をいれるのだが適当にいれている
+          );
         });
       }
     });
@@ -525,7 +525,7 @@ export default class VRMExporter {
           byteLength: bufferOffset,
         },
       ],
-      bufferViews: outputBufferViews, // accessors + images
+      bufferViews: outputBufferViews,
       extensions: {
         VRM: {
           blendShapeMaster: blendShapeMaster,
