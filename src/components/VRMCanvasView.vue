@@ -8,6 +8,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM, VRMMeta } from "@pixiv/three-vrm";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { Bone, Object3D, Vector3 } from "three";
 
 @Component
 export default class VRMCanvasView extends Vue {
@@ -68,6 +69,12 @@ export default class VRMCanvasView extends Vue {
 
     if (this.vrmObject) {
       this.initScene();
+      const rootBone = this.vrmObject.children.filter(
+        (child) =>
+          child.children.length > 0 && child.children[0].type === "Bone"
+      )[0];
+      const boneLine = this.generateBoneSupporter(rootBone);
+      this.scene.add(boneLine);
     }
     this.vrmObject = newObject;
 
@@ -83,6 +90,34 @@ export default class VRMCanvasView extends Vue {
     this.scene.add(this.gridHelper);
     this.scene.add(this.axesHelper);
     this.animate();
+  }
+
+  generateBoneSupporter(
+    node: Object3D | Bone,
+    parentNode?: Object3D | Bone,
+    material?: THREE.LineBasicMaterial
+  ): THREE.Line {
+    if (!material) {
+      material = new THREE.LineBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+      });
+    }
+
+    const lineGeometry = new THREE.Geometry();
+    if (parentNode) {
+      lineGeometry.vertices.push(
+        parentNode.getWorldPosition(new Vector3(0, 0, 0)),
+        node.getWorldPosition(new Vector3(0, 0, 0))
+      );
+    }
+    const newLine = new THREE.Line(lineGeometry, material);
+    node.children.forEach((child) => {
+      newLine.children.push(this.generateBoneSupporter(child, node, material));
+    });
+    return newLine;
   }
 }
 </script>
