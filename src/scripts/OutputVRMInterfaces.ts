@@ -1,10 +1,14 @@
+type Vector2 = [number, number];
+type Vector3 = [number, number, number];
+type Vector4 = [number, number, number, number];
+
 export interface OutputAccessor {
   bufferView: number;
   byteOffset: number;
   componentType: number;
   count: number;
-  max: [number, number, number] | undefined;
-  min: [number, number, number] | undefined;
+  max: Vector3 | undefined;
+  min: Vector3 | undefined;
   normalized: boolean;
   type: string;
 }
@@ -30,7 +34,7 @@ export interface OutputMaterial {
   extensions?: { KHR_materials_unlit: {} } | undefined;
   name: string;
   pbrMetallicRoughness: {
-    baseColorFactor?: [number, number, number, number] | undefined;
+    baseColorFactor?: Vector4 | undefined;
     baseColorTexture?: OutputBaseTexture | undefined;
     metallicFactor: number;
     roughnessFactor: number;
@@ -40,8 +44,8 @@ export interface OutputMaterial {
 export interface OutputBaseTexture {
   extensions: {
     KHR_texture_transform: {
-      offset: [number, number];
-      scale: [number, number];
+      offset: Vector2;
+      scale: Vector2;
     };
   };
   index: number;
@@ -83,9 +87,9 @@ export interface OutputNode {
   skin?: number | undefined;
   mesh?: number | undefined;
   name: string;
-  rotation: [number, number, number, number];
-  scale: [number, number, number];
-  translation: [number, number, number];
+  rotation: Vector4;
+  scale: Vector3;
+  translation: Vector3;
 }
 
 export interface OutputSampler {
