@@ -11,16 +11,19 @@ import {
 } from "three";
 import { VRMSkinnedMesh } from "@/scripts/VRMInterface";
 import { ToOutputVRMMeta } from "./VRMMetaUtils";
-import { OutputSkin } from "./OutputSkin";
-import { OutputBaseTexture, OutputMaterial } from "./OutputMaterial";
-import { OutputMesh } from "./OutputMesh";
-import { OutputNode } from "./OutputNode";
-import { OutputImage } from "./OutputImage";
-import { OutputSampler } from "./OutputSampler";
-import { OutputTexture } from "./OutputTexture";
-import { OutputAccessor } from "./OutputAccessor";
-import { OutputBufferView } from "./OutputBufferView";
-import { OutputScene } from "./OutputScene";
+import {
+  OutputSkin,
+  OutputBaseTexture,
+  OutputMaterial,
+  OutputMesh,
+  OutputNode,
+  OutputAccessor,
+  OutputBufferView,
+  OutputImage,
+  OutputSampler,
+  OutputTexture,
+  OutputScene,
+} from "./OutputVRMInterfaces";
 
 // WebGL(OpenGL)マクロ定数
 enum WEBGL_CONST {

@@ -1,5 +1,5 @@
 import { VRMMeta } from "@pixiv/three-vrm";
-import { OutputVRMMeta } from "./OutputVRMMeta";
+import { OutputVRMMeta } from "./OutputVRMInterfaces";
 import { VRMImageData } from "./VRMExporter";
 
 type OutputImage = {
