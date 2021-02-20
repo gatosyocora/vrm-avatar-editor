@@ -2,6 +2,35 @@ type Vector2 = [number, number];
 type Vector3 = [number, number, number];
 type Vector4 = [number, number, number, number];
 
+export interface OutputVRM {
+  accessors: Array<OutputAccessor>;
+  asset: OutputExporterInfo;
+  buffers: [
+    {
+      byteLength: number;
+    }
+  ];
+  bufferViews: Array<OutputBufferView>;
+  extensions: {
+    VRM: OutputVRMExtension;
+  };
+  extensionsUsed: Array<string>;
+  images: Array<OutputImage>;
+  materials: Array<OutputMaterial>;
+  meshes: Array<OutputMesh>;
+  nodes: Array<OutputNode>;
+  samplers: Array<OutputSampler>;
+  scene: number;
+  scenes: Array<OutputScene>;
+  skins: Array<OutputSkin>;
+  textures: Array<OutputTexture>;
+}
+
+export interface OutputExporterInfo {
+  generator: string;
+  version: string;
+}
+
 export interface OutputAccessor {
   bufferView: number;
   byteOffset: number;
@@ -114,6 +143,85 @@ export interface OutputTexture {
   source: number;
 }
 
+export interface OutputVRMExtension {
+  blendShapeMaster: OutputBlendShapeMaster;
+  exporterVersion: string;
+  firstPerson: OutputFirstPerson;
+  humanoid: OutputHumanoid;
+  materialProperties: Array<OutputMaterialProperty>;
+  meta: OutputVRMMeta;
+  secondaryAnimation: OutputSecondaryAnimation;
+  specVersion: string; // TODO: numberかもしれない
+}
+
+export interface OutputBlendShapeMaster {
+  blendShapeGroups: Array<OutputBlendShapeGroup>;
+}
+
+export interface OutputBlendShapeGroup {
+  binds: [];
+  isBinary: boolean;
+  materialValues: [];
+  name: string;
+  presetName: string;
+}
+
+export interface OutputFirstPerson {
+  firstPersonBone: number;
+  firstPersonBoneOffset: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  lookAtHorizontalInner: LookAt;
+  lookAtHorizontalOuter: LookAt;
+  lookAtTypeName: string;
+  lookAtVerticalDown: LookAt;
+  lookAtVerticalUp: LookAt;
+  meshAnnotations: Array<{
+    firstPersonFlag: string;
+    mesh: number;
+  }>;
+}
+
+interface LookAt {
+  curve: Array<number>;
+  xRange: number;
+  yRange: number;
+}
+
+export interface OutputHumanoid {
+  armStretch?: number | undefined;
+  feetSpacing?: number | undefined;
+  hasTranslationDoF?: boolean | undefined;
+  humanBones: Array<{
+    bone: string;
+    node: number;
+    useDefaultValues: boolean;
+  }>;
+  legStretch?: number | undefined;
+  lowerArmTwist?: number | undefined;
+  lowerLegTwist?: number | undefined;
+  upperArmTwist?: number | undefined;
+  upperLegTwist?: number | undefined;
+}
+
+export interface OutputMaterialProperty {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  floatProperties: {};
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  keywordMap: {};
+  name: string;
+  renderQueue: number;
+  shader: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  tagMap: {};
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  textureProperties: {};
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  vectorProperties: {};
+}
+
 export interface OutputVRMMeta {
   allowedUserName?: string | undefined;
   author?: string | undefined;
@@ -128,4 +236,36 @@ export interface OutputVRMMeta {
   title?: string | undefined;
   version?: string | undefined;
   violentUssageName?: string | undefined;
+}
+
+export interface OutputSecondaryAnimation {
+  boneGroups: Array<OutputBoneGroup>;
+  colliderGroups: Array<OutputColliderGroup>;
+}
+
+export interface OutputBoneGroup {
+  bones: Array<number>;
+  center: number;
+  colliderGroups: Array<number>;
+  dragForce: number;
+  gravityDir: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  gravityPower: number;
+  hitRadius: number;
+  stiffiness: number;
+}
+
+export interface OutputColliderGroup {
+  colliders: Array<{
+    offset: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    radius?: number | undefined;
+  }>;
+  node: number;
 }

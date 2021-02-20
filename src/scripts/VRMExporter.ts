@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { VRM, MToonMaterial } from "@pixiv/three-vrm";
+import { VRM, MToonMaterial, VRMSpringBoneManager } from "@pixiv/three-vrm";
 import {
   BufferAttribute,
   MeshStandardMaterial,
@@ -23,6 +23,8 @@ import {
   OutputSampler,
   OutputTexture,
   OutputScene,
+  OutputVRM,
+  OutputSecondaryAnimation,
 } from "./OutputVRMInterfaces";
 
 // WebGL(OpenGL)マクロ定数
@@ -448,56 +450,10 @@ export default class VRMExporter {
     );
 
     const outputVrmMeta = ToOutputVRMMeta(vrmMeta, icon, outputImages);
-    const secondaryAnimation = {
-      boneGroups:
-        springBone.springBoneGroupList[0] &&
-        springBone.springBoneGroupList[0].length > 0
-          ? springBone.springBoneGroupList.map((group) => ({
-              bones: group.map((e) => nodeNames.indexOf(e.bone.name)), // TODO: indexが入っているが4つあるのに対して2つしか入っていない
-              center: group[0].center ? group[0].center : -1, // TODO: nullになっていて実際のデータはわからん
-              colliderGroups: springBone.colliderGroups.map(
-                (_, index) => index
-              ), // TODO: とりあえずindex
-              dragForce: group[0].dragForce, // TODO: それっぽいやつをいれた
-              gravityDir: {
-                x: group[0].gravityDir.x, // TODO: それっぽいやつをいれた
-                y: group[0].gravityDir.y, // TODO: それっぽいやつをいれた
-                z: group[0].gravityDir.z, // TODO: それっぽいやつをいれた
-              },
-              gravityPower: group[0].gravityPower, // TODO: それっぽいやつをいれた
-              hitRadius: group[0].radius, // TODO: それっぽいやつをいれた
-              stiffiness: group[0].stiffnessForce, // TODO: それっぽいやつをいれた
-            }))
-          : [
-              {
-                bones: [],
-                center: -1,
-                colliderGroups: [],
-                dragForce: 0.4,
-                gravityDir: {
-                  x: 0,
-                  y: -1,
-                  z: 0,
-                },
-                gravityPower: 0,
-                hitRadius: 0.02,
-                stiffiness: 1,
-              },
-            ], // TODO: 2重に書いてしまった
-      colliderGroups: springBone.colliderGroups.map((group) => ({
-        colliders: [
-          {
-            offset: {
-              x: group.colliders[0].position.x,
-              y: group.colliders[0].position.y,
-              z: group.colliders[0].position.z,
-            },
-            radius: group.colliders[0].geometry.boundingSphere?.radius,
-          },
-        ],
-        node: group.node,
-      })),
-    };
+    const outputSecondaryAnimation = toOutputSecondaryAnimation(
+      springBone,
+      nodeNames
+    );
 
     const bufferViews: Array<BufferView> = [];
     bufferViews.push(
@@ -561,7 +517,7 @@ export default class VRMExporter {
 
     const outputScenes = toOutputScenes(scene, outputNodes);
 
-    const outputData = {
+    const outputData: OutputVRM = {
       accessors: outputAccessors, // buffer数 - 画像数
       asset: exporterInfo, // TODO:
       buffers: [
@@ -578,7 +534,7 @@ export default class VRMExporter {
           humanoid: vrmHumanoid,
           materialProperties: materialProperties,
           meta: outputVrmMeta,
-          secondaryAnimation: secondaryAnimation,
+          secondaryAnimation: outputSecondaryAnimation,
           specVersion: "0.0", // TODO:
         },
       },
@@ -1064,4 +1020,60 @@ const toOutputScenes = (
         .map((x) => nodeNames.indexOf(x.name)),
     },
   ];
+};
+
+const toOutputSecondaryAnimation = (
+  springBone: VRMSpringBoneManager,
+  nodeNames: Array<string>
+): OutputSecondaryAnimation => {
+  return {
+    boneGroups:
+      springBone.springBoneGroupList[0] &&
+      springBone.springBoneGroupList[0].length > 0
+        ? springBone.springBoneGroupList.map((group) => ({
+            bones: group.map((e) => nodeNames.indexOf(e.bone.name)), // TODO: indexが入っているが4つあるのに対して2つしか入っていない
+            center: group[0].center
+              ? nodeNames.indexOf(group[0].center.name) // TODO: nullになっていて実際のデータはわからん
+              : -1,
+            colliderGroups: springBone.colliderGroups.map((_, index) => index), // TODO: とりあえずindex
+            dragForce: group[0].dragForce, // TODO: それっぽいやつをいれた
+            gravityDir: {
+              x: group[0].gravityDir.x, // TODO: それっぽいやつをいれた
+              y: group[0].gravityDir.y, // TODO: それっぽいやつをいれた
+              z: group[0].gravityDir.z, // TODO: それっぽいやつをいれた
+            },
+            gravityPower: group[0].gravityPower, // TODO: それっぽいやつをいれた
+            hitRadius: group[0].radius, // TODO: それっぽいやつをいれた
+            stiffiness: group[0].stiffnessForce, // TODO: それっぽいやつをいれた
+          }))
+        : [
+            {
+              bones: [],
+              center: -1,
+              colliderGroups: [],
+              dragForce: 0.4,
+              gravityDir: {
+                x: 0,
+                y: -1,
+                z: 0,
+              },
+              gravityPower: 0,
+              hitRadius: 0.02,
+              stiffiness: 1,
+            },
+          ], // TODO: 2重に書いてしまった
+    colliderGroups: springBone.colliderGroups.map((group) => ({
+      colliders: [
+        {
+          offset: {
+            x: group.colliders[0].position.x,
+            y: group.colliders[0].position.y,
+            z: group.colliders[0].position.z,
+          },
+          radius: group.colliders[0].geometry.boundingSphere?.radius,
+        },
+      ],
+      node: group.node,
+    })),
+  };
 };
