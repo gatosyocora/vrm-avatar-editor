@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "deploy": "gh-pages -d docs",
     "test": "jest",
-    "format": "prettier --write src/**/*.{js,vue,ts}",
+    "format": "prettier --write {src,tests}/**/*.{js,vue,ts}",
     "lint": "eslint --fix src"
   },
   "dependencies": {
