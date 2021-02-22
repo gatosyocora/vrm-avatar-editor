@@ -5,22 +5,27 @@
         <tr v-if="vrmObject.children !== null">
           <td>Mesh Count</td>
           <td>{{ getMeshCount(vrmObject.children) }}</td>
+          <td></td>
         </tr>
         <tr v-if="materials !== null">
           <td>SubMesh Count</td>
           <td>{{ materials.length }}</td>
+          <td></td>
         </tr>
         <tr v-if="vrmObject.children !== null">
           <td>Polygon Count</td>
           <td>{{ getPolygonCount(vrmObject.children) }}</td>
+          <td></td>
         </tr>
         <tr v-if="vrmObject.children !== null">
           <td>Bone Count</td>
           <td>{{ getBoneCount(vrmObject.children) }}</td>
+          <td><ShowBoneButton :vrm="vrmObject" /></td>
         </tr>
         <tr v-if="vrmObject.children !== null">
           <td>BlendShape Count</td>
           <td>{{ getBlendShapeCount(vrmObject.children) }}</td>
+          <td></td>
         </tr>
       </tbody>
     </v-simple-table>
@@ -33,7 +38,13 @@ import * as THREE from "three";
 
 import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 
-@Component
+import ShowBoneButton from "@/components/ShowBoneButton.vue";
+
+@Component({
+  components: {
+    ShowBoneButton,
+  },
+})
 export default class ModelInfoView extends Vue {
   @Prop()
   public materials: THREE.Material[] | undefined | null = null;
