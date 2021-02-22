@@ -46,7 +46,6 @@
       </v-card>
     </div>
   </div>
-  <div v-else>aaa</div>
 </template>
 
 <script lang="ts">
