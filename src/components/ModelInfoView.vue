@@ -20,7 +20,7 @@
         <tr v-if="vrmObject.children !== null">
           <td>Bone Count</td>
           <td>{{ getBoneCount(vrmObject.children) }}</td>
-          <td><ShowBoneButton :vrm="vrmObject" /></td>
+          <td><ShowBoneButton /></td>
         </tr>
         <tr v-if="vrmObject.children !== null">
           <td>BlendShape Count</td>

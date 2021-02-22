@@ -3,7 +3,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Provide,
+  ProvideReactive,
+  Vue,
+  Watch,
+} from "vue-property-decorator";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM, VRMMeta } from "@pixiv/three-vrm";
@@ -12,6 +19,7 @@ import { Bone, Object3D, Vector3 } from "three";
 
 @Component
 export default class VRMCanvasView extends Vue {
+  @ProvideReactive("scene")
   private scene: THREE.Scene | null = null;
   private renderer: THREE.WebGLRenderer | null = null;
   private camera = new THREE.PerspectiveCamera(

@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, ProvideReactive, Vue } from "vue-property-decorator";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM, VRMMeta } from "@pixiv/three-vrm";
@@ -108,7 +108,7 @@ export default class Home extends Vue {
   @Prop()
   public materials: THREE.Material[] | undefined | null = null;
 
-  @Prop()
+  @ProvideReactive("vrmObject")
   public vrmObject: THREE.Scene | THREE.Group | null = null;
 
   @Prop()
