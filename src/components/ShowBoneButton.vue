@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="showBone"> Show </v-btn>
+  <v-btn @click="showBone">Show</v-btn>
 </template>
 
 <script lang="ts">
