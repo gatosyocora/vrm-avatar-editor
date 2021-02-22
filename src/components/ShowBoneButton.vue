@@ -66,6 +66,7 @@ export default class ShowBoneButton extends Vue {
       );
     }
     const newLine = new THREE.Line(lineGeometry, material);
+    newLine.name = node.name;
     node.children.forEach((child) => {
       newLine.children.push(this.generateBoneSupporter(child, node, material));
     });
