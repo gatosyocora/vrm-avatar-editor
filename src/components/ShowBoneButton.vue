@@ -1,5 +1,8 @@
 <template>
-  <v-btn @click="showBone">Show</v-btn>
+  <v-btn @click="!isShowing ? showBone() : hideBone()">
+    <div v-if="!isShowing">Show</div>
+    <div v-else>Hide</div>
+  </v-btn>
 </template>
 
 <script lang="ts">
@@ -19,14 +22,26 @@ export default class ShowBoneButton extends Vue {
 
   public boneObject: Line | null = null;
 
+  @Prop()
+  isShowing: boolean = false;
+
   public showBone() {
-    if (!this.vrmObject || !this.scene || this.boneObject) return;
+    if (!this.vrmObject || !this.scene || this.isShowing) return;
 
     const rootBone = this.vrmObject!.children.filter(
       (child) => child.children.length > 0 && child.children[0].type === "Bone"
     )[0];
     this.boneObject = this.generateBoneSupporter(rootBone);
-    this.scene!.add(this.boneObject);
+    this.scene.add(this.boneObject);
+
+    this.isShowing = true;
+  }
+
+  public hideBone() {
+    if (!this.boneObject || !this.scene || !this.isShowing) return;
+
+    this.scene.remove(this.boneObject);
+    this.isShowing = false;
   }
 
   generateBoneSupporter(
