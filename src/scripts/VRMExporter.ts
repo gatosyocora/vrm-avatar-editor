@@ -66,16 +66,20 @@ export default class VRMExporter {
     };
 
     // TODO: とりあえず全部ある想定で進める
-    if (
-      !scene ||
-      !humanoid ||
-      !vrmMeta ||
-      !materials ||
-      !blendShapeProxy ||
-      !lookAt ||
-      !springBone
-    ) {
-      throw new Error();
+    if (!scene) {
+      throw new Error("scene is undefined or null");
+    } else if (!humanoid) {
+      throw new Error("humanoid is undefined or null");
+    } else if (!vrmMeta) {
+      throw new Error("meta is undefined or null");
+    } else if (!materials) {
+      throw new Error("materials is undefined or null");
+    } else if (!blendShapeProxy) {
+      throw new Error("blendShapeProxy is undefined or null");
+    } else if (!lookAt) {
+      throw new Error("lookAt is undefined or null");
+    } else if (!springBone) {
+      throw new Error("springBone is undefined or null");
     }
 
     // TODO: name基準で重複除外 これでいいのか？
@@ -94,7 +98,7 @@ export default class VRMExporter {
     const images: Array<VRMImageData> = uniqueMaterials
       .filter((material) => material.map)
       .map((material) => {
-        if (!material.map) throw new Error();
+        if (!material.map) throw new Error(material.name + " map is null");
         return { name: material.name, imageBitmap: material.map.image };
       }); // TODO: 画像がないMaterialもある
     const outputImages = toOutputImages(images, icon);
@@ -197,7 +201,9 @@ export default class VRMExporter {
           ? object.children.map((child) => child as VRMSkinnedMesh)
           : [object as VRMSkinnedMesh];
       subMeshes.forEach((subMesh) => {
-        if (!subMesh.geometry.index) throw new Error();
+        if (!subMesh.geometry.index) {
+          throw new Error(subMesh.name + " geometry.index is null");
+        }
         meshDatas.push(
           new MeshData(
             subMesh.geometry.index,
@@ -212,7 +218,7 @@ export default class VRMExporter {
 
       // TODO: とりあえずundefiendは例外スロー
       if (!mesh.morphTargetDictionary) {
-        throw new Error();
+        throw new Error(mesh.name + " morphTargetDictionary is null");
       }
 
       const morphIndexPair = Object.entries(mesh.morphTargetDictionary);
