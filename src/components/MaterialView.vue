@@ -1,33 +1,40 @@
 <template>
   <div v-if="materials">
-    <div v-for="(material, index) in materials">
+    <div
+      v-for="(materialInfo, index) in toUniqueMaterialInfos(materials)"
+      :key="index"
+    >
       <v-card dark class="card">
         <v-list-item three-line>
           <v-list-item-content>
             <v-list-item-title class="headline">
-              {{ material.name }}
+              {{ materialInfo.material.name }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{ material.userData.vrmMaterialProperties.shader }}
+              {{ materialInfo.material.userData.vrmMaterialProperties.shader }}
             </v-list-item-subtitle>
             <v-list-item-subtitle> </v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-avatar
             size="80"
-            v-if="material.color"
-            :color="convertRGB2Hex(material.color)"
+            v-if="materialInfo.material.color"
+            :color="convertRGB2Hex(materialInfo.material.color)"
           />
           <div style="margin: 0 10px 0 10px">
             <v-hover v-slot="{ hover }">
               <v-list-item-avatar rounded size="80" color="white">
                 <v-img
-                  v-if="material.map && material.map.image"
-                  :src="convertImageBitmap2Base64(material.map.image)"
+                  v-if="
+                    materialInfo.material.map && materialInfo.material.map.image
+                  "
+                  :src="
+                    convertImageBitmap2Base64(materialInfo.material.map.image)
+                  "
                 >
                   <div v-if="hover" class="tex-info">
-                    {{ material.map.image.width }}x{{
-                      material.map.image.height
+                    {{ materialInfo.material.map.image.width }}x{{
+                      materialInfo.material.map.image.height
                     }}
                   </div>
                 </v-img>
@@ -39,17 +46,26 @@
       </v-card>
     </div>
   </div>
+  <div v-else>aaa</div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import * as THREE from "three";
-import { VRM, VRMMeta } from "@pixiv/three-vrm";
+
+interface MaterialInfo {
+  name: string;
+  material: THREE.Material;
+  indices: Array<number>;
+}
 
 @Component
 export default class MaterialView extends Vue {
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials: Array<THREE.Material> | undefined | null = null;
+
+  @Prop()
+  public uniqueMaterialInfos: Array<MaterialInfo> | null = null;
 
   public convertRGB2Hex(color: THREE.Vector3 | THREE.Vector4): String {
     const r = Math.round(Number(color.x) * 255);
@@ -64,6 +80,27 @@ export default class MaterialView extends Vue {
     canvas.height = image.height;
     canvas.getContext("2d")!.drawImage(image, 0, 0);
     return canvas.toDataURL();
+  }
+
+  public toUniqueMaterialInfos(
+    materials: Array<THREE.Material>
+  ): Array<MaterialInfo> {
+    const materialInfos = Array<MaterialInfo>();
+    for (let i = 0; i < materials.length; i++) {
+      const index = materialInfos
+        .map((info) => info.name)
+        .indexOf(materials[i].name);
+      if (index === -1) {
+        materialInfos.push({
+          name: materials[i].name,
+          material: materials[i],
+          indices: [i],
+        });
+      } else {
+        materialInfos[index].indices.push(i);
+      }
+    }
+    return materialInfos;
   }
 }
 </script>
