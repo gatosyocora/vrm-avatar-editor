@@ -5,9 +5,11 @@
       :key="index"
     >
       <p>{{ blendShapeInfo.meshName }}</p>
-      <ul v-for="(morphName, index) in blendShapeInfo.morphNames" :key="index">
-        <li>{{ morphName }}</li>
-      </ul>
+      <div v-for="(morphName, index) in blendShapeInfo.morphNames" :key="index">
+        <div>
+          <v-slider :label="morphName" min="0" max="100"></v-slider>
+        </div>
+      </div>
     </div>
   </div>
 </template>
