@@ -34,6 +34,9 @@
           <v-tab @click="changeTab(2)" :class="{ active: currentTab === 2 }"
             >Model</v-tab
           >
+          <v-tab @click="changeTab(3)" :class="{ active: currentTab === 3 }"
+            >BlendShape</v-tab
+          >
         </v-tabs>
         <div class="margin-area contents full-height">
           <div v-show="currentTab === 0">
@@ -44,6 +47,9 @@
           </div>
           <div v-show="currentTab === 2">
             <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
+          </div>
+          <div v-show="currentTab === 3">
+            <BlendShapeView :vrmObject="vrmObject" />
           </div>
           <ExportButton :vrm="vrm" />
         </div>
@@ -84,6 +90,7 @@ import MetaView from "@/components/MetaView.vue";
 import MaterialView from "@/components/MaterialView.vue";
 import ModelInfoView from "@/components/ModelInfoView.vue";
 import ExportButton from "@/components/ExportButton.vue";
+import BlendShapeView from "@/components/BlendShapeView.vue";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -96,6 +103,7 @@ interface HTMLInputEvent extends Event {
     MaterialView,
     ModelInfoView,
     ExportButton,
+    BlendShapeView,
   },
 })
 export default class Home extends Vue {
