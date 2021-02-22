@@ -12,7 +12,7 @@ import { Bone, Line, LineBasicMaterial, Object3D, Scene, Vector3 } from "three";
 @Component
 export default class ShowBoneButton extends Vue {
   @Prop()
-  public vrm: VRM | null = null;
+  public vrmScene: THREE.Scene | THREE.Group | null = null;
 
   @Prop()
   public scene: Scene | null = null;
@@ -20,9 +20,9 @@ export default class ShowBoneButton extends Vue {
   public boneObject: Line | null = null;
 
   public showBone() {
-    if (!this.vrm || !this.scene || this.boneObject) return;
+    if (!this.vrmScene || !this.scene || this.boneObject) return;
 
-    const rootBone = this.vrm.scene.children.filter(
+    const rootBone = this.vrmScene.children.filter(
       (child) => child.children.length > 0 && child.children[0].type === "Bone"
     )[0];
     this.boneObject = this.generateBoneSupporter(rootBone);
