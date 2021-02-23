@@ -62,6 +62,10 @@
           <td>Reference</td>
           <td>{{ meta.reference }}</td>
         </tr>
+        <tr>
+          <td>ExporterVersion</td>
+          <td>{{ exporterVersion }}</td>
+        </tr>
       </tbody>
     </v-simple-table>
   </div>
@@ -82,6 +86,9 @@ export default class MetaView extends Vue {
 
   @Prop()
   public vrmObject: THREE.Scene | THREE.Group | null = null;
+
+  @Prop()
+  public exporterVersion: string = "";
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>

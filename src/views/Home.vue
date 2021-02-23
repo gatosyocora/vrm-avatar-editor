@@ -37,7 +37,7 @@
         </v-tabs>
         <div class="margin-area contents full-height">
           <div v-show="currentTab === 0">
-            <MetaView :meta="meta" />
+            <MetaView :meta="meta" :exporterVersion="exporterVersion" />
           </div>
           <div v-show="currentTab === 1">
             <MaterialView :materials="materials" />
@@ -112,6 +112,9 @@ export default class Home extends Vue {
   public vrmObject: THREE.Scene | THREE.Group | null = null;
 
   @Prop()
+  public exporterVersion: string = "";
+
+  @Prop()
   public currentTab: Number = 0;
 
   public isDragOver: boolean = false;
@@ -147,15 +150,20 @@ export default class Home extends Vue {
       // called when the resource is loaded
       (gltf) => {
         console.log(gltf);
-        // generate a VRM instance from gltf
-        VRM.from(gltf).then((vrm) => {
-          // deal with vrm features
-          this.vrm = vrm;
-          this.meta = vrm.meta;
-          this.materials = vrm.materials;
-          this.vrmObject = vrm.scene;
-          console.log(vrm);
-        });
+        const vrmExtension = gltf.userData.gltfExtensions.VRM;
+        this.exporterVersion = vrmExtension.exporterVersion
+          ? vrmExtension.exporterVersion
+          : "UniVRM-" + vrmExtension.version;
+        console.log(this.exporterVersion);
+        VRM.from(gltf) // generate a VRM instance from gltf
+          .then((vrm) => {
+            // deal with vrm features
+            this.vrm = vrm;
+            this.meta = vrm.meta;
+            this.materials = vrm.materials;
+            this.vrmObject = vrm.scene;
+            console.log(vrm);
+          });
       },
 
       // called while loading is progressing
