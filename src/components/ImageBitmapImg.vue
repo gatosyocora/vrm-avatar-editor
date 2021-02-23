@@ -3,7 +3,7 @@
     <v-hover v-slot="{ hover }">
       <v-list-item-avatar rounded size="80" color="white">
         <v-img v-if="imageBitmap" :src="convertImageBitmap2Base64(imageBitmap)">
-          <div v-if="hover" class="tex-info">
+          <div v-if="viewInfo && hover" class="tex-info">
             {{ imageBitmap.width }}x{{ imageBitmap.height }}
           </div>
         </v-img>
@@ -27,6 +27,9 @@ interface MaterialInfo {
 export default class ImageBitmapImg extends Vue {
   @Prop()
   public imageBitmap!: ImageBitmap;
+
+  @Prop({ default: true })
+  public viewInfo!: boolean;
 
   public convertImageBitmap2Base64(image: ImageBitmap): string {
     const canvas = document.createElement("canvas");

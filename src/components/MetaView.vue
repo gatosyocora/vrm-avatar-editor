@@ -63,6 +63,18 @@
           <td>{{ meta.reference }}</td>
         </tr>
         <tr>
+          <td>Icon</td>
+          <td>
+            <div v-if="meta.texture && meta.texture.image">
+              <ImageBitmapImg
+                :imageBitmap="meta.texture.image"
+                :viewInfo="false"
+              />
+            </div>
+            <div v-else>None</div>
+          </td>
+        </tr>
+        <tr>
           <td>ExporterVersion</td>
           <td>{{ exporterVersion }}</td>
         </tr>
@@ -79,7 +91,11 @@ import { VRM, VRMMeta } from "@pixiv/three-vrm";
 
 import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 
-@Component
+import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
+
+@Component({
+  components: { ImageBitmapImg },
+})
 export default class MetaView extends Vue {
   @Prop()
   public meta: VRMMeta | undefined | null = null;
