@@ -3,7 +3,7 @@
     <v-hover v-slot="{ hover }">
       <v-list-item-avatar rounded size="80" color="white">
         <v-img v-if="imageBitmap" :src="convertImageBitmap2Base64(imageBitmap)">
-          <div v-if="viewInfo && hover" class="tex-info">
+          <div v-if="viewInfo && hover" class="tex-info unselectable">
             {{ imageBitmap.width }}x{{ imageBitmap.height }}
           </div>
         </v-img>
@@ -47,5 +47,12 @@ export default class ImageBitmapImg extends Vue {
   opacity: 0.75;
   width: 100%;
   height: 100%;
+}
+
+.unselectable {
+  user-select: none; /* CSS3 */
+  -moz-user-select: none; /* Firefox */
+  -webkit-user-select: none; /* Safari、Chromeなど */
+  -ms-user-select: none; /* IE10以降 */
 }
 </style>
