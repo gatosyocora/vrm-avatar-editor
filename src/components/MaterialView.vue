@@ -13,7 +13,11 @@
             <v-list-item-subtitle>
               {{ materialInfo.material.userData.vrmMaterialProperties.shader }}
             </v-list-item-subtitle>
-            <v-list-item-subtitle> </v-list-item-subtitle>
+            <v-list-item-subtitle>
+              <div v-if="materialInfo.material.side === 0">FrontSide</div>
+              <div v-else-if="materialInfo.material.side === 1">BackSide</div>
+              <div v-else>BothSide</div>
+            </v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-avatar
