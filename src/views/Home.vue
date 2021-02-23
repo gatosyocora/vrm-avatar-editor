@@ -1,6 +1,6 @@
 <template>
   <div class="home full">
-    <v-app-bar danse dark>
+    <v-app-bar danse dark id="app-bar">
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -38,7 +38,7 @@
             >Model</v-tab
           >
         </v-tabs>
-        <div class="margin-area contents full-height">
+        <div class="margin-area contents">
           <div v-show="currentTab === 0">
             <MetaView :meta="meta" :exporterVersion="exporterVersion" />
           </div>
@@ -259,15 +259,22 @@ body {
   height: 100%;
 }
 
+#app-bar {
+  z-index: 999;
+}
+
 #main {
   float: none;
   z-index: 0;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #menu {
   float: right;
   width: 30%;
+  height: 90%;
   z-index: 9;
   position: relative;
 }
