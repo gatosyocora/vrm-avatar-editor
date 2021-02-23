@@ -18,6 +18,9 @@
         target="_blank"
         >License</v-btn
       >
+      <v-btn @click="reloadPage" icon>
+        <v-icon>mdi-cached</v-icon>
+      </v-btn>
     </v-app-bar>
     <p id="message">
       ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
@@ -181,6 +184,10 @@ export default class Home extends Vue {
 
   public changeTab(tabNumber: Number) {
     this.currentTab = tabNumber;
+  }
+
+  public reloadPage() {
+    location.reload();
   }
 }
 </script>
