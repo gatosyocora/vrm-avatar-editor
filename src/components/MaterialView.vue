@@ -25,27 +25,10 @@
             v-if="materialInfo.material.color"
             :color="convertRGB2Hex(materialInfo.material.color)"
           />
-          <div style="margin: 0 10px 0 10px">
-            <v-hover v-slot="{ hover }">
-              <v-list-item-avatar rounded size="80" color="white">
-                <v-img
-                  v-if="
-                    materialInfo.material.map && materialInfo.material.map.image
-                  "
-                  :src="
-                    convertImageBitmap2Base64(materialInfo.material.map.image)
-                  "
-                >
-                  <div v-if="hover" class="tex-info">
-                    {{ materialInfo.material.map.image.width }}x{{
-                      materialInfo.material.map.image.height
-                    }}
-                  </div>
-                </v-img>
-                <span style="color: black" v-else> none </span>
-              </v-list-item-avatar>
-            </v-hover>
-          </div>
+          <ImageBitmapImg
+            v-if="materialInfo.material.map && materialInfo.material.map.image"
+            :imageBitmap="materialInfo.material.map.image"
+          />
         </v-list-item>
       </v-card>
     </div>
@@ -56,13 +39,17 @@
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import * as THREE from "three";
 
+import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
+
 interface MaterialInfo {
   name: string;
   material: THREE.Material;
   indices: Array<number>;
 }
 
-@Component
+@Component({
+  components: { ImageBitmapImg },
+})
 export default class MaterialView extends Vue {
   @Prop()
   public materials: Array<THREE.Material> | undefined | null = null;
@@ -75,14 +62,6 @@ export default class MaterialView extends Vue {
     const g = Math.round(Number(color.y) * 255);
     const b = Math.round(Number(color.z) * 255);
     return "#" + r.toString(16) + g.toString(16) + b.toString(16);
-  }
-
-  public convertImageBitmap2Base64(image: ImageBitmap): string {
-    const canvas = document.createElement("canvas");
-    canvas.width = image.width;
-    canvas.height = image.height;
-    canvas.getContext("2d")!.drawImage(image, 0, 0);
-    return canvas.toDataURL();
   }
 
   public toUniqueMaterialInfos(
