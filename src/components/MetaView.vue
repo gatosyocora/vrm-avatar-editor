@@ -66,16 +66,12 @@
           <td>Icon</td>
           <td>
             <DragAndDroppableArea @onDropFile="changeIconFile">
-              <div v-if="iconData">
-                <ImageBitmapImg :imageBitmap="iconData" :showInfo="false" />
-              </div>
-              <div v-else-if="meta.texture && meta.texture.image">
+              <div v-if="meta.texture && meta.texture.image">
                 <ImageBitmapImg
                   :imageBitmap="meta.texture.image"
                   :showInfo="false"
                 />
               </div>
-
               <div v-else>None</div>
             </DragAndDroppableArea>
           </td>
@@ -115,9 +111,6 @@ export default class MetaView extends Vue {
 
   @Prop()
   public exporterVersion: string = "";
-
-  @Prop()
-  public iconData: ImageBitmap | null = null;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>
@@ -164,7 +157,9 @@ export default class MetaView extends Vue {
     const image = new Image();
     image.onload = (_) => {
       Promise.resolve(createImageBitmap(image)).then((data) => {
-        this.iconData = data;
+        if (this.meta && this.meta.texture) {
+          this.meta.texture.image = data;
+        }
       });
     };
     image.src = url;
