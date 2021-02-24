@@ -101,13 +101,13 @@ import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 })
 export default class MetaView extends Vue {
   @Prop()
-  public meta: VRMMeta | undefined | null = null;
+  public meta!: VRMMeta | undefined | null;
 
   @Prop()
-  public vrmObject: THREE.Scene | THREE.Group | null = null;
+  public vrmObject!: THREE.Scene | THREE.Group | null;
 
   @Prop()
-  public exporterVersion: string = "";
+  public exporterVersion!: string;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>

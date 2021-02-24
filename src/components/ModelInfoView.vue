@@ -47,10 +47,10 @@ import ShowBoneButton from "@/components/ShowBoneButton.vue";
 })
 export default class ModelInfoView extends Vue {
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials!: THREE.Material[] | null;
 
   @Prop()
-  public vrmObject: THREE.Scene | THREE.Group | null = null;
+  public vrmObject!: THREE.Scene | THREE.Group | null;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>
