@@ -68,7 +68,7 @@
             <div v-if="meta.texture && meta.texture.image">
               <ImageBitmapImg
                 :imageBitmap="meta.texture.image"
-                :viewInfo="false"
+                :showInfo="false"
               />
             </div>
             <div v-else>None</div>
