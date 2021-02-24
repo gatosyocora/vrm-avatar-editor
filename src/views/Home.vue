@@ -102,22 +102,22 @@ interface HTMLInputEvent extends Event {
 })
 export default class Home extends Vue {
   @Prop()
-  public vrm: VRM | null = null;
+  public vrm!: VRM | null;
 
   @Prop()
-  public meta: VRMMeta | undefined | null = null;
+  public meta!: VRMMeta | undefined | null;
 
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials!: THREE.Material[] | undefined | null;
 
   @ProvideReactive("vrmObject")
   public vrmObject: THREE.Scene | THREE.Group | null = null;
 
   @Prop()
-  public exporterVersion: string = "";
+  public exporterVersion!: string;
 
-  @Prop()
-  public currentTab: Number = 0;
+  @Prop({ default: 0 })
+  public currentTab!: Number;
 
   public onFileChange(e: HTMLInputEvent) {
     if (e.target.files === null) return;

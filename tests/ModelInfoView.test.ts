@@ -4,8 +4,86 @@ import ModelInfoView from "@/components/ModelInfoView.vue";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM } from "@pixiv/three-vrm";
+import {
+  Bone,
+  BufferAttribute,
+  BufferGeometry,
+  Group,
+  Object3D,
+  SkinnedMesh,
+} from "three";
 
 const vrmModels = [{ name: "Shapell", path: "./vrm/shapell3.vrm" }];
+
+const number3 = [0, 0, 0];
+
+let testModel: Object3D;
+beforeAll(() => {
+  testModel = new Object3D();
+  const rootBone = new Object3D();
+  const bone1 = new Bone();
+  rootBone.children.push(bone1);
+  const bone2 = new Bone();
+  const bone3 = new Bone();
+  bone1.children.push(bone2, bone3);
+  const bone4 = new Bone();
+  bone2.children.push(bone4);
+  const bone5 = new Bone();
+  bone3.children.push(bone5);
+  const geometry = new BufferGeometry();
+  const attribute = new BufferAttribute(
+    new Float32Array([...number3, ...number3, ...number3]),
+    3
+  );
+  geometry.setAttribute("position", attribute);
+  geometry.setAttribute("normal", attribute);
+  const groupMesh = new Group();
+  groupMesh.children.push(new SkinnedMesh(geometry), new SkinnedMesh(geometry));
+  const mesh = new SkinnedMesh(geometry);
+  testModel.children.push(rootBone, groupMesh, mesh);
+});
+
+describe("getMeshCount", () => {
+  test("can execute", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    wrapper.vm.$emit("getMeshCount", testModel.children);
+    expect(wrapper.emitted("getMeshCount")).toBeDefined();
+  });
+  test("return correct value", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vm = wrapper.vm as any;
+    expect(vm.getMeshCount(testModel.children)).toBe(2);
+  });
+});
+
+describe("getPolygonCount", () => {
+  test("can execute", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    wrapper.vm.$emit("getPolygonCount", testModel.children);
+    expect(wrapper.emitted("getPolygonCount")).toBeDefined();
+  });
+  test("return correct value", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vm = wrapper.vm as any;
+    expect(vm.getPolygonCount(testModel.children)).toBe(6);
+  });
+});
+
+describe("getBoneCount", () => {
+  test("can execute", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    wrapper.vm.$emit("getBoneCount", testModel.children);
+    expect(wrapper.emitted("getBoneCount")).toBeDefined();
+  });
+  test("return correct value", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vm = wrapper.vm as any;
+    expect(vm.getBoneCount(testModel.children)).toBe(5);
+  });
+});
 
 // TODO: ちゃんとテストができるように修正する
 describe.skip.each(vrmModels)("getMeshCount", (vrmModel) => {

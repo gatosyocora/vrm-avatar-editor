@@ -34,13 +34,13 @@ export default class VRMCanvasView extends Vue {
   private controls: OrbitControls | null = null;
 
   @Prop()
-  public meta: VRMMeta | undefined | null = null;
+  public meta!: VRMMeta | undefined | null;
 
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials!: THREE.Material[] | undefined | null;
 
   @Prop()
-  public vrmObject: THREE.Scene | THREE.Group | null = null;
+  public vrmObject!: THREE.Scene | THREE.Group | null;
 
   mounted() {
     const $canvas = <HTMLCanvasElement>document.getElementById("canvas");

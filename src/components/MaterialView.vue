@@ -75,10 +75,10 @@ interface HSVColor {
 })
 export default class MaterialView extends Vue {
   @Prop()
-  public materials: Array<THREE.Material> | undefined | null = null;
+  public materials!: Array<THREE.Material> | undefined | null;
 
   @Prop()
-  public uniqueMaterialInfos: Array<MaterialInfo> | null = null;
+  public uniqueMaterialInfos!: Array<MaterialInfo> | null;
 
   public convertRGB2Hex(color: THREE.Vector3 | THREE.Vector4): String {
     const r = Math.round(Number(color.x) * 255);
