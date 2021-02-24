@@ -124,7 +124,7 @@ export default class MaterialView extends Vue {
 
     this.changeColorForDot(ctx!, imageBitmap, (color: RGBColor) => {
       const hsv = this.rgb2hsv(color);
-      hsv.h *= materialInfo.value;
+      hsv.h = materialInfo.value * 255;
       return this.hsv2rgb(hsv);
     });
 
