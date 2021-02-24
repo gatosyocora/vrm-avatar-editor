@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { VRM } from "@pixiv/three-vrm";
 import {
+  Bone,
   BufferAttribute,
   BufferGeometry,
   Group,
@@ -20,6 +21,15 @@ let testModel: Object3D;
 beforeAll(() => {
   testModel = new Object3D();
   const rootBone = new Object3D();
+  const bone1 = new Bone();
+  rootBone.children.push(bone1);
+  const bone2 = new Bone();
+  const bone3 = new Bone();
+  bone1.children.push(bone2, bone3);
+  const bone4 = new Bone();
+  bone2.children.push(bone4);
+  const bone5 = new Bone();
+  bone3.children.push(bone5);
   const geometry = new BufferGeometry();
   const attribute = new BufferAttribute(
     new Float32Array([...number3, ...number3, ...number3]),
@@ -58,6 +68,20 @@ describe("getPolygonCount", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vm = wrapper.vm as any;
     expect(vm.getPolygonCount(testModel.children)).toBe(6);
+  });
+});
+
+describe("getBoneCount", () => {
+  test("can execute", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    wrapper.vm.$emit("getBoneCount", testModel.children);
+    expect(wrapper.emitted("getBoneCount")).toBeDefined();
+  });
+  test("return correct value", () => {
+    const wrapper = shallowMount(ModelInfoView);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vm = wrapper.vm as any;
+    expect(vm.getBoneCount(testModel.children)).toBe(5);
   });
 });
 
