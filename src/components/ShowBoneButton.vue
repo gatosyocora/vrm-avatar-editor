@@ -22,8 +22,8 @@ export default class ShowBoneButton extends Vue {
 
   public boneObject!: Line | null;
 
-  @Prop()
-  isShowing: boolean = false;
+  @Prop({ default: false })
+  isShowing!: boolean;
 
   public showBone() {
     if (!this.vrmObject || !this.scene || this.isShowing) return;
