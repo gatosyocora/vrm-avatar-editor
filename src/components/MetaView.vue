@@ -66,13 +66,10 @@
           <td>Icon</td>
           <td>
             <DragAndDroppableArea @onDropFile="changeIconFile">
-              <div v-if="meta.texture && meta.texture.image">
-                <ImageBitmapImg
-                  :imageBitmap="meta.texture.image"
-                  :showInfo="false"
-                />
-              </div>
-              <div v-else>None</div>
+              <ImageBitmapImg
+                :imageBitmap="meta.texture ? meta.texture.image : undefined"
+                :showInfo="false"
+              />
             </DragAndDroppableArea>
           </td>
         </tr>
@@ -157,7 +154,10 @@ export default class MetaView extends Vue {
     const image = new Image();
     image.onload = (_) => {
       Promise.resolve(createImageBitmap(image)).then((data) => {
-        if (this.meta && this.meta.texture) {
+        if (this.meta) {
+          if (!this.meta.texture) {
+            this.meta.texture = new THREE.Texture();
+          }
           this.meta.texture.image = data;
         }
       });
