@@ -65,13 +65,19 @@
         <tr>
           <td>Icon</td>
           <td>
-            <div v-if="meta.texture && meta.texture.image">
-              <ImageBitmapImg
-                :imageBitmap="meta.texture.image"
-                :showInfo="false"
-              />
-            </div>
-            <div v-else>None</div>
+            <DragAndDroppableArea @onDropFile="changeIconFile">
+              <div v-if="iconData">
+                <ImageBitmapImg :imageBitmap="iconData" :showInfo="false" />
+              </div>
+              <div v-else-if="meta.texture && meta.texture.image">
+                <ImageBitmapImg
+                  :imageBitmap="meta.texture.image"
+                  :showInfo="false"
+                />
+              </div>
+
+              <div v-else>None</div>
+            </DragAndDroppableArea>
           </td>
         </tr>
         <tr>
@@ -92,9 +98,13 @@ import { VRM, VRMMeta } from "@pixiv/three-vrm";
 import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 
 import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
+import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 
 @Component({
-  components: { ImageBitmapImg },
+  components: {
+    ImageBitmapImg,
+    DragAndDroppableArea,
+  },
 })
 export default class MetaView extends Vue {
   @Prop()
@@ -105,6 +115,9 @@ export default class MetaView extends Vue {
 
   @Prop()
   public exporterVersion: string = "";
+
+  @Prop()
+  public iconData: ImageBitmap | null = null;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>
@@ -145,6 +158,16 @@ export default class MetaView extends Vue {
       }
     });
     return count;
+  }
+
+  public changeIconFile(url: string) {
+    const image = new Image();
+    image.onload = (_) => {
+      Promise.resolve(createImageBitmap(image)).then((data) => {
+        this.iconData = data;
+      });
+    };
+    image.src = url;
   }
 }
 </script>
