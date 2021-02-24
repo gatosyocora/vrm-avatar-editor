@@ -55,13 +55,10 @@
 
     <div id="main" class="full">
       <div class="top full">
-        <div
+        <DragAndDroppableArea
           v-if="vrmObject === null"
           class="layer2 layer full"
-          :class="{ outline: isDragOver }"
-          @dragover.prevent="onDrag('over')"
-          @dragleave.prevent="onDrag('leave')"
-          @drop.prevent="onDrop"
+          @onDropFile="loadVrm"
         >
           <div class="white-color">
             <center>
@@ -69,7 +66,7 @@
               <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
             </center>
           </div>
-        </div>
+        </DragAndDroppableArea>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer full" />
       </div>
     </div>
@@ -87,6 +84,7 @@ import MetaView from "@/components/MetaView.vue";
 import MaterialView from "@/components/MaterialView.vue";
 import ModelInfoView from "@/components/ModelInfoView.vue";
 import ExportButton from "@/components/ExportButton.vue";
+import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -99,6 +97,7 @@ interface HTMLInputEvent extends Event {
     MaterialView,
     ModelInfoView,
     ExportButton,
+    DragAndDroppableArea,
   },
 })
 export default class Home extends Vue {
@@ -119,21 +118,6 @@ export default class Home extends Vue {
 
   @Prop()
   public currentTab: Number = 0;
-
-  public isDragOver: boolean = false;
-
-  public onDrag(type: string) {
-    this.isDragOver = type === "over";
-  }
-  public onDrop(e: DragEvent) {
-    if (e.dataTransfer === null || e.dataTransfer.files === null) return;
-
-    this.isDragOver = false;
-    const file = e.dataTransfer.files[0];
-    const url: string = window.URL.createObjectURL(file);
-
-    this.loadVrm(url);
-  }
 
   public onFileChange(e: HTMLInputEvent) {
     if (e.target.files === null) return;
@@ -239,9 +223,6 @@ export default class Home extends Vue {
 }
 .white-color {
   color: #ffffff;
-}
-.outline {
-  outline: 5px dashed red;
 }
 .margin-area {
   margin: 20px;
