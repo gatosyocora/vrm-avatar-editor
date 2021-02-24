@@ -43,7 +43,10 @@
             <MetaView :meta="meta" :exporterVersion="exporterVersion" />
           </div>
           <div v-show="currentTab === 1">
-            <MaterialView :materials="materials" />
+            <MaterialView
+              :materials="materials"
+              @onChangeMaterial="updateMaterial"
+            />
           </div>
           <div v-show="currentTab === 2">
             <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
@@ -85,6 +88,12 @@ import MaterialView from "@/components/MaterialView.vue";
 import ModelInfoView from "@/components/ModelInfoView.vue";
 import ExportButton from "@/components/ExportButton.vue";
 import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
+import {
+  Material,
+  MeshBasicMaterial,
+  MeshStandardMaterial,
+  SkinnedMesh,
+} from "three";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -164,6 +173,27 @@ export default class Home extends Vue {
       // called when loading has errors
       (error) => console.error(error)
     );
+  }
+
+  public updateMaterial(changedMaterial: Material) {
+    this.vrmObject?.traverse((mesh) => {
+      if (mesh.type === "SkinnedMesh") {
+        if (
+          ((mesh as SkinnedMesh).material as Array<Material>)[0].name ===
+          changedMaterial.name
+        ) {
+          const newMaterial = changedMaterial.clone() as
+            | MeshBasicMaterial
+            | MeshStandardMaterial;
+          ((mesh as SkinnedMesh).material as Array<Material>)[0] = newMaterial;
+          newMaterial.needsUpdate = true;
+
+          if (newMaterial.map) {
+            newMaterial.map.needsUpdate = true;
+          }
+        }
+      }
+    });
   }
 
   public changeTab(tabNumber: Number) {

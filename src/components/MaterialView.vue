@@ -134,6 +134,7 @@ export default class MaterialView extends Vue {
       Promise.resolve(createImageBitmap(image)).then((data) => {
         if (material.map) {
           material.map.image = data;
+          this.$emit("onChangeMaterial", material);
         }
       });
     };
