@@ -14,13 +14,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import * as THREE from "three";
+import { Material } from "three";
 
 import MaterialItem from "@/components/MaterialItem.vue";
 
 interface MaterialInfo {
   name: string;
-  material: THREE.Material;
+  material: Material;
   indices: Array<number>;
   value: number;
 }
@@ -30,13 +30,13 @@ interface MaterialInfo {
 })
 export default class MaterialView extends Vue {
   @Prop()
-  public materials!: Array<THREE.Material> | undefined | null;
+  public materials!: Array<Material> | undefined | null;
 
   @Prop()
   public uniqueMaterialInfos!: Array<MaterialInfo> | null;
 
   public toUniqueMaterialInfos(
-    materials: Array<THREE.Material>
+    materials: Array<Material>
   ): Array<MaterialInfo> {
     const materialInfos = Array<MaterialInfo>();
     for (let i = 0; i < materials.length; i++) {
@@ -57,7 +57,7 @@ export default class MaterialView extends Vue {
     return materialInfos;
   }
 
-  public changeMaterial(material: THREE.Material) {
+  public changeMaterial(material: Material) {
     this.$emit("onChangeMaterial", material);
   }
 }

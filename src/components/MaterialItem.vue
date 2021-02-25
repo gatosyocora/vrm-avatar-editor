@@ -39,16 +39,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import * as THREE from "three";
+import { Material, MeshBasicMaterial, MeshStandardMaterial } from "three";
 
 import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
 import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
-import { MeshBasicMaterial, MeshStandardMaterial } from "three";
 import { loadImage } from "@/scripts/ImageUtils";
 
 interface MaterialInfo {
   name: string;
-  material: THREE.Material;
+  material: Material;
   indices: Array<number>;
   value: number;
 }
