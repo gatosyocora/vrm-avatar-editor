@@ -93,6 +93,8 @@ import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
 import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 
+import { loadImage } from "@/scripts/ImageUtils.ts";
+
 @Component({
   components: {
     ImageBitmapImg,
@@ -150,19 +152,15 @@ export default class MetaView extends Vue {
     return count;
   }
 
-  public changeIconFile(url: string) {
-    const image = new Image();
-    image.onload = (_) => {
-      Promise.resolve(createImageBitmap(image)).then((data) => {
-        if (this.meta) {
-          if (!this.meta.texture) {
-            this.meta.texture = new THREE.Texture();
-          }
-          this.meta.texture.image = data;
-        }
-      });
-    };
-    image.src = url;
+  public async changeIconFile(url: string) {
+    if (this.meta) {
+      const data = await loadImage(url);
+      if (!data) return;
+      if (!this.meta.texture) {
+        this.meta.texture = new THREE.Texture();
+      }
+      this.meta.texture.image = data;
+    }
   }
 }
 </script>
