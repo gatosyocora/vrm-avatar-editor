@@ -62,6 +62,21 @@
           <td>Reference</td>
           <td>{{ meta.reference }}</td>
         </tr>
+        <tr>
+          <td>Icon</td>
+          <td>
+            <DragAndDroppableArea @onDropFile="changeIconFile">
+              <ImageBitmapImg
+                :imageBitmap="meta.texture ? meta.texture.image : undefined"
+                :showInfo="false"
+              />
+            </DragAndDroppableArea>
+          </td>
+        </tr>
+        <tr>
+          <td>ExporterVersion</td>
+          <td>{{ exporterVersion }}</td>
+        </tr>
       </tbody>
     </v-simple-table>
   </div>
@@ -75,13 +90,24 @@ import { VRM, VRMMeta } from "@pixiv/three-vrm";
 
 import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 
-@Component
+import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
+import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
+
+@Component({
+  components: {
+    ImageBitmapImg,
+    DragAndDroppableArea,
+  },
+})
 export default class MetaView extends Vue {
   @Prop()
-  public meta: VRMMeta | undefined | null = null;
+  public meta!: VRMMeta | undefined | null;
 
   @Prop()
-  public vrmObject: THREE.Scene | THREE.Group | null = null;
+  public vrmObject!: THREE.Scene | THREE.Group | null;
+
+  @Prop()
+  public exporterVersion!: string;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>
@@ -122,6 +148,21 @@ export default class MetaView extends Vue {
       }
     });
     return count;
+  }
+
+  public changeIconFile(url: string) {
+    const image = new Image();
+    image.onload = (_) => {
+      Promise.resolve(createImageBitmap(image)).then((data) => {
+        if (this.meta) {
+          if (!this.meta.texture) {
+            this.meta.texture = new THREE.Texture();
+          }
+          this.meta.texture.image = data;
+        }
+      });
+    };
+    image.src = url;
   }
 }
 </script>

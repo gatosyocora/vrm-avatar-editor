@@ -15,7 +15,7 @@ import VRMExporter from "@/scripts/VRMExporter";
 @Component
 export default class ExportButton extends Vue {
   @Prop()
-  public vrm: VRM | null = null;
+  public vrm!: VRM | null;
 
   public exportVRM() {
     if (!this.vrm) return;

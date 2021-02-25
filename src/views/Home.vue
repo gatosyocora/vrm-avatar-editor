@@ -1,6 +1,6 @@
 <template>
   <div class="home full">
-    <v-app-bar danse dark>
+    <v-app-bar danse dark id="app-bar">
       <v-toolbar-title>VRM Avatar Editor</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -18,6 +18,9 @@
         target="_blank"
         >License</v-btn
       >
+      <v-btn @click="reloadPage" icon>
+        <v-icon>mdi-cached</v-icon>
+      </v-btn>
     </v-app-bar>
     <p id="message">
       ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
@@ -35,9 +38,9 @@
             >Model</v-tab
           >
         </v-tabs>
-        <div class="margin-area contents full-height">
+        <div class="margin-area contents">
           <div v-show="currentTab === 0">
-            <MetaView :meta="meta" />
+            <MetaView :meta="meta" :exporterVersion="exporterVersion" />
           </div>
           <div v-show="currentTab === 1">
             <MaterialView :materials="materials" />
@@ -52,13 +55,10 @@
 
     <div id="main" class="full">
       <div class="top full">
-        <div
+        <DragAndDroppableArea
           v-if="vrmObject === null"
           class="layer2 layer full"
-          :class="{ outline: isDragOver }"
-          @dragover.prevent="onDrag('over')"
-          @dragleave.prevent="onDrag('leave')"
-          @drop.prevent="onDrop"
+          @onDropFile="loadVrm"
         >
           <div class="white-color">
             <center>
@@ -66,7 +66,7 @@
               <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
             </center>
           </div>
-        </div>
+        </DragAndDroppableArea>
         <VRMCanvas :vrmObject="vrmObject" class="layer1 layer full" />
       </div>
     </div>
@@ -84,6 +84,7 @@ import MetaView from "@/components/MetaView.vue";
 import MaterialView from "@/components/MaterialView.vue";
 import ModelInfoView from "@/components/ModelInfoView.vue";
 import ExportButton from "@/components/ExportButton.vue";
+import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -96,38 +97,27 @@ interface HTMLInputEvent extends Event {
     MaterialView,
     ModelInfoView,
     ExportButton,
+    DragAndDroppableArea,
   },
 })
 export default class Home extends Vue {
   @Prop()
-  public vrm: VRM | null = null;
+  public vrm!: VRM | null;
 
   @Prop()
-  public meta: VRMMeta | undefined | null = null;
+  public meta!: VRMMeta | undefined | null;
 
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials!: THREE.Material[] | undefined | null;
 
   @ProvideReactive("vrmObject")
   public vrmObject: THREE.Scene | THREE.Group | null = null;
 
   @Prop()
-  public currentTab: Number = 0;
+  public exporterVersion!: string;
 
-  public isDragOver: boolean = false;
-
-  public onDrag(type: string) {
-    this.isDragOver = type === "over";
-  }
-  public onDrop(e: DragEvent) {
-    if (e.dataTransfer === null || e.dataTransfer.files === null) return;
-
-    this.isDragOver = false;
-    const file = e.dataTransfer.files[0];
-    const url: string = window.URL.createObjectURL(file);
-
-    this.loadVrm(url);
-  }
+  @Prop({ default: 0 })
+  public currentTab!: Number;
 
   public onFileChange(e: HTMLInputEvent) {
     if (e.target.files === null) return;
@@ -147,15 +137,20 @@ export default class Home extends Vue {
       // called when the resource is loaded
       (gltf) => {
         console.log(gltf);
-        // generate a VRM instance from gltf
-        VRM.from(gltf).then((vrm) => {
-          // deal with vrm features
-          this.vrm = vrm;
-          this.meta = vrm.meta;
-          this.materials = vrm.materials;
-          this.vrmObject = vrm.scene;
-          console.log(vrm);
-        });
+        const vrmExtension = gltf.userData.gltfExtensions.VRM;
+        this.exporterVersion = vrmExtension.exporterVersion
+          ? vrmExtension.exporterVersion
+          : "UniVRM-" + vrmExtension.version;
+        console.log(this.exporterVersion);
+        VRM.from(gltf) // generate a VRM instance from gltf
+          .then((vrm) => {
+            // deal with vrm features
+            this.vrm = vrm;
+            this.meta = vrm.meta;
+            this.materials = vrm.materials;
+            this.vrmObject = vrm.scene;
+            console.log(vrm);
+          });
       },
 
       // called while loading is progressing
@@ -173,6 +168,10 @@ export default class Home extends Vue {
 
   public changeTab(tabNumber: Number) {
     this.currentTab = tabNumber;
+  }
+
+  public reloadPage() {
+    location.reload();
   }
 }
 </script>
@@ -225,9 +224,6 @@ export default class Home extends Vue {
 .white-color {
   color: #ffffff;
 }
-.outline {
-  outline: 5px dashed red;
-}
 .margin-area {
   margin: 20px;
 }
@@ -244,15 +240,22 @@ body {
   height: 100%;
 }
 
+#app-bar {
+  z-index: 999;
+}
+
 #main {
   float: none;
   z-index: 0;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #menu {
   float: right;
   width: 30%;
+  height: 90%;
   z-index: 9;
   position: relative;
 }

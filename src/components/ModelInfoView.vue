@@ -47,10 +47,10 @@ import ShowBoneButton from "@/components/ShowBoneButton.vue";
 })
 export default class ModelInfoView extends Vue {
   @Prop()
-  public materials: THREE.Material[] | undefined | null = null;
+  public materials!: THREE.Material[] | null;
 
   @Prop()
-  public vrmObject: THREE.Scene | THREE.Group | null = null;
+  public vrmObject!: THREE.Scene | THREE.Group | null;
 
   public getMeshCount(objects: Arrays): Number {
     return objects.filter((object) =>
@@ -59,20 +59,17 @@ export default class ModelInfoView extends Vue {
   }
 
   public getPolygonCount(objects: Arrays): Number {
-    return (
-      objects
-        .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
-        .map((object) => {
-          if (object.type === "Group") {
-            return object.children
-              .map((mesh) => (mesh as VRMSkinnedMesh).geometry.groups[0].count)
-              .reduce((sum, value) => sum + value, 0);
-          } else {
-            return (object as VRMSkinnedMesh).geometry.groups[0].count;
-          }
-        })
-        .reduce((sum, value) => sum + value, 0) / 3
-    );
+    return objects
+      .filter((object) => ["Group", "SkinnedMesh"].includes(object.type))
+      .map((object) => {
+        if (object.type === "Group") {
+          return (object.children[0] as VRMSkinnedMesh).geometry.attributes
+            .position.count;
+        } else {
+          return (object as VRMSkinnedMesh).geometry.attributes.position.count;
+        }
+      })
+      .reduce((sum, value) => sum + value, 0);
   }
 
   public getBoneCount(objects: Arrays): Number {
