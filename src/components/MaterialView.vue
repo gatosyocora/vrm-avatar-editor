@@ -4,40 +4,10 @@
       v-for="(materialInfo, index) in toUniqueMaterialInfos(materials)"
       :key="index"
     >
-      <v-card dark class="card">
-        <v-list-item three-line>
-          <v-list-item-content>
-            <v-list-item-title class="headline">
-              {{ materialInfo.material.name }}
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ materialInfo.material.userData.vrmMaterialProperties.shader }}
-            </v-list-item-subtitle>
-            <v-list-item-subtitle>
-              <div v-if="materialInfo.material.side === 0">FrontSide</div>
-              <div v-else-if="materialInfo.material.side === 1">BackSide</div>
-              <div v-else>BothSide</div>
-            </v-list-item-subtitle>
-            <v-slider
-              min="0"
-              step="0.01"
-              max="1"
-              v-model="materialInfo.value"
-              @change="changeHsv(materialInfo)"
-            ></v-slider>
-          </v-list-item-content>
-
-          <v-list-item-avatar
-            size="80"
-            v-if="materialInfo.material.color"
-            :color="convertRGB2Hex(materialInfo.material.color)"
-          />
-          <ImageBitmapImg
-            v-if="materialInfo.material.map && materialInfo.material.map.image"
-            :imageBitmap="materialInfo.material.map.image"
-          />
-        </v-list-item>
-      </v-card>
+      <MaterialItem
+        :materialInfo="materialInfo"
+        @onChangeMaterial="changeMaterial"
+      />
     </div>
   </div>
 </template>
