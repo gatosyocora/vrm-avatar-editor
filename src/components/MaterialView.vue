@@ -13,11 +13,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import * as THREE from "three";
 
 import MaterialItem from "@/components/MaterialItem.vue";
-import { MeshBasicMaterial, MeshStandardMaterial } from "three";
 
 interface MaterialInfo {
   name: string;
@@ -25,8 +24,6 @@ interface MaterialInfo {
   indices: Array<number>;
   value: number;
 }
-
-type HasMapMaterial = MeshBasicMaterial | MeshStandardMaterial;
 
 @Component({
   components: { MaterialItem },
