@@ -1076,7 +1076,9 @@ const toOutputSecondaryAnimation = (
             y: group.colliders[0].position.y,
             z: group.colliders[0].position.z,
           },
-          radius: group.colliders[0].geometry.boundingSphere?.radius,
+          radius: group.colliders[0].geometry.boundingSphere
+            ? group.colliders[0].geometry.boundingSphere.radius
+            : undefined,
         },
       ],
       node: group.node,
