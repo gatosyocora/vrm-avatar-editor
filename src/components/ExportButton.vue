@@ -1,5 +1,5 @@
 <template>
-  <v-btn block color="primary" :disabled="vrm === null" @click="exportVRM">
+  <v-btn block color="primary" :disabled="!vrm" @click="exportVRM">
     Export VRM (beta)
   </v-btn>
 </template>
