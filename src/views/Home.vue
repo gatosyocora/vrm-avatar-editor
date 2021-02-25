@@ -22,7 +22,7 @@
         <v-icon>mdi-cached</v-icon>
       </v-btn>
     </v-app-bar>
-    <p id="message">
+    <p id="message" class="unselectable">
       ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
     </p>
     <div id="menu" class="full-height">
@@ -63,7 +63,7 @@
           class="layer2 layer full"
           @onDropFile="loadVrm"
         >
-          <div class="white-color">
+          <div class="white-color unselectable">
             <center>
               VRMをドラッグ&ドロップ<br />
               <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
@@ -263,6 +263,13 @@ export default class Home extends Vue {
 
 .v-data-table__wrapper tr:hover {
   background: white !important;
+}
+
+.unselectable {
+  user-select: none; /* CSS3 */
+  -moz-user-select: none; /* Firefox */
+  -webkit-user-select: none; /* Safari、Chromeなど */
+  -ms-user-select: none; /* IE10以降 */
 }
 
 body {
