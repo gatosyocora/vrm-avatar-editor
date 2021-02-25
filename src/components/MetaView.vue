@@ -15,27 +15,27 @@
           <td>{{ meta.author }}</td>
         </tr>
         <tr>
-          <td>AllowUser</td>
+          <td>Allow User</td>
           <td>{{ meta.allowedUserName }}</td>
         </tr>
         <tr>
-          <td>CommercialUssage</td>
+          <td>Commercial Ussage</td>
           <td>{{ meta.commercialUssageName }}</td>
         </tr>
         <tr>
-          <td>SexualUssage</td>
+          <td>Sexual Ussage</td>
           <td>{{ meta.sexualUssageName }}</td>
         </tr>
         <tr>
-          <td>ViolentUssage</td>
+          <td>Violent Ussage</td>
           <td>{{ meta.violentUssageName }}</td>
         </tr>
         <tr>
-          <td>LicenseName</td>
+          <td>License Name</td>
           <td>{{ meta.licenseName }}</td>
         </tr>
         <tr>
-          <td>OtherLicense</td>
+          <td>Other License</td>
           <td>
             <a :href="meta.otherLicenseUrl" target="_blank">
               {{ meta.otherLicenseUrl }}
@@ -43,7 +43,7 @@
           </td>
         </tr>
         <tr>
-          <td>OtherPermission</td>
+          <td>Other Permission</td>
           <td>
             <a :href="meta.otherPermissionUrl" target="_blank">
               {{ meta.otherPermissionUrl }}
@@ -51,7 +51,7 @@
           </td>
         </tr>
         <tr>
-          <td>ContactInformation</td>
+          <td>Contact Information</td>
           <td>
             <a :href="meta.contactInformation" target="_blank">
               {{ meta.contactInformation }}
@@ -74,7 +74,7 @@
           </td>
         </tr>
         <tr>
-          <td>ExporterVersion</td>
+          <td>Exporter Version</td>
           <td>{{ exporterVersion }}</td>
         </tr>
       </tbody>
