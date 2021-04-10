@@ -1,4 +1,4 @@
-# vrm-avatar-editor
+# VRM Avatar Editor
 Web Application Editting VRM Avatar
 
 Access↓  
