@@ -13,13 +13,13 @@
           <div v-else-if="materialInfo.material.side === 1">BackSide</div>
           <div v-else>BothSide</div>
         </v-list-item-subtitle>
-        <v-slider
+        <!--<v-slider
           min="0"
           step="0.01"
           max="1"
           v-model="materialInfo.value"
           @change="changeHsv(materialInfo)"
-        ></v-slider>
+        ></v-slider>-->
       </v-list-item-content>
 
       <v-list-item-avatar
