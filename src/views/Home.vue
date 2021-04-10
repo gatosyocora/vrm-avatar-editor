@@ -14,7 +14,7 @@
         >GitHub</v-btn
       >
       <v-btn
-        href="https://github.com/gatosyocora/vrm-avatar-editor/blob/master/README.md"
+        href="https://github.com/gatosyocora/vrm-avatar-editor/blob/main/README.md"
         target="_blank"
         >License</v-btn
       >
