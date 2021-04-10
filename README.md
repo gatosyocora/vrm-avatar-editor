@@ -1,6 +1,9 @@
 # VRM Avatar Editor
 Web Application Editting VRM Avatar
 
+This is WIP.  
+Unintended behavior may occur.
+
 ## Usage
 1. Access this link.  
 https://gatosyocora.github.io/vrm-avatar-editor/
