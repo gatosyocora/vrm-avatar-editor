@@ -58,12 +58,14 @@ export default class ShowBoneButton extends Vue {
       });
     }
 
-    const lineGeometry = new THREE.Geometry();
+    const lineGeometry = new THREE.BufferGeometry();
     if (parentNode) {
-      lineGeometry.vertices.push(
+      const points = new Array<THREE.Vector3>();
+      points.push(
         parentNode.getWorldPosition(new Vector3(0, 0, 0)),
         node.getWorldPosition(new Vector3(0, 0, 0))
       );
+      lineGeometry.setFromPoints(points);
     }
     const newLine = new THREE.Line(lineGeometry, material);
     newLine.name = node.name;
