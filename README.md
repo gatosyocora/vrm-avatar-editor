@@ -1,8 +1,12 @@
 # VRM Avatar Editor
 Web Application Editting VRM Avatar
 
-Access↓  
+## Usage
+1. Access this link.  
 https://gatosyocora.github.io/vrm-avatar-editor/
+2. Select or Drag & Drop VRM file to browser window.
+3. Check or Edit avatar.
+4. [WIP] Click "Export VRM" if export editted avatar .
 
 ## Environment
 * Vue.js
