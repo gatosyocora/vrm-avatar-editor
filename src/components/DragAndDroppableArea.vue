@@ -1,5 +1,6 @@
 <template>
   <div
+    class="fit-inline"
     :class="{ outline: isDragOver }"
     @dragover.prevent="onDrag('over')"
     @dragleave.prevent="onDrag('leave')"
@@ -31,6 +32,9 @@ export default class DragAndDroppableArea extends Vue {
 }
 </script>
 <style>
+.fit-inline {
+  display: inline-block;
+}
 .outline {
   outline: 5px dashed red;
 }
