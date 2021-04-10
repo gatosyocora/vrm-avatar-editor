@@ -28,7 +28,7 @@ export default class VRMCanvasView extends Vue {
     0.1,
     1000
   );
-  private light = new THREE.DirectionalLight(0xffffff, 2);
+  private light = new THREE.DirectionalLight(0xffffff, 1);
   private gridHelper = new THREE.GridHelper(10, 10);
   private axesHelper = new THREE.AxesHelper(5);
   private controls: OrbitControls | null = null;

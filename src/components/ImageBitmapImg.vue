@@ -1,7 +1,7 @@
 <template>
-  <div style="margin: 0 10px 0 10px">
+  <div style="margin: 0 10px 0 10px; display: inline-block">
     <v-hover v-slot="{ hover }">
-      <v-list-item-avatar rounded size="80" color="white">
+      <v-list-item-avatar rounded size="80" color="white" style="margin: 5px">
         <v-img v-if="imageBitmap" :src="convertImageBitmap2Base64(imageBitmap)">
           <div v-if="showInfo && hover" class="tex-info unselectable">
             {{ imageBitmap.width }}x{{ imageBitmap.height }}

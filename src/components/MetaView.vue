@@ -15,27 +15,27 @@
           <td>{{ meta.author }}</td>
         </tr>
         <tr>
-          <td>AllowUser</td>
+          <td>Allow User</td>
           <td>{{ meta.allowedUserName }}</td>
         </tr>
         <tr>
-          <td>CommercialUssage</td>
+          <td>Commercial Ussage</td>
           <td>{{ meta.commercialUssageName }}</td>
         </tr>
         <tr>
-          <td>SexualUssage</td>
+          <td>Sexual Ussage</td>
           <td>{{ meta.sexualUssageName }}</td>
         </tr>
         <tr>
-          <td>ViolentUssage</td>
+          <td>Violent Ussage</td>
           <td>{{ meta.violentUssageName }}</td>
         </tr>
         <tr>
-          <td>LicenseName</td>
+          <td>License Name</td>
           <td>{{ meta.licenseName }}</td>
         </tr>
         <tr>
-          <td>OtherLicense</td>
+          <td>Other License</td>
           <td>
             <a :href="meta.otherLicenseUrl" target="_blank">
               {{ meta.otherLicenseUrl }}
@@ -43,7 +43,7 @@
           </td>
         </tr>
         <tr>
-          <td>OtherPermission</td>
+          <td>Other Permission</td>
           <td>
             <a :href="meta.otherPermissionUrl" target="_blank">
               {{ meta.otherPermissionUrl }}
@@ -51,7 +51,7 @@
           </td>
         </tr>
         <tr>
-          <td>ContactInformation</td>
+          <td>Contact Information</td>
           <td>
             <a :href="meta.contactInformation" target="_blank">
               {{ meta.contactInformation }}
@@ -74,7 +74,7 @@
           </td>
         </tr>
         <tr>
-          <td>ExporterVersion</td>
+          <td>Exporter Version</td>
           <td>{{ exporterVersion }}</td>
         </tr>
       </tbody>
@@ -92,6 +92,8 @@ import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 
 import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
 import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
+
+import { loadImage } from "@/scripts/ImageUtils.ts";
 
 @Component({
   components: {
@@ -150,19 +152,15 @@ export default class MetaView extends Vue {
     return count;
   }
 
-  public changeIconFile(url: string) {
-    const image = new Image();
-    image.onload = (_) => {
-      Promise.resolve(createImageBitmap(image)).then((data) => {
-        if (this.meta) {
-          if (!this.meta.texture) {
-            this.meta.texture = new THREE.Texture();
-          }
-          this.meta.texture.image = data;
-        }
-      });
-    };
-    image.src = url;
+  public async changeIconFile(url: string) {
+    if (this.meta) {
+      const data = await loadImage(url);
+      if (!data) return;
+      if (!this.meta.texture) {
+        this.meta.texture = new THREE.Texture();
+      }
+      this.meta.texture.image = data;
+    }
   }
 }
 </script>
