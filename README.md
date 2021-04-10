@@ -42,3 +42,7 @@ Unintended behavior may occur.
 - vue-property-decorator [[MITLicense](https://github.com/kaorun343/vue-property-decorator/blob/master/LICENSE)]
 - vue-router [[MITLicense](https://github.com/vuejs/vue-router/blob/dev/LICENSE)]
 - vuetify [[MITLicense](https://github.com/vuetifyjs/vuetify/blob/master/LICENSE.md)]
+
+## Test 3D models
+
+- Shapell (CC0 License) https://booth.pm/ja/items/1349366
