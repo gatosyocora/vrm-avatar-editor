@@ -18,6 +18,20 @@ Unintended behavior may occur.
 - Vue.js
 - TypeScript
 
+## Features
+
+- [x] Load vrm
+- [x] Show meta data
+- [x] Show model data
+- [x] Change icon
+- [x] Change base texture in material
+- [x] Export vrm
+- [ ] Remove meshes
+- [ ] Polygon reduction
+- [ ] Change texture color
+- [ ] Set BlendShape
+- [ ] Support mobile device
+
 ## Library
 
 - three-vrm [[MITLicense](https://github.com/pixiv/three-vrm/blob/dev/LICENSE)]
