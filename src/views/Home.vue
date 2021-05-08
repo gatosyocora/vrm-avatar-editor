@@ -41,20 +41,20 @@
             >BlendShape</v-tab
           >
         </v-tabs>
-        <div class="margin-area contents">
-          <div v-show="currentTab === 0">
+        <div class="margin-area full-height">
+          <div v-show="currentTab === 0" class="contents">
             <MetaView :meta="meta" :exporterVersion="exporterVersion" />
           </div>
-          <div v-show="currentTab === 1">
+          <div v-show="currentTab === 1" class="contents">
             <MaterialView
               :materials="materials"
               @onChangeMaterial="updateMaterial"
             />
           </div>
-          <div v-show="currentTab === 2">
+          <div v-show="currentTab === 2" class="contents">
             <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
           </div>
-          <div v-show="currentTab === 3">
+          <div v-show="currentTab === 3" class="contents">
             <BlendShapeView
               :vrmObject="vrmObject"
               @updateBlendShape="updateBlendShape"
@@ -284,6 +284,8 @@ export default class Home extends Vue {
 }
 .contents {
   padding: 10px;
+  overflow-y: scroll;
+  max-height: 750px;
 }
 
 .v-data-table__wrapper tr:hover {
