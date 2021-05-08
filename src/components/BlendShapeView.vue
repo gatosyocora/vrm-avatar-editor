@@ -1,17 +1,21 @@
 <template>
   <div v-if="vrmObject">
     <div
-      v-for="(blendShapeInfo, index) in toBlendShapeInfo(vrmObject)"
-      :key="index"
+      v-for="(blendShapeInfo, meshIndex) in blendShapeInfos"
+      :key="meshIndex"
     >
       <p>{{ blendShapeInfo.meshName }}</p>
-      <div v-for="(morphName, index) in blendShapeInfo.morphNames" :key="index">
+      <div
+        v-for="(morphName, morphIndex) in blendShapeInfo.morphNames"
+        :key="morphIndex"
+      >
         <div>
           <v-slider
+            v-model="blendShapeInfo.morphValues[morphIndex]"
             :label="morphName"
             min="0"
             max="100"
-            @change="updateBlendShape(index)"
+            @change="updateBlendShape(meshIndex, morphIndex)"
           ></v-slider>
         </div>
       </div>
@@ -20,13 +24,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import * as THREE from "three";
 import { Group, Scene, SkinnedMesh } from "three";
 
 interface BlendShapeInfo {
   meshName: string;
   morphNames: Array<string>;
+  morphValues: Array<number>;
 }
 
 @Component
@@ -34,8 +39,11 @@ export default class BlendShapeView extends Vue {
   @Prop()
   public vrmObject: THREE.Scene | THREE.Group | null = null;
 
-  public toBlendShapeInfo(vrmObject: Scene | Group): Array<BlendShapeInfo> {
-    return vrmObject.children
+  public blendShapeInfos: Array<BlendShapeInfo> | undefined = undefined;
+
+  @Watch("vrmObject")
+  public LoadBlendShapeInfos(vrmObject: Scene | Group) {
+    this.blendShapeInfos = vrmObject.children
       .filter((child) => child.type === "Group" || child.type === "SkinnedMesh")
       .map((child) => {
         const mesh = (child.type === "Group"
@@ -44,12 +52,17 @@ export default class BlendShapeView extends Vue {
         return {
           meshName: child.name,
           morphNames: Object.keys(mesh.morphTargetDictionary!),
+          morphValues: Object.keys(mesh.morphTargetDictionary!).map((_) => 0),
         };
       });
   }
 
-  public updateBlendShape(index: number) {
-    this.$emit("updateBlendShape", index);
+  public updateBlendShape(meshIndex: number, morphIndex: number) {
+    var value = 0;
+    if (this.blendShapeInfos) {
+      value = this.blendShapeInfos[meshIndex].morphValues[morphIndex];
+    }
+    this.$emit("updateBlendShape", { index: morphIndex, value: value });
   }
 }
 </script>
