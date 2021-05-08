@@ -49,7 +49,10 @@
             <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
           </div>
           <div v-show="currentTab === 3">
-            <BlendShapeView :vrmObject="vrmObject" />
+            <BlendShapeView
+              :vrmObject="vrmObject"
+              @updateBlendShape="updateBlendShape($event, index)"
+            />
           </div>
           <ExportButton :vrm="vrm" />
         </div>
@@ -181,6 +184,20 @@ export default class Home extends Vue {
 
   public changeTab(tabNumber: Number) {
     this.currentTab = tabNumber;
+  }
+
+  public updateBlendShape(index: number) {
+    this.vrmObject?.children
+      .filter((child) => child.type === "Group" || child.type === "SkinnedMesh")
+      .map((child) => {
+        const mesh = (child.type === "Group"
+          ? child.children[0]
+          : child) as THREE.SkinnedMesh;
+
+        if (mesh.morphTargetInfluences) {
+          mesh.morphTargetInfluences[index] = 1;
+        }
+      });
   }
 }
 </script>

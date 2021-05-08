@@ -7,7 +7,12 @@
       <p>{{ blendShapeInfo.meshName }}</p>
       <div v-for="(morphName, index) in blendShapeInfo.morphNames" :key="index">
         <div>
-          <v-slider :label="morphName" min="0" max="100"></v-slider>
+          <v-slider
+            :label="morphName"
+            min="0"
+            max="100"
+            @change="updateBlendShape(index)"
+          ></v-slider>
         </div>
       </div>
     </div>
@@ -41,6 +46,10 @@ export default class BlendShapeView extends Vue {
           morphNames: Object.keys(mesh.morphTargetDictionary!),
         };
       });
+  }
+
+  public updateBlendShape(index: number) {
+    this.$emit("updateBlendShape", index);
   }
 }
 </script>
