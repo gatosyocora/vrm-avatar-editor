@@ -51,6 +51,26 @@ type VRMMaterial = MeshBasicMaterial | MeshStandardMaterial | MToonMaterial;
 
 export default class VRMExporter {
   parse(vrm: VRM, onDone: (buffer: ArrayBuffer) => void): void {
+    const [outputData, bufferViews] = this.convertOutputData(vrm);
+
+    const jsonChunk = new GlbChunk(
+      parseString2Binary(JSON.stringify(outputData, undefined, 2)),
+      "JSON"
+    );
+    const binaryChunk = new GlbChunk(
+      concatBinary(bufferViews.map((buf) => buf.buffer)),
+      "BIN\x00"
+    );
+    const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
+    const header = concatBinary([
+      parseString2Binary("glTF"),
+      parseNumber2Binary(2, 4),
+      parseNumber2Binary(fileData.byteLength + 12, 4),
+    ]);
+    onDone(concatBinary([header, fileData]));
+  }
+
+  private convertOutputData(vrm: VRM): [OutputVRM, Array<BufferView>] {
     const scene = vrm.scene;
     const humanoid = vrm.humanoid;
     const vrmMeta = vrm.meta;
@@ -560,21 +580,7 @@ export default class VRMExporter {
       textures: outputTextures,
     };
 
-    const jsonChunk = new GlbChunk(
-      parseString2Binary(JSON.stringify(outputData, undefined, 2)),
-      "JSON"
-    );
-    const binaryChunk = new GlbChunk(
-      concatBinary(bufferViews.map((buf) => buf.buffer)),
-      "BIN\x00"
-    );
-    const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
-    const header = concatBinary([
-      parseString2Binary("glTF"),
-      parseNumber2Binary(2, 4),
-      parseNumber2Binary(fileData.byteLength + 12, 4),
-    ]);
-    onDone(concatBinary([header, fileData]));
+    return [outputData, bufferViews];
   }
 }
 
