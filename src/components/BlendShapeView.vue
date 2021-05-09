@@ -51,8 +51,12 @@ export default class BlendShapeView extends Vue {
           : child) as SkinnedMesh;
         return {
           meshName: child.name,
-          morphNames: Object.keys(mesh.morphTargetDictionary!),
-          morphValues: Object.keys(mesh.morphTargetDictionary!).map((_) => 0),
+          morphNames: mesh.morphTargetDictionary
+            ? Object.keys(mesh.morphTargetDictionary)
+            : Array<string>(),
+          morphValues: mesh.morphTargetDictionary
+            ? Object.keys(mesh.morphTargetDictionary).map((_) => 0)
+            : Array<number>(),
         };
       });
   }
