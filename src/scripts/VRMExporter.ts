@@ -47,6 +47,11 @@ const SPRINGBONE_COLLIDER_NAME = "vrmColliderSphere";
 
 const EXPORTER_VERSION = "UniVRM-0.64.0";
 
+const CHUNK_TYPE_JSON = "JSON";
+const CHUNK_TYPE_BIN = "BIN\x00";
+const GLTF_VERSION = 2;
+const HEADER_SIZE = 12;
+
 type VRMMaterial = MeshBasicMaterial | MeshStandardMaterial | MToonMaterial;
 
 export default class VRMExporter {
@@ -55,17 +60,17 @@ export default class VRMExporter {
 
     const jsonChunk = new GlbChunk(
       parseString2Binary(JSON.stringify(outputData, undefined, 2)),
-      "JSON"
+      CHUNK_TYPE_JSON
     );
     const binaryChunk = new GlbChunk(
       concatBinary(bufferViews.map((buf) => buf.buffer)),
-      "BIN\x00"
+      CHUNK_TYPE_BIN
     );
     const fileData = concatBinary([jsonChunk.buffer, binaryChunk.buffer]);
     const header = concatBinary([
       parseString2Binary("glTF"),
-      parseNumber2Binary(2, 4),
-      parseNumber2Binary(fileData.byteLength + 12, 4),
+      parseNumber2Binary(GLTF_VERSION, 4),
+      parseNumber2Binary(fileData.byteLength + HEADER_SIZE, 4),
     ]);
     onDone(concatBinary([header, fileData]));
   }
