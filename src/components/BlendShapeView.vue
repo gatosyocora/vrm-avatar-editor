@@ -15,7 +15,7 @@
             :label="morphName"
             min="0"
             max="100"
-            @change="updateBlendShape(meshIndex, morphIndex)"
+            @input="updateBlendShape(meshIndex, morphIndex)"
           ></v-slider>
         </div>
       </div>
