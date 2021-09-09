@@ -287,9 +287,8 @@ export default class Home extends Vue {
   margin: 20px;
 }
 .contents {
-  padding: 10px;
   overflow-y: scroll;
-  max-height: 750px;
+  height: 90%;
 }
 
 .v-data-table__wrapper tr:hover {
