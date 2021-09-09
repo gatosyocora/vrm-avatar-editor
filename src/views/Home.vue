@@ -74,8 +74,11 @@
         >
           <div class="white-color unselectable">
             <center>
-              VRMをドラッグ&ドロップ<br />
-              <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
+              VRMをドラッグ&ドロップ<br><br>
+              <label class="my-file-button black--text">
+                ファイルを選択
+                <input type="file" @change="onFileChange" accept=".vrm" />
+              </label>
             </center>
           </div>
         </DragAndDroppableArea>
@@ -297,6 +300,16 @@ export default class Home extends Vue {
   -moz-user-select: none; /* Firefox */
   -webkit-user-select: none; /* Safari、Chromeなど */
   -ms-user-select: none; /* IE10以降 */
+}
+.my-file-button input {
+  display: none;
+}
+
+.my-file-button {
+  background-color: #d3d3d3;
+  padding: 8px;
+  border-radius: 2px;
+  font-weight: bold;
 }
 
 body {
