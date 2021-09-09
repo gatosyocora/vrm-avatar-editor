@@ -25,7 +25,7 @@
     <p id="message" class="unselectable">
       ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
     </p>
-    <div id="menu" class="full-height">
+    <div id="menu">
       <v-card class="full-height">
         <v-tabs fixed-tabs dark>
           <v-tab @click="changeTab(0)" :class="{ active: currentTab === 0 }"
