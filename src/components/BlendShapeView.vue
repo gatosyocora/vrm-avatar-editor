@@ -4,23 +4,21 @@
       v-for="(blendShapeInfo, meshIndex) in blendShapeInfos"
       :key="meshIndex"
     >
-      <div v-if="blendShapeInfo.morphNames.length > 0">
-        <p>{{ blendShapeInfo.meshName }}</p>
-        <div
+      <v-list v-if="blendShapeInfo.morphNames.length > 0">
+        <v-subheader>{{ blendShapeInfo.meshName }}</v-subheader>
+        <v-list-item
           v-for="(morphName, morphIndex) in blendShapeInfo.morphNames"
           :key="morphIndex"
         >
-          <div>
-            <v-slider
-              v-model="blendShapeInfo.morphValues[morphIndex]"
-              :label="morphName"
-              min="0"
-              max="100"
-              @input="updateBlendShape(meshIndex, morphIndex)"
-            ></v-slider>
-          </div>
-        </div>
-      </div>
+          <v-slider
+            v-model="blendShapeInfo.morphValues[morphIndex]"
+            :label="morphName"
+            min="0"
+            max="100"
+            @input="updateBlendShape(meshIndex, morphIndex)"
+          />
+        </v-list-item>
+      </v-list>
     </div>
   </div>
 </template>
