@@ -41,7 +41,7 @@
             >BlendShape</v-tab
           >
         </v-tabs>
-        <div class="margin-area full-height">
+        <div class="full-height">
           <div v-show="currentTab === 0" class="contents">
             <MetaView :meta="meta" :exporterVersion="exporterVersion">
               <ExportButton :vrm="vrm" />
@@ -269,7 +269,8 @@ export default class Home extends Vue {
   height: 100%;
 }
 .full-height {
-  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
 }
 .layer1 {
   z-index: 1;
