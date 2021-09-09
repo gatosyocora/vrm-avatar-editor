@@ -79,6 +79,7 @@
         </tr>
       </tbody>
     </v-simple-table>
+    <slot></slot>
   </div>
 </template>
 

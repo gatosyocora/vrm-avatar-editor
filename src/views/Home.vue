@@ -43,7 +43,9 @@
         </v-tabs>
         <div class="margin-area full-height">
           <div v-show="currentTab === 0" class="contents">
-            <MetaView :meta="meta" :exporterVersion="exporterVersion" />
+            <MetaView :meta="meta" :exporterVersion="exporterVersion">
+              <ExportButton :vrm="vrm" />
+            </MetaView>
           </div>
           <div v-show="currentTab === 1" class="contents">
             <MaterialView
@@ -60,7 +62,6 @@
               @updateBlendShape="updateBlendShape"
             />
           </div>
-          <ExportButton :vrm="vrm" />
         </div>
       </v-card>
     </div>
