@@ -290,6 +290,7 @@ export default class Home extends Vue {
 .contents {
   overflow-y: scroll;
   height: 90%;
+  padding: 10px;
 }
 
 .v-data-table__wrapper tr:hover {
