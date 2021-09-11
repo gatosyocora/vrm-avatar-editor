@@ -289,7 +289,7 @@ export default class Home extends Vue {
 }
 .contents {
   overflow-y: scroll;
-  height: 90%;
+  height: 90vh;
   padding: 10px;
 }
 
