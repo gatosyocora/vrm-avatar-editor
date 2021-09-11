@@ -25,7 +25,7 @@
     <p id="message" class="unselectable">
       ローカル環境で処理しているため、VRMファイルをサーバーにアップロードしていません。
     </p>
-    <div id="menu" class="full-height">
+    <div id="menu">
       <v-card class="full-height">
         <v-tabs fixed-tabs dark>
           <v-tab @click="changeTab(0)" :class="{ active: currentTab === 0 }"
@@ -37,21 +37,31 @@
           <v-tab @click="changeTab(2)" :class="{ active: currentTab === 2 }"
             >Model</v-tab
           >
+          <v-tab @click="changeTab(3)" :class="{ active: currentTab === 3 }"
+            >BlendShape</v-tab
+          >
         </v-tabs>
-        <div class="margin-area contents">
-          <div v-show="currentTab === 0">
-            <MetaView :meta="meta" :exporterVersion="exporterVersion" />
+        <div class="full-height">
+          <div v-show="currentTab === 0" class="contents">
+            <MetaView :meta="meta" :exporterVersion="exporterVersion">
+              <ExportButton :vrm="vrm" />
+            </MetaView>
           </div>
-          <div v-show="currentTab === 1">
+          <div v-show="currentTab === 1" class="contents">
             <MaterialView
               :materials="materials"
               @onChangeMaterial="updateMaterial"
             />
           </div>
-          <div v-show="currentTab === 2">
+          <div v-show="currentTab === 2" class="contents">
             <ModelInfoView :vrmObject="vrmObject" :materials="materials" />
           </div>
-          <ExportButton :vrm="vrm" />
+          <div v-show="currentTab === 3" class="contents">
+            <BlendShapeView
+              :vrmObject="vrmObject"
+              @updateBlendShape="updateBlendShape"
+            />
+          </div>
         </div>
       </v-card>
     </div>
@@ -65,8 +75,11 @@
         >
           <div class="white-color unselectable">
             <center>
-              VRMをドラッグ&ドロップ<br />
-              <p><input type="file" @change="onFileChange" accept=".vrm" /></p>
+              VRMをドラッグ&ドロップ<br /><br />
+              <label class="my-file-button black--text">
+                ファイルを選択
+                <input type="file" @change="onFileChange" accept=".vrm" />
+              </label>
             </center>
           </div>
         </DragAndDroppableArea>
@@ -94,6 +107,7 @@ import {
   MeshStandardMaterial,
   SkinnedMesh,
 } from "three";
+import BlendShapeView from "@/components/BlendShapeView.vue";
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -107,6 +121,7 @@ interface HTMLInputEvent extends Event {
     ModelInfoView,
     ExportButton,
     DragAndDroppableArea,
+    BlendShapeView,
   },
 })
 export default class Home extends Vue {
@@ -203,6 +218,20 @@ export default class Home extends Vue {
   public reloadPage() {
     location.reload();
   }
+
+  public updateBlendShape(args: any) {
+    this.vrmObject?.children
+      .filter((child) => child.type === "Group" || child.type === "SkinnedMesh")
+      .map((child) => {
+        const mesh = (child.type === "Group"
+          ? child.children[0]
+          : child) as THREE.SkinnedMesh;
+
+        if (mesh.morphTargetInfluences) {
+          mesh.morphTargetInfluences[args.index] = args.value / 100;
+        }
+      });
+  }
 }
 </script>
 <style>
@@ -258,6 +287,8 @@ export default class Home extends Vue {
   margin: 20px;
 }
 .contents {
+  overflow-y: scroll;
+  height: 90vh;
   padding: 10px;
 }
 
@@ -271,10 +302,22 @@ export default class Home extends Vue {
   -webkit-user-select: none; /* Safari、Chromeなど */
   -ms-user-select: none; /* IE10以降 */
 }
+.my-file-button input {
+  display: none;
+}
 
+.my-file-button {
+  background-color: #d3d3d3;
+  padding: 8px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+html,
 body {
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 #app-bar {
@@ -292,7 +335,7 @@ body {
 #menu {
   float: right;
   width: 30%;
-  height: 90%;
+  height: 100%;
   z-index: 9;
   position: relative;
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="!isShowing ? showBone() : hideBone()">
+  <v-btn style="width: 50px" @click="!isShowing ? showBone() : hideBone()">
     <div v-if="!isShowing">Show</div>
     <div v-else>Hide</div>
   </v-btn>

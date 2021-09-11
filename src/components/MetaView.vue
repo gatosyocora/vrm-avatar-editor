@@ -79,6 +79,7 @@
         </tr>
       </tbody>
     </v-simple-table>
+    <slot></slot>
   </div>
 </template>
 
@@ -93,7 +94,7 @@ import { Arrays, VRMSkinnedMesh, VRMGroup } from "@/scripts/VRMInterface";
 import ImageBitmapImg from "@/components/ImageBitmapImg.vue";
 import DragAndDroppableArea from "@/components/DragAndDroppableArea.vue";
 
-import { loadImage } from "@/scripts/ImageUtils.ts";
+import { loadImage } from "@/scripts/ImageUtils";
 
 @Component({
   components: {
