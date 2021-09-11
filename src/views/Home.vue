@@ -75,7 +75,7 @@
         >
           <div class="white-color unselectable">
             <center>
-              VRMをドラッグ&ドロップ<br><br>
+              VRMをドラッグ&ドロップ<br /><br />
               <label class="my-file-button black--text">
                 ファイルを選択
                 <input type="file" @change="onFileChange" accept=".vrm" />
