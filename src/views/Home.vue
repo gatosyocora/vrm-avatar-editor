@@ -269,8 +269,7 @@ export default class Home extends Vue {
   height: 100%;
 }
 .full-height {
-  max-height: 100%;
-  overflow-y: auto;
+  height: 100%;
 }
 .layer1 {
   z-index: 1;
@@ -336,7 +335,7 @@ body {
 #menu {
   float: right;
   width: 30%;
-  height: 90%;
+  height: 100%;
   z-index: 9;
   position: relative;
 }
